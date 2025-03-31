@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layoutDirection="ltr">
+
+    <ImageView
+        android:id="@+id/ivIntro"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:src="@color/colorError"
+        app:layout_constraintBottom_toTopOf="@+id/tvTitle"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginBottom="16dp"/>
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:fontFamily="@font/nunito_sans_bold"
+        android:gravity="center"
+        android:textColor="@color/colorTextTitle"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/tvMessage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="@string/title_intro_1"
+        android:layout_marginBottom="8dp"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:fontFamily="@font/nunito_sans_regular"
+        android:gravity="center"
+        android:textColor="@color/colorTextTitle"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/message_intro_1"
+        app:layout_constraintVertical_bias="0.9"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

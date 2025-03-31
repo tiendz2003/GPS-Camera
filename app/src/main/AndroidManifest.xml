@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:name=".MyApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.BaseProject"
+        tools:targetApi="31">
+        <activity
+            android:name=".presentation.hometab.activities.VideoLibraryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.hometab.activities.TemplatesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.hometab.activities.ShowMediaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.hometab.activities.SelectImageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.hometab.activities.ImagesSavedActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.hometab.activities.DetailTemplateActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.hometab.activities.CustomPhotoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.hometab.activities.AlbumLibraryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.BaseProject" />
+        <activity
+            android:name=".presentation.hometab.activities.MainActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".presentation.hometab.activities.IntroActivity"
+            android:enableOnBackInvokedCallback="true"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".presentation.hometab.activities.LanguageActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".presentation.hometab.activities.SplashActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/admob_app_id" />
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/fb_app_id" />
+        <meta-data
+            android:name="com.facebook.sdk.ClientToken"
+            android:value="@string/facebook_client_token" />
+    </application>
+
+</manifest>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="12dp"
+    android:layout_margin="6dp"
+    android:background="@drawable/bg_language_unselected"
+    android:gravity="center_vertical">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivLanguage"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/ic_english"/>
+
+    <TextView
+        android:id="@+id/language_name"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginStart="12dp"
+        android:fontFamily="@font/nunito_sans_regular"
+        android:gravity="start|center_vertical"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:text="@string/english"
+        android:textColor="@color/colorTextTitle"
+        android:textSize="14sp"
+        android:includeFontPadding="false"/>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_weight="1" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_checked_language"
+        android:id="@+id/ivRadio"/>
+
+</LinearLayout>

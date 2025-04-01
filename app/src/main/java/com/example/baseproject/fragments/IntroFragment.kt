@@ -22,17 +22,17 @@ class IntroFragment : BaseFragment<FragmentIntroBinding>(FragmentIntroBinding::i
     private fun fragmentPosition(position: Int) {
         when (position) {
             0 -> {
-                Glide.with(this).load(R.color.colorError).into(binding.ivIntro)
+                Glide.with(this).load(R.drawable.img_intro_1).into(binding.ivIntro)
                 binding.tvTitle.text = getString(R.string.title_intro_1)
                 binding.tvMessage.text = getString(R.string.message_intro_1)
             }
             1 -> {
-                Glide.with(this).load(R.color.colorSecondary).into(binding.ivIntro)
+                Glide.with(this).load(R.drawable.img_intro_2).into(binding.ivIntro)
                 binding.tvTitle.text = getString(R.string.title_intro_2)
                 binding.tvMessage.text = getString(R.string.message_intro_2)
             }
             else -> {
-                Glide.with(this).load(R.color.colorPrimary).into(binding.ivIntro)
+                Glide.with(this).load(R.drawable.img_intro_3).into(binding.ivIntro)
                 binding.tvTitle.text = getString(R.string.title_intro_3)
                 binding.tvMessage.text = getString(R.string.message_intro_3)
             }

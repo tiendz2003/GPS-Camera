@@ -40,8 +40,14 @@
             android:theme="@style/Theme.BaseProject" />
         <activity
             android:name=".presentation.hometab.activities.MainActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:exported="true"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".presentation.hometab.activities.IntroActivity"
             android:enableOnBackInvokedCallback="true"
@@ -53,13 +59,9 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.hometab.activities.SplashActivity"
-            android:exported="true"
+            android:exported="false"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <meta-data

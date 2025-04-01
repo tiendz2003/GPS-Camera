@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layoutDirection="ltr"
-    android:background="@color/white">
+    android:background="@color/neutralWhite">
 
     <RelativeLayout
         android:id="@+id/layoutToolbar"
@@ -34,6 +34,7 @@
             android:layout_centerVertical="true"
             android:layout_toEndOf="@id/ivBack"
             android:ellipsize="marquee"
+            android:textStyle="bold"
             android:singleLine="true"
             android:fontFamily="@font/nunito_sans_bold"
             android:text="@string/language"
@@ -41,13 +42,17 @@
             android:textSize="20sp"
             android:layout_marginStart="12dp"/>
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <TextView
             android:id="@+id/ivDone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="72dp"
+            android:layout_height="40dp"
+            android:text="Apply"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:background="@drawable/rounded_blue_button"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/ic_done"
             android:layout_marginEnd="12dp"
             android:padding="4dp"/>
 

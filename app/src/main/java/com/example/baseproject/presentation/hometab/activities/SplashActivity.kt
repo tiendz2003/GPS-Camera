@@ -1,5 +1,6 @@
 package com.example.baseproject.presentation.hometab.activities
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Handler
@@ -42,6 +43,13 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(ActivitySplashBinding
                 replaceActivity()
             }, 3000)
         }
+        val animator = ValueAnimator.ofFloat(0f, 1f)
+        animator.duration = 4000
+        animator.addUpdateListener { animation ->
+            val progress = animation.animatedValue as Float
+            binding.progressBar.progress = progress
+        }
+        animator.start()
     }
 
     override fun initActionView() {
@@ -78,12 +86,12 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(ActivitySplashBinding
                 binding.tvLoadingAds.invisible()
                 Handler(Looper.getMainLooper()).postDelayed({
                     replaceActivity()
-                }, 5000)
+                }, 3000)
             } else {
                 binding.tvLoadingAds.invisible()
                 Handler(Looper.getMainLooper()).postDelayed({
                     replaceActivity()
-                }, 5000)
+                }, 3000)
             }
         })
     }

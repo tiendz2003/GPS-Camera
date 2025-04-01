@@ -31,11 +31,9 @@ class LanguageAdapter(private val context: Context, private val languageList: Mu
         val language = languageList[position]
         if (selectedLanguage == language){
             holder.binding.layoutRoot.setBackgroundResource(R.drawable.bg_language_selected)
-            holder.binding.ivRadio.setImageResource(R.drawable.ic_checked_language)
             holder.binding.languageName.typeface = ResourcesCompat.getFont(context, R.font.nunito_sans_semi_bold)
         }else{
             holder.binding.layoutRoot.setBackgroundResource(R.drawable.bg_language_unselected)
-            holder.binding.ivRadio.setImageResource(R.drawable.ic_unchecked_language)
             holder.binding.languageName.typeface = ResourcesCompat.getFont(context, R.font.nunito_sans_regular)
         }
 

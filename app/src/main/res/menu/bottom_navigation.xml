@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/home_icon_selector"
+        android:title="Home"/>
+    <item
+    android:id="@+id/placeholder"
+    android:title=""
+    android:enabled="false" />
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/setting_icon_selector"
+        android:title="Settings"/>
+</menu>

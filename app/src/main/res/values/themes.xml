@@ -1,9 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.BaseProject" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <style name="Base.Theme.BaseProject" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="fontFamily">@font/nunito_sans_regular</item>
     </style>
 
     <style name="Theme.BaseProject" parent="Base.Theme.BaseProject" />
+    <style name="BottomNavigationTextStyle" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">14sp</item>
+        <item name="android:paddingTop">8dp</item>
+    </style>
 </resources>

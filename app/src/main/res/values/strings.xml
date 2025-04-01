@@ -35,6 +35,8 @@
     <string name="previous">Previous</string>
     <string name="ads_warning">This action can contain ads…</string>
     <string name="start">Start</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

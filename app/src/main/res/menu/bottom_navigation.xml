@@ -8,7 +8,7 @@
     android:title=""
     android:enabled="false" />
     <item
-        android:id="@+id/nav_profile"
+        android:id="@+id/nav_setting"
         android:icon="@drawable/setting_icon_selector"
         android:title="Settings"/>
 </menu>

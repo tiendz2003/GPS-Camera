@@ -1,47 +1,63 @@
 package com.example.baseproject.presentation.hometab.activities
 
 import android.content.Context
+import android.os.Bundle
 import androidx.core.content.ContextCompat
 import com.example.baseproject.bases.BaseActivity
 import com.example.baseproject.databinding.ActivityMainBinding
 import androidx.core.view.get
+import androidx.fragment.app.Fragment
+import com.example.baseproject.R
+import com.example.baseproject.fragments.HomeFragment
+import com.example.baseproject.fragments.SettingsFragment
+import com.example.baseproject.utils.dpToPx
+import com.example.baseproject.utils.updateCornerSize
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 
 class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::inflate) {
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if(savedInstanceState == null){
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragmentContainer, HomeFragment())
+                .commit()
+        }
+    }
     override fun initData() {
 
     }
 
     override fun initView() {
+
         binding.bottomNavigationView.background = null
         binding.bottomNavigationView.menu[1].isEnabled = false
 
         val materialShapeDrawable = binding.bottomAppBar.background as MaterialShapeDrawable
-
-        // Tạo ShapeAppearanceModel mới với góc bo tròn trên
-        // và giữ nguyên các thuộc tính khác của model hiện tại
-        val shapeAppearanceModel = materialShapeDrawable.shapeAppearanceModel.toBuilder()
-            .setTopLeftCornerSize(16f.dpToPx(this))
-            .setTopRightCornerSize(16f.dpToPx(this))
-            .build()
-
-        // Thiết lập model mới và giữ nguyên các thuộc tính đường cong cho FAB
-        materialShapeDrawable.shapeAppearanceModel = shapeAppearanceModel
-
-        // Thiết lập đổ bóng
-        materialShapeDrawable.shadowCompatibilityMode = MaterialShapeDrawable.SHADOW_COMPAT_MODE_ALWAYS
-        materialShapeDrawable.initializeElevationOverlay(this)
-        materialShapeDrawable.elevation = 4f.dpToPx(this)
+        materialShapeDrawable.updateCornerSize(this)
 
     }
 
     override fun initActionView() {
-
+        setupBottomNavigation()
     }
+    private fun setupBottomNavigation (){
+        binding.bottomNavigationView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> replaceFragment(HomeFragment())
+                R.id.nav_setting -> replaceFragment(SettingsFragment())
+            }
+            true
+        }
+    }
+    private fun setupFab(){
+        binding.fab.setOnClickListener {
 
-}
-fun Float.dpToPx(context: Context): Float {
-    return this * context.resources.displayMetrics.density
+        }
+    }
+    private fun replaceFragment(fragment: Fragment){
+        val fragmentTransaction = supportFragmentManager.beginTransaction()
+        fragmentTransaction.replace(R.id.fragmentContainer, fragment).commit()
+    }
 }

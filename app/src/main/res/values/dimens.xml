@@ -3,4 +3,5 @@
     <dimen name="spacing_small">4dp</dimen>
     <dimen name="spacing_medium">8dp</dimen>
     <dimen name="spacing_large">16dp</dimen>
-   </resources>
+    <dimen name="grid_spacing">16dp</dimen>
+</resources>

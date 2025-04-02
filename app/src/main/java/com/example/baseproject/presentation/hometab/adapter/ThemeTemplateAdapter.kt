@@ -8,20 +8,27 @@ import com.example.baseproject.models.TemplateType
 import com.example.baseproject.models.ThemeTemplateModel
 
 class ThemeTemplateAdapter(
-    private val onItemClick: (ThemeTemplateModel) -> Unit
+    private var isFromDetail: Boolean = false,
+    private val onItemClick: (ThemeTemplateModel) -> Unit,
 ): ListAdapter<ThemeTemplateModel, BaseViewHolder>(ThemeTemplateDiffUtil()) {
 
     companion object{
         private const val DAILY = 0
         private const val TRAVEL = 1
         private const val GPS = 2
+        private const val GRID_TEMPLATE = 3
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when(getItem(position).type){
-            TemplateType.DAILY -> DAILY
-            TemplateType.TRAVEL -> TRAVEL
-            TemplateType.GPS -> GPS
+        val item = getItem(position)
+        return if (isFromDetail) {
+            GRID_TEMPLATE
+        } else {
+            when (item.type) {
+                TemplateType.DAILY -> DAILY
+                TemplateType.TRAVEL -> TRAVEL
+                TemplateType.GPS -> GPS
+            }
         }
     }
     override fun onCreateViewHolder(
@@ -32,6 +39,7 @@ class ThemeTemplateAdapter(
             DAILY -> BaseViewHolder.ViewHolder.create(parent)
             TRAVEL -> BaseViewHolder.ViewHolder.create(parent)
             GPS -> BaseViewHolder.ViewHolder.create(parent)
+            GRID_TEMPLATE -> BaseViewHolder.DetailViewHolder.create(parent)
             else -> throw IllegalArgumentException("Looix")
         }
     }

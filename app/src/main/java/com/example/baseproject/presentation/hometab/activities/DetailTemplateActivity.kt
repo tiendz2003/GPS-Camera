@@ -2,14 +2,17 @@ package com.example.baseproject.presentation.hometab.activities
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.baseproject.R
 import com.example.baseproject.bases.BaseActivity
 import com.example.baseproject.databinding.ActivityDetailTemplateBinding
@@ -21,7 +24,7 @@ class DetailTemplateActivity : BaseActivity<ActivityDetailTemplateBinding>(
     ActivityDetailTemplateBinding::inflate
 ) {
     private val allItemsAdapter by lazy {
-        ThemeTemplateAdapter(){
+        ThemeTemplateAdapter(isFromDetail = true){
 
         }
     }
@@ -80,9 +83,27 @@ class DetailTemplateActivity : BaseActivity<ActivityDetailTemplateBinding>(
         binding.rvDetail.apply {
             setHasFixedSize(true)
             adapter = allItemsAdapter
-            Log.d("DetailTemplateActivity", "List size: ${allItemsAdapter.currentList.size}")
+            Log.d("DetailTemplateActivity", "size: ${allItemsAdapter.currentList.size}")
             val gridLayoutManager = GridLayoutManager(this@DetailTemplateActivity, 2)
             layoutManager = gridLayoutManager
+            val spacing = resources.getDimensionPixelSize(R.dimen.grid_spacing)
+            addItemDecoration(object:RecyclerView.ItemDecoration(){
+                override fun getItemOffsets(
+                    outRect: Rect,
+                    view: View,
+                    parent: RecyclerView,
+                    state: RecyclerView.State
+                ) {
+                    val position = parent.getChildAdapterPosition(view)
+                    val column = position % 2
+
+                    outRect.left = spacing - column * spacing / 2
+                    outRect.right =  (column + 1) * spacing / 2
+                    if(position >=2){
+                        outRect.top = spacing
+                    }
+                }
+            })
         }
     }
 }

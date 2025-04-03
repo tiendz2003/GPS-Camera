@@ -14,6 +14,9 @@
         android:theme="@style/Theme.BaseProject"
         tools:targetApi="31">
         <activity
+            android:name=".presentation.hometab.activities.PreviewTemplateActivity"
+            android:exported="false" />
+        <activity
             android:name=".presentation.hometab.activities.VideoLibraryActivity"
             android:exported="false" />
         <activity
@@ -35,13 +38,13 @@
             android:name=".presentation.hometab.activities.CustomPhotoActivity"
             android:exported="false" />
         <activity
-            android:name=".presentation.hometab.activities.AlbumLibraryActivity"
+            android:name=".presentation.hometab.activities.EditAlbumLibraryActivity"
             android:exported="false"
             android:theme="@style/Theme.BaseProject" />
         <activity
             android:name=".presentation.hometab.activities.MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -60,9 +63,7 @@
         <activity
             android:name=".presentation.hometab.activities.SplashActivity"
             android:exported="false"
-            android:screenOrientation="portrait">
-
-        </activity>
+            android:screenOrientation="portrait"></activity>
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

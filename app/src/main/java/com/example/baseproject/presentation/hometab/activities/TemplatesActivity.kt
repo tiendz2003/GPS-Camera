@@ -3,28 +3,30 @@ package com.example.baseproject.presentation.hometab.activities
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.baseproject.bases.BaseActivity
 import com.example.baseproject.databinding.ActivityTemplatesBinding
-import com.example.baseproject.models.TemplateType
-import com.example.baseproject.models.ThemeTemplateModel
-import com.example.baseproject.presentation.custom.HorizontalSpaceItemDecoration
+import com.example.baseproject.data.models.TemplateType
+import com.example.baseproject.data.models.ThemeTemplateModel
 import com.example.baseproject.presentation.hometab.adapter.ThemeTemplateAdapter
-import com.example.baseproject.utils.dpToPx
+import com.example.baseproject.utils.setupHorizontal
 
-class TemplatesActivity : BaseActivity<ActivityTemplatesBinding>(ActivityTemplatesBinding::inflate) {
-    private val dailyAdapter by lazy { ThemeTemplateAdapter {
-        Log.d("TemplatesActivity", "initData: ${it.id}")
-
+class TemplatesActivity :
+    BaseActivity<ActivityTemplatesBinding>(ActivityTemplatesBinding::inflate) {
+    private val dailyAdapter by lazy {
+        ThemeTemplateAdapter {selectedTemplate ->
+            Log.d("TemplatesActivity", "initData: ${selectedTemplate.id}")
+            navToPreview(selectedTemplate)
+        }
     }
+    private val travelAdapter by lazy {
+        ThemeTemplateAdapter {selectedTemplate->
+            navToPreview(selectedTemplate)
+        }
     }
-    private val travelAdapter by lazy { ThemeTemplateAdapter(){
-        Log.d("TemplatesActivity", "initData: $it")
-    }
-    }
-    private val gpsAdapter by lazy { ThemeTemplateAdapter(){
-        Log.d("TemplatesActivity", "initData: $it")
-    }
+    private val gpsAdapter by lazy {
+        ThemeTemplateAdapter {selectedTemplate->
+            navToPreview(selectedTemplate)
+        }
     }
 
 
@@ -60,31 +62,23 @@ class TemplatesActivity : BaseActivity<ActivityTemplatesBinding>(ActivityTemplat
             startActivity(DetailTemplateActivity.getIntent(this, TemplateType.GPS))
         }
     }
+
     private fun setupRecyclerView() {
         binding.rvDaily.apply {
             Log.d("TemplatesActivity", "List size: ${listTheme.size}")
-            binding.rvDaily.addItemDecoration(
-                HorizontalSpaceItemDecoration(16.dpToPx(this@TemplatesActivity),4.dpToPx(this@TemplatesActivity))
-            )
-            binding.rvDaily.setHasFixedSize(true)
-            adapter = dailyAdapter
-            layoutManager = LinearLayoutManager(this@TemplatesActivity, LinearLayoutManager.HORIZONTAL, false)
+            setupHorizontal(dailyAdapter)
         }
         binding.rvTravel.apply {
-            binding.rvTravel.addItemDecoration(
-                HorizontalSpaceItemDecoration(16.dpToPx(this@TemplatesActivity),4.dpToPx(this@TemplatesActivity))
-            )
-            binding.rvTravel.setHasFixedSize(true)
-            adapter = travelAdapter
-            layoutManager = LinearLayoutManager(this@TemplatesActivity, LinearLayoutManager.HORIZONTAL, false)
+            setupHorizontal(travelAdapter)
         }
         binding.rvGPS.apply {
-            binding.rvGPS.addItemDecoration(
-                HorizontalSpaceItemDecoration(16.dpToPx(this@TemplatesActivity),4.dpToPx(this@TemplatesActivity))
-            )
-            binding.rvGPS.setHasFixedSize(true)
-            adapter = gpsAdapter
-            layoutManager = LinearLayoutManager(this@TemplatesActivity, LinearLayoutManager.HORIZONTAL, false)
+            setupHorizontal(gpsAdapter)
         }
+    }
+    fun navToPreview(selectedTemplate: ThemeTemplateModel) {
+        val themeType = selectedTemplate.type
+        val filterList = ThemeTemplateModel.getTemplate().filter { it.type == themeType } as ArrayList<ThemeTemplateModel>
+        val intent = PreviewTemplateActivity.getIntent(this, selectedTemplate, filterList,themeType)
+        startActivity(intent)
     }
 }

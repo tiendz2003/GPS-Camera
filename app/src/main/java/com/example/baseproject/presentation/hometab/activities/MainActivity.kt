@@ -2,6 +2,7 @@ package com.example.baseproject.presentation.hometab.activities
 
 import android.content.Context
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.core.content.ContextCompat
 import com.example.baseproject.bases.BaseActivity
 import com.example.baseproject.databinding.ActivityMainBinding
@@ -19,6 +20,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         if(savedInstanceState == null){
             supportFragmentManager.beginTransaction()
                 .add(R.id.fragmentContainer, HomeFragment())

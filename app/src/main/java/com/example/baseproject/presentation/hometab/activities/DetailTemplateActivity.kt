@@ -8,24 +8,24 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.baseproject.R
 import com.example.baseproject.bases.BaseActivity
 import com.example.baseproject.databinding.ActivityDetailTemplateBinding
-import com.example.baseproject.models.TemplateType
-import com.example.baseproject.models.ThemeTemplateModel
+import com.example.baseproject.data.models.TemplateType
+import com.example.baseproject.data.models.ThemeTemplateModel
 import com.example.baseproject.presentation.hometab.adapter.ThemeTemplateAdapter
 
 class DetailTemplateActivity : BaseActivity<ActivityDetailTemplateBinding>(
     ActivityDetailTemplateBinding::inflate
 ) {
     private val allItemsAdapter by lazy {
-        ThemeTemplateAdapter(isFromDetail = true){
-
+        ThemeTemplateAdapter(isFromDetail = true){selectedTemplate ->
+            val themeType = selectedTemplate.type
+            val filterList = ThemeTemplateModel.getTemplate().filter { it.type == themeType } as ArrayList<ThemeTemplateModel>
+            val intent = PreviewTemplateActivity.getIntent(this, selectedTemplate, filterList,themeType)
+            startActivity(intent)
         }
     }
     companion object{

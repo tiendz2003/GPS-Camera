@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.baseproject.databinding.ItemDetailTemplateBinding
 import com.example.baseproject.databinding.ItemThemeHomeBinding
-import com.example.baseproject.models.ThemeTemplateModel
+import com.example.baseproject.data.models.ThemeTemplateModel
 import com.example.baseproject.utils.loadImageIcon
 
 sealed class BaseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -40,35 +40,4 @@ sealed class BaseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             }
         }
     }
-   /* class TravelViewHolder(private val binding: ItemThemeHomeBinding) : BaseViewHolder(binding.root) {
-        override fun bind(item: ThemeTemplateModel) {
-            Log.d("RecyclerView", "Binding item: ${item.image}")
-            binding.imvTheme.loadImageIcon(item.image)
-        }
-        companion object{
-            fun create(parent: ViewGroup):TravelViewHolder{
-                val binding = ItemThemeHomeBinding.inflate(
-                    android.view.LayoutInflater.from(parent.context),
-                    parent,
-                    false
-                )
-                return TravelViewHolder(binding)
-            }
-        }
-    }
-    class GpsViewHolder(private val binding: ItemThemeHomeBinding) : BaseViewHolder(binding.root) {
-        override fun bind(item: ThemeTemplateModel) {
-            binding.imvTheme.loadImageIcon(item.image)
-        }
-        companion object{
-            fun create(parent: ViewGroup):GpsViewHolder{
-                val binding = ItemThemeHomeBinding.inflate(
-                    android.view.LayoutInflater.from(parent.context),
-                    parent,
-                    false
-                )
-                return GpsViewHolder(binding)
-            }
-        }
-    }*/
 }

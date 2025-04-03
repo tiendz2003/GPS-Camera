@@ -4,8 +4,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.baseproject.bases.BaseViewHolder
-import com.example.baseproject.models.TemplateType
-import com.example.baseproject.models.ThemeTemplateModel
+import com.example.baseproject.data.models.TemplateType
+import com.example.baseproject.data.models.ThemeTemplateModel
 
 class ThemeTemplateAdapter(
     private var isFromDetail: Boolean = false,

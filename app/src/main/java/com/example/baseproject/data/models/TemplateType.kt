@@ -1,4 +1,4 @@
-package com.example.baseproject.models
+package com.example.baseproject.data.models
 
 enum class TemplateType {
     DAILY,

@@ -4,11 +4,12 @@ import android.content.Intent
 import android.util.Log
 import com.example.baseproject.bases.BaseFragment
 import com.example.baseproject.databinding.FragmentHomeBinding
-import com.example.baseproject.models.ThemeTemplateModel
-import com.example.baseproject.presentation.custom.HorizontalSpaceItemDecoration
+import com.example.baseproject.data.models.ThemeTemplateModel
+import com.example.baseproject.presentation.hometab.activities.EditAlbumLibraryActivity
+import com.example.baseproject.presentation.hometab.activities.PreviewTemplateActivity
 import com.example.baseproject.presentation.hometab.activities.TemplatesActivity
 import com.example.baseproject.presentation.hometab.adapter.ThemeTemplateAdapter
-import com.example.baseproject.utils.dpToPx
+import com.example.baseproject.utils.setupHorizontal
 
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::inflate) {
@@ -21,14 +22,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         Log.d("RecyclerView", "List size: ${listTheme.size}")
         adapter = ThemeTemplateAdapter {
             Log.d("RecyclerView", "Binding item: ${it.id}")
+            navToPreview(it)
         }
-        binding.rcvTheme.adapter = adapter
-        binding.rcvTheme.addItemDecoration(
-            HorizontalSpaceItemDecoration(16.dpToPx(requireContext()),4.dpToPx(requireContext()))
-        )
-        binding.rcvTheme.setHasFixedSize(true)
         adapter.submitList(listTheme)
-
+        binding.rcvTheme.setupHorizontal(adapter)
     }
 
     override fun initActionView() {
@@ -36,7 +33,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             val intent = Intent(requireContext(), TemplatesActivity::class.java)
             startActivity(intent)
         }
+        binding.editPhotoCard.setOnClickListener {
+            val intent = Intent(requireContext(), EditAlbumLibraryActivity::class.java)
+            startActivity(intent)
+        }
     }
-
+    fun navToPreview(selectedTemplate: ThemeTemplateModel) {
+        val themeType = selectedTemplate.type
+        val filterList = ThemeTemplateModel.getTemplate().filter { it.type == themeType } as ArrayList<ThemeTemplateModel>
+        val intent = PreviewTemplateActivity.getIntent(requireContext(), selectedTemplate, filterList,themeType)
+        startActivity(intent)
+    }
 
 }

@@ -1,7 +1,7 @@
 package com.example.baseproject.utils
 
 import com.example.baseproject.R
-import com.example.baseproject.models.LanguageModel
+import com.example.baseproject.data.models.LanguageModel
 import com.example.baseproject.utils.Constants.HAWK_LANGUAGE_POSITION
 import com.example.baseproject.utils.Constants.HAWK_RATE_STAR
 import com.orhanobut.hawk.Hawk

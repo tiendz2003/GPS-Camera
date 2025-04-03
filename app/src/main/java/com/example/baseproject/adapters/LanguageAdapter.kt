@@ -8,7 +8,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.baseproject.R
 import com.example.baseproject.databinding.ItemLanguageBinding
-import com.example.baseproject.models.LanguageModel
+import com.example.baseproject.data.models.LanguageModel
 import com.example.baseproject.utils.Common
 
 class LanguageAdapter(private val context: Context, private val languageList: MutableList<LanguageModel>) :

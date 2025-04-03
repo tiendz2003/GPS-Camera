@@ -1,11 +1,15 @@
-package com.example.baseproject.models
+package com.example.baseproject.data.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class ThemeTemplateModel(
     val id: String,
     val image: String,
     var isSelected: Boolean = false,
     val type: TemplateType
-) {
+) : Parcelable{
     companion object{
         fun getTemplate():List<ThemeTemplateModel>{
             val listTemplate = arrayListOf(

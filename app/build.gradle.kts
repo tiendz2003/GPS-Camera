@@ -49,7 +49,7 @@ android {
 }
 
 dependencies {
-
+    implementation("io.insert-koin:koin-android:3.5.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

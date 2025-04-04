@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="RoundedCornerImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+
+    <style name="medium_500">
+        <item name="fontFamily">@font/nunito_sans_medium</item>
+        <item name="fontWeight">500</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="medium_500_v2">
+        <item name="fontFamily">@font/nunito_sans_medium</item>
+        <item name="fontWeight">500</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="bold_700">
+        <item name="fontFamily">@font/nunito_sans_bold</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">17dp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="fontStyle">normal</item>
+    </style>
+</resources>

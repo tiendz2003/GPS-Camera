@@ -49,7 +49,17 @@ android {
 }
 
 dependencies {
-    implementation("io.insert-koin:koin-android:3.5.0")
+    // CameraX Core (Bắt buộc)
+    implementation (libs.androidx.camera.core)
+    // CameraX Lifecycle để tự động quản lý camera theo lifecycle
+    implementation (libs.androidx.camera.lifecycle)
+    // CameraX View để hiển thị preview
+    implementation (libs.androidx.camera.view)
+    // CameraX Extensions (Tùy chọn, dùng để có chế độ HDR, Night Mode...)
+    implementation (libs.androidx.camera.extensions)
+    // CameraX VideoCapture (Nếu muốn quay video)
+    implementation (libs.androidx.camera.video)
+    implementation(libs.koin.android)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

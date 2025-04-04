@@ -14,3 +14,12 @@ data class Photo(
     val albumId: String,
     val dateAdded: Long
 )
+enum class CameraMode {
+    PHOTO,
+    VIDEO
+}
+enum class FlashMode {
+    OFF,
+    ON,
+    AUTO
+}

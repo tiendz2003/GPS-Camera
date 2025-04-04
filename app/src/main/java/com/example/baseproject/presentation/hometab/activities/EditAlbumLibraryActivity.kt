@@ -1,5 +1,6 @@
 package com.example.baseproject.presentation.hometab.activities
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -41,7 +42,7 @@ class EditAlbumLibraryActivity : BaseActivity<ActivityAlbumLibraryBinding>(
     }
     private fun setupRecycleView(){
         adapter = EditAlbumAdapter {album->
-            //chuyển sang photo
+            startActivity(SelectImageActivity.getIntent(this,album.id,album.name))
         }
         binding.rcvAlbum.adapter = adapter
     }

@@ -1,21 +1,104 @@
 package com.example.baseproject.presentation.hometab.activities
 
+import android.content.Context
+import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.baseproject.R
+import com.example.baseproject.bases.BaseActivity
+import com.example.baseproject.databinding.ActivitySelectedImageBinding
+import com.example.baseproject.presentation.hometab.adapter.PhotoAdapter
+import com.example.baseproject.presentation.viewmodel.PhotosViewModel
+import com.example.baseproject.utils.GridSpacingItemDecoration
+import com.example.baseproject.utils.Resource
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-class SelectImageActivity : AppCompatActivity() {
+class SelectImageActivity : BaseActivity<ActivitySelectedImageBinding>(ActivitySelectedImageBinding::inflate) {
+    companion object {
+        const val ALBUM_ID = "ALBUM_ID"
+        const val ALBUM_NAME = "ALBUM_NAME"
+        fun getIntent(context: Context, albumId: String, albumName: String): Intent {
+            return Intent(context, SelectImageActivity::class.java).apply {
+                putExtra(ALBUM_ID, albumId)
+                putExtra(ALBUM_NAME, albumName)
+            }
+        }
+    }
+    private var albumId: String? = null
+    private var albumName: String? = null
+    private var adapter: PhotoAdapter? = null
+    private val albumsViewModel: PhotosViewModel by viewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_select_image)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+    }
+
+    override fun initData() {
+        albumId = intent.getStringExtra(ALBUM_ID)
+        albumName = intent.getStringExtra(ALBUM_NAME)
+        albumId?.let { albumId ->
+            albumsViewModel.loadPhotosFromAlbum(albumId)
+        }
+    }
+
+    override fun initView() {
+        setupRecycleView()
+        observeViewModel()
+    }
+
+    override fun initActionView() {
+
+    }
+    private fun setupRecycleView(){
+        adapter = PhotoAdapter {photo->
+
+        }
+        binding.rcvImage.apply {
+            val spanCount = 3
+            setHasFixedSize(true)
+            adapter = this@SelectImageActivity.adapter
+
+            val gridLayoutManager = GridLayoutManager(this@SelectImageActivity, spanCount)
+            gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                    return when (adapter?.getItemViewType(position)) {
+                        PhotoAdapter.VIEW_TYPE_DATE_HEADER -> spanCount
+                        else -> 1
+                    }
+                }
+            }
+            layoutManager = gridLayoutManager
+            val spacing = resources.getDimensionPixelSize(R.dimen.spacing_medium)
+            addItemDecoration(GridSpacingItemDecoration(spanCount, spacing, false))
+        }
+        binding.tvTitle.text = albumName
+    }
+    private fun observeViewModel(){
+        albumsViewModel.photos.observe(this){resource->
+            when(resource){
+                is Resource.Loading -> {
+
+                }
+                is Resource.Success->{
+                    resource.data?.let {photos->
+                        val photosByDate = photos.groupBy {photo->
+                            SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(photo.dateAdded))
+                        }
+                        adapter?.submitList(photosByDate)
+                    }
+                }
+                is Resource.Error -> {
+                    Toast.makeText(this, resource.message, Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 }

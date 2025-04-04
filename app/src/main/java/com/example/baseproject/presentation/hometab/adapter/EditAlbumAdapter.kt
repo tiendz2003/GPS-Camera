@@ -1,5 +1,6 @@
 package com.example.baseproject.presentation.hometab.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -26,10 +27,10 @@ class EditAlbumAdapter(private val onAlbumClick: (Album) -> Unit) :
     inner class AlbumViewHolder(private val binding: EditAlbumItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
+        @SuppressLint("SetTextI18n")
         fun bind(album: Album) {
             binding.tvName.text = album.name
             binding.tvCount.text = "(${album.photoCount})"
-
             // tỉa ảnh bìa
             binding.imvPreview.loadImageIcon(album.coverPath)
 

@@ -49,8 +49,11 @@ android {
 }
 
 dependencies {
+    implementation("com.google.guava:guava:31.1-android")
+
     // CameraX Core (Bắt buộc)
     implementation (libs.androidx.camera.core)
+    implementation ("androidx.camera:camera-camera2:1.4.2")
     // CameraX Lifecycle để tự động quản lý camera theo lifecycle
     implementation (libs.androidx.camera.lifecycle)
     // CameraX View để hiển thị preview

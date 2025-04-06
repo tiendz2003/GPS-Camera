@@ -1,6 +1,7 @@
 package com.example.baseproject.utils
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.result.ActivityResultLauncher
@@ -9,8 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
-class PermissionManager {
-    companion object {
+object PermissionManager {
         private const val REQUEST_STORAGE_PERMISSION = 100
 
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -45,9 +45,9 @@ class PermissionManager {
                 }
             }
         }
-        fun hasPermissions(permissions: Array<String>): Boolean {
+        fun hasPermissions(context: Context, permissions: Array<String>): Boolean {
             return permissions.all {
-                ContextCompat.checkSelfPermission(AppCompatActivity(), it) == PackageManager.PERMISSION_GRANTED
+                ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
             }
         }
 
@@ -57,5 +57,5 @@ class PermissionManager {
         ) {
             launcher.launch(permissions)
         }
-    }
+
 }

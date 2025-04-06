@@ -1,6 +1,7 @@
 package com.example.baseproject.presentation.hometab.activities
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.core.content.ContextCompat
@@ -11,6 +12,7 @@ import androidx.fragment.app.Fragment
 import com.example.baseproject.R
 import com.example.baseproject.fragments.HomeFragment
 import com.example.baseproject.fragments.SettingsFragment
+import com.example.baseproject.presentation.mainscreen.activity.CameraActivity
 import com.example.baseproject.utils.dpToPx
 import com.example.baseproject.utils.updateCornerSize
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -43,6 +45,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
     override fun initActionView() {
         setupBottomNavigation()
+        setupFab()
     }
     private fun setupBottomNavigation (){
         binding.bottomNavigationView.setOnItemSelectedListener { item ->
@@ -55,7 +58,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
     }
     private fun setupFab(){
         binding.fab.setOnClickListener {
-
+            startActivity(Intent(this, CameraActivity::class.java))
         }
     }
     private fun replaceFragment(fragment: Fragment){

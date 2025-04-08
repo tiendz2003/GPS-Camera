@@ -1,5 +1,6 @@
 package com.example.baseproject.utils
 
+import android.app.Activity
 import android.content.Context
 import android.util.DisplayMetrics
 import android.view.View
@@ -96,4 +97,20 @@ fun ImageView.loadImageIcon(url: Any) {
         .error(R.drawable.ic_image_default)
         .diskCacheStrategy(DiskCacheStrategy.ALL)
         .into(this)
+}
+ fun Activity.startCountdownAnimation(view: View) {
+     view.visible()
+     view.animate()
+        .scaleX(1.5f)
+        .scaleY(1.5f)
+        .setDuration(500)
+        .withEndAction {
+            view.gone()
+            view.animate()
+                .scaleX(1.0f)
+                .scaleY(1.0f)
+                .setDuration(500)
+                .start()
+        }
+        .start()
 }

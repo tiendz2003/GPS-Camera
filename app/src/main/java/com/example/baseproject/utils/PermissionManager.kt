@@ -17,7 +17,6 @@ object PermissionManager {
         fun checkAndRequestPermissions(activity: AppCompatActivity): Boolean {
             val permissionsToRequest = mutableListOf<String>()
 
-            // Android 13 trở lên cần READ_MEDIA_IMAGES
             if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
                 permissionsToRequest.add(Manifest.permission.READ_MEDIA_IMAGES)
             }

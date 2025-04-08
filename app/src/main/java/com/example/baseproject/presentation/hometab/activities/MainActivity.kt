@@ -46,6 +46,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
     override fun initActionView() {
         setupBottomNavigation()
         setupFab()
+
     }
     private fun setupBottomNavigation (){
         binding.bottomNavigationView.setOnItemSelectedListener { item ->

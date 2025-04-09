@@ -139,8 +139,6 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                         Log.d("CameraActivity", "gone")
                         binding.tvCountDown.gone()
                     }
-
-
                 }
             }
         }

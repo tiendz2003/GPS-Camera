@@ -22,11 +22,14 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.baseproject.presentation.mainscreen.activity.CameraState
+import com.example.baseproject.utils.formatDuration
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
@@ -51,7 +54,9 @@ class CameraViewModel : ViewModel() {
     private var isGridEnabled = false
     private var isRecording = false
     private var isFullScreen = false
+    private var isVideoMode = false
 
+    private var recordingTimerJob: Job ?= null
     private var tempFile: File? = null
 
     fun updateCameraState(update: (CameraState) -> CameraState) {
@@ -155,7 +160,40 @@ class CameraViewModel : ViewModel() {
     fun toggleFullScreen() {
         isFullScreen = !isFullScreen
     }
-
+    fun toggleCameraMode() {
+        isVideoMode = !isVideoMode
+        updateCameraState {
+            it.copy(
+                isVideoMode = isVideoMode
+            )
+        }
+    }
+    fun isVideoMode(): Boolean{
+        return isVideoMode
+    }
+    fun startRecordingTime(){
+        var second = 0
+        recordingTimerJob = viewModelScope.launch {
+            while (isActive){
+                updateCameraState {
+                    it.copy(
+                        recordingDuration = second.formatDuration()
+                    )
+                }
+                delay(1000)
+                second++
+            }
+        }
+    }
+    private fun stopRecordingTimer(){
+        recordingTimerJob?.cancel()
+        recordingTimerJob = null
+        updateCameraState {
+            it.copy(
+                recordingDuration = null
+            )
+        }
+    }
     fun getCurrentScreenState(): Boolean {
         return isFullScreen
     }
@@ -182,7 +220,7 @@ class CameraViewModel : ViewModel() {
                 }
                 delay(1000)
             }
-            updateCameraState { it.copy(countDownTimer = 0) }//reset\
+            updateCameraState { it.copy(countDownTimer = 0) }//reset
             //cười nào
             capturePhoto()
         }
@@ -221,8 +259,20 @@ class CameraViewModel : ViewModel() {
     fun toggleVideoRecording(context: Context) {
         if (isRecording) {
             stopVideoRecording()
+            stopRecordingTimer()
+            updateCameraState {
+                it.copy(
+                    isRecording = false
+                )
+            }
         } else {
             startVideoRecording(context)
+            startRecordingTime()
+            updateCameraState {
+                it.copy(
+                    isRecording = true
+                )
+            }
         }
     }
 
@@ -323,6 +373,8 @@ class CameraViewModel : ViewModel() {
             preview = null
             imageCapture = null
             videoCapture = null
+            recordingTimerJob?.cancel()
+            recordingTimerJob = null
             recording = null
         } catch (e: Exception) {
             updateCameraState {

@@ -6,6 +6,7 @@
     <color name="colorSecondary">#E290FF</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="lightWhite">#EEF0FF</color>
     <color name="bottom_nav_color">#FFFFFF</color>
     <color name="colorTextTitle">#33322F</color>
     <color name="colorTextSub">#A633322F</color>

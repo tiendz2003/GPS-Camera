@@ -190,8 +190,8 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_duration_video"
             style="@style/medium_500"
-            android:layout_width="64dp"
-            android:layout_height="32dp"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
             android:background="@drawable/background_button_template_success"
             android:gravity="center"
             android:paddingHorizontal="12dp"

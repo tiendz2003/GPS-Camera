@@ -10,5 +10,8 @@ data class CameraState(
     val countDownTimer:Int = 0,
     val selectedTimerDuration: Int= 0 ,
     val isCameraReady : Boolean = false,
+    val isVideoMode : Boolean = false,
+    val isRecording : Boolean = false,
+    val recordingDuration: String? = null,
     val error : String? = null
 )

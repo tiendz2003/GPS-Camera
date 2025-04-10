@@ -26,12 +26,11 @@ class CustomOptionsFragment : BaseFragment<FragmentCustomOptionsBinding>(Fragmen
     override fun initActionView() {
 
     }
-    @SuppressLint("NotifyDataSetChanged")
     private fun setupRecyclerView() {
-        customOptionsAdapter = CustomOptionsAdapter { customTemplate ->
+        customOptionsAdapter = CustomOptionsAdapter { customTemplate,position ->
 
             customTemplate.isSelected = !customTemplate.isSelected
-            customOptionsAdapter?.notifyDataSetChanged()
+            customOptionsAdapter?.notifyItemChanged(position)
 
         }
 
@@ -44,9 +43,5 @@ class CustomOptionsFragment : BaseFragment<FragmentCustomOptionsBinding>(Fragmen
         }
 
         customOptionsAdapter?.submitList(CustomTemplateModel.getCustomTemplates(requireContext()))
-    }
-    companion object {
-        @JvmStatic
-        fun newInstance() = CustomOptionsFragment()
     }
 }

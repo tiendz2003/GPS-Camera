@@ -73,8 +73,8 @@ class GridSpaceItemDecoration(private val spacing: Int) : RecyclerView.ItemDecor
         state: RecyclerView.State
     ) {
         outRect.left = spacing / 2
-        outRect.right = spacing / 2
+        outRect.right = spacing / 3
         outRect.bottom = spacing
-        outRect.top = spacing
+        outRect.top = spacing/2
     }
 }

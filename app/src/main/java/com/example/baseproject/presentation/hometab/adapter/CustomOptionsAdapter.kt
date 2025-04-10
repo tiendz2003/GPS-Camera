@@ -1,8 +1,10 @@
 package com.example.baseproject.presentation.hometab.adapter
 
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -12,29 +14,27 @@ import com.example.baseproject.databinding.ItemCustomTemplateBinding
 import com.example.baseproject.utils.loadImageIcon
 
 class CustomOptionsAdapter(
-    private val onItemClick: (CustomTemplateModel) -> Unit
+    private val onItemClick: (CustomTemplateModel,Int) -> Unit
 ) :
     ListAdapter<CustomTemplateModel, CustomOptionsAdapter.CustomViewHolder>(CustomDiffCallback()) {
 
     inner class CustomViewHolder(private val binding: ItemCustomTemplateBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: CustomTemplateModel) {
+        fun bind(item: CustomTemplateModel,position: Int) {
             with(binding){
                 tvControlName.text = item.name
                  ivControlIcon.setImageResource(item.icon)
 
                 if (item.isSelected) {
-                    ivControlIcon.strokeWidth = 4f
-                    ivControlIcon.strokeColor = ColorStateList.valueOf(
-                        root.context.getColor(R.color.colorPrimary)
-                    )
+                    cardControlIcon.strokeWidth = 4
+                    cardControlIcon.strokeColor = ContextCompat.getColor(root.context, R.color.colorPrimary)
                 } else {
-                    ivControlIcon.strokeWidth = 0f
+                    cardControlIcon.strokeWidth = 0
                 }
                 root.setOnClickListener {
                    if(item.isActive){
-                       onItemClick(item)
+                       onItemClick(item,position)
                    }
                 }
             }
@@ -48,7 +48,7 @@ class CustomOptionsAdapter(
     }
 
     override fun onBindViewHolder(holder: CustomViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position),position)
     }
 }
 

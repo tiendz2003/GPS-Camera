@@ -7,19 +7,31 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/ivControlIcon"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardControlIcon"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:scaleType="centerInside"
+        app:cardCornerRadius="10dp"
+        app:cardBackgroundColor="@color/lightWhite"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp"
+        app:cardPreventCornerOverlap="false"
+        app:cardUseCompatPadding="false"
+        android:forceHasOverlappingRendering="false"
+        android:outlineProvider="none"
         app:layout_constraintBottom_toTopOf="@id/tvControlName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        app:shapeAppearanceOverlay="@style/circleImageView"
-        android:background="@color/lightWhite"
-        tools:srcCompat="@drawable/ic_location" />
+        app:layout_constraintVertical_chainStyle="packed">
+
+        <ImageView
+            android:id="@+id/ivControlIcon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            tools:src="@drawable/ic_location" />
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/tvControlName"
@@ -27,7 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:textAlignment="center"
-        android:textSize="12sp"
+        android:textSize="14sp"
         android:textColor="@color/black"
         android:maxLines="1"
         android:ellipsize="end"
@@ -35,6 +47,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ivControlIcon" />
+        app:layout_constraintTop_toBottomOf="@id/cardControlIcon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

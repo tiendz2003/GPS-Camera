@@ -1,9 +1,16 @@
 package com.example.baseproject.utils
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.graphics.Color
+import android.graphics.Typeface
 import android.util.DisplayMetrics
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +19,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.baseproject.R
 import com.example.baseproject.presentation.custom.HorizontalSpaceItemDecoration
 import com.google.android.material.shape.MaterialShapeDrawable
+import com.google.android.material.tabs.TabLayout
 import kotlin.math.roundToInt
 
 fun View.gone() {
@@ -96,4 +104,28 @@ fun ImageView.loadImageIcon(url: Any) {
         .error(R.drawable.ic_image_default)
         .diskCacheStrategy(DiskCacheStrategy.ALL)
         .into(this)
+}
+@SuppressLint("DefaultLocale")
+fun Int.formatDuration(): String {
+    val hours = this / 3600
+    val minutes = (this % 3600) / 60
+    val seconds = this % 60
+    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+}
+
+ fun Activity.startCountdownAnimation(view: View) {
+     view.visible()
+     view.animate()
+        .scaleX(1.5f)
+        .scaleY(1.5f)
+        .setDuration(500)
+        .withEndAction {
+            view.gone()
+            view.animate()
+                .scaleX(1.0f)
+                .scaleY(1.0f)
+                .setDuration(500)
+                .start()
+        }
+        .start()
 }

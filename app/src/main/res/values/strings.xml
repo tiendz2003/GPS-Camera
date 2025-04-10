@@ -40,6 +40,10 @@
     <string name="theme">Theme</string>
     <string name="photo">Photo</string>
     <string name="video">Video</string>
+    <string name="location">Location</string>
+    <string name="latlng" >Lat/Long</string>
+    <string name="time">Time\n</string>
+    <string name="date">Date</string>
 
 
 </resources>

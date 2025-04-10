@@ -22,11 +22,14 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.baseproject.presentation.mainscreen.activity.CameraState
+import com.example.baseproject.utils.formatDuration
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
@@ -34,53 +37,65 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.Executors
 
-class CameraViewModel: ViewModel() {
+class CameraViewModel : ViewModel() {
     private val _cameraState = MutableStateFlow<CameraState>(CameraState())
     val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
 
-    private var cameraProvider :ProcessCameraProvider ? = null
+    private var cameraProvider: ProcessCameraProvider? = null
     private var camera: Camera? = null
-    private var imageCapture : ImageCapture? = null
-    private var videoCapture:VideoCapture<Recorder> ?= null
-    private var recording:Recording ?= null
-    private var preview: Preview?= null
+    private var imageCapture: ImageCapture? = null
+    private var videoCapture: VideoCapture<Recorder>? = null
+    private var recording: Recording? = null
+    private var preview: Preview? = null
     private var cameraExecutor = Executors.newSingleThreadExecutor()
 
     private var lensFacing = CameraSelector.LENS_FACING_BACK
     private var flashMode = ImageCapture.FLASH_MODE_OFF
     private var isGridEnabled = false
     private var isRecording = false
+    private var isFullScreen = false
+    private var isVideoMode = false
 
-    private var tempFile:File? = null
+    private var recordingTimerJob: Job ?= null
+    private var tempFile: File? = null
+
     fun updateCameraState(update: (CameraState) -> CameraState) {
         return _cameraState.update(update)
     }
+
     override fun onCleared() {
         super.onCleared()
+        cleanupCamera()
         cameraExecutor.shutdown()
     }
-    fun initializeCamera(context:Context,previewView: PreviewView,lifecycleOwner: LifecycleOwner){
-       viewModelScope.launch {
-           try {
-               val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-               cameraProvider = cameraProviderFuture.get()
-               bindCameraUseCase(context,previewView,lifecycleOwner)
-               updateCameraState {
-                   it.copy(
-                       isCameraReady = false
-                   )
-               }
-           }catch (e:Exception){
-               updateCameraState {
-                   it.copy(
-                       error = e.message,
-                       isCameraReady = false
-                   )
-               }
-           }
-       }
+
+    fun initializeCamera(
+        context: Context,
+        previewView: PreviewView,
+        lifecycleOwner: LifecycleOwner
+    ) {
+        viewModelScope.launch {
+            try {
+                val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+                cameraProvider = cameraProviderFuture.get()
+                bindCameraUseCase(previewView, lifecycleOwner)
+                updateCameraState {
+                    it.copy(
+                        isCameraReady = false
+                    )
+                }
+            } catch (e: Exception) {
+                updateCameraState {
+                    it.copy(
+                        error = e.message,
+                        isCameraReady = false
+                    )
+                }
+            }
+        }
     }
-    fun bindCameraUseCase(context: Context,previewView: PreviewView,lifecycleOwner: LifecycleOwner){
+
+    fun bindCameraUseCase(previewView: PreviewView, lifecycleOwner: LifecycleOwner) {
         val cameraProvider = this.cameraProvider ?: throw IllegalStateException("Chuwa khoi tao")
 
         //cameara selector
@@ -113,7 +128,7 @@ class CameraViewModel: ViewModel() {
                 videoCapture
             )
 
-        }catch (e:Exception){
+        } catch (e: Exception) {
             _cameraState.update {
                 it.copy(
                     error = e.message
@@ -121,82 +136,143 @@ class CameraViewModel: ViewModel() {
             }
         }
     }
-    fun toggleCamera(context: Context,previewView: PreviewView,lifecycleOwner: LifecycleOwner){
-        lensFacing = if(lensFacing == CameraSelector.LENS_FACING_BACK){
+
+    fun toggleCamera(previewView: PreviewView, lifecycleOwner: LifecycleOwner) {
+        lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) {
             CameraSelector.LENS_FACING_FRONT
-        }else{
+        } else {
             CameraSelector.LENS_FACING_BACK
         }
-        bindCameraUseCase(context,previewView,lifecycleOwner)
+        bindCameraUseCase(previewView, lifecycleOwner)
     }
-    fun toggleFlashMode(context: Context,previewView: PreviewView,lifecycleOwner: LifecycleOwner) {
-        flashMode = when(flashMode){
+
+    fun toggleFlashMode(previewView: PreviewView, lifecycleOwner: LifecycleOwner) {
+        flashMode = when (flashMode) {
             ImageCapture.FLASH_MODE_OFF -> ImageCapture.FLASH_MODE_ON
             ImageCapture.FLASH_MODE_ON -> ImageCapture.FLASH_MODE_AUTO
             else -> ImageCapture.FLASH_MODE_OFF
         }
         imageCapture?.flashMode = flashMode
 
-        bindCameraUseCase(context,previewView,lifecycleOwner)
+        bindCameraUseCase(previewView, lifecycleOwner)
     }
-    fun enableGrid(){
+
+    fun toggleFullScreen() {
+        isFullScreen = !isFullScreen
+    }
+    fun toggleCameraMode() {
+        isVideoMode = !isVideoMode
+        updateCameraState {
+            it.copy(
+                isVideoMode = isVideoMode
+            )
+        }
+    }
+    fun isVideoMode(): Boolean{
+        return isVideoMode
+    }
+    fun startRecordingTime(){
+        var second = 0
+        recordingTimerJob = viewModelScope.launch {
+            while (isActive){
+                updateCameraState {
+                    it.copy(
+                        recordingDuration = second.formatDuration()
+                    )
+                }
+                delay(1000)
+                second++
+            }
+        }
+    }
+    private fun stopRecordingTimer(){
+        recordingTimerJob?.cancel()
+        recordingTimerJob = null
+        updateCameraState {
+            it.copy(
+                recordingDuration = null
+            )
+        }
+    }
+    fun getCurrentScreenState(): Boolean {
+        return isFullScreen
+    }
+
+    fun enableGrid() {
         isGridEnabled = !isGridEnabled
     }
-    fun takePhoto(timerSeconds: Int = 0){
-        if(timerSeconds > 0){
+
+    fun takePhoto(timerSeconds: Int = 0) {
+        if (timerSeconds > 0) {
             countToCapturePhoto(timerSeconds)
-        }else{
+        } else {
             capturePhoto()
         }
     }
-    private fun countToCapturePhoto(seconds : Int) {
+
+    private fun countToCapturePhoto(seconds: Int) {
         viewModelScope.launch {
-            for(i in seconds downTo 1){
-                updateCameraState { it.copy(
-                    countDownTimer = i
-                )
+            for (i in seconds downTo 1) {
+                updateCameraState {
+                    it.copy(
+                        countDownTimer = i
+                    )
                 }
                 delay(1000)
             }
-            updateCameraState { it.copy(countDownTimer = 0) }//reset\
+            updateCameraState { it.copy(countDownTimer = 0) }//reset
             //cười nào
             capturePhoto()
         }
 
     }
+
     private fun capturePhoto() {
         val imageCapture = this.imageCapture ?: return
         imageCapture.takePicture(
             cameraExecutor,
             object : ImageCapture.OnImageCapturedCallback() {
                 override fun onCaptureSuccess(image: ImageProxy) {
-                   viewModelScope.launch {
-                       try {
-                           val bitmap = image.toBitmap()
-                           updateCameraState {
-                               it.copy(
-                                   captureImageBitmap = bitmap
-                               )
-                           }
-                       }catch (e:Exception){
-                           updateCameraState {
-                               it.copy(
-                                   error = e.message
-                               )
-                           }
-                       }finally {
-                           image.close()
-                       }
-                   }
+                    viewModelScope.launch {
+                        try {
+                            val bitmap = image.toBitmap()
+                            updateCameraState {
+                                it.copy(
+                                    captureImageBitmap = bitmap
+                                )
+                            }
+                        } catch (e: Exception) {
+                            updateCameraState {
+                                it.copy(
+                                    error = e.message
+                                )
+                            }
+                        } finally {
+                            image.close()
+                        }
+                    }
                 }
             }
         )
     }
+
     fun toggleVideoRecording(context: Context) {
-        if(isRecording){
+        if (isRecording) {
             stopVideoRecording()
-        }else{
+            stopRecordingTimer()
+            updateCameraState {
+                it.copy(
+                    isRecording = false
+                )
+            }
+        } else {
             startVideoRecording(context)
+            startRecordingTime()
+            updateCameraState {
+                it.copy(
+                    isRecording = true
+                )
+            }
         }
     }
 
@@ -205,30 +281,36 @@ class CameraViewModel: ViewModel() {
         try {
             tempFile = File(
                 context.cacheDir,
-                "video_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())}.mp4"
+                "video_${
+                    SimpleDateFormat(
+                        "yyyyMMdd_HHmmss",
+                        Locale.getDefault()
+                    ).format(Date())
+                }.mp4"
             )
             val fileOutputOptions = FileOutputOptions.Builder(tempFile!!).build()
             recording = videoCapture.output.prepareRecording(
-                context,fileOutputOptions
+                context, fileOutputOptions
             ).apply {
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     withAudioEnabled()
                 }
             }
-                .start(ContextCompat.getMainExecutor(context)){recordEvent->
-                    when(recordEvent){
+                .start(ContextCompat.getMainExecutor(context)) { recordEvent ->
+                    when (recordEvent) {
                         is VideoRecordEvent.Start -> {
                             isRecording = true
                         }
-                        is VideoRecordEvent.Finalize ->{
+
+                        is VideoRecordEvent.Finalize -> {
                             isRecording = false
-                            if(recordEvent.hasError()){
+                            if (recordEvent.hasError()) {
                                 updateCameraState {
                                     it.copy(
-                                        error = "Khoong tao duoc video: "+recordEvent.error
+                                        error = "Khoong tao duoc video: " + recordEvent.error
                                     )
                                 }
-                            }else{
+                            } else {
                                 updateCameraState {
                                     it.copy(
                                         previewUri = Uri.fromFile(tempFile)
@@ -238,14 +320,13 @@ class CameraViewModel: ViewModel() {
                         }
                     }
                 }
-        }catch (e:SecurityException){
+        } catch (e: SecurityException) {
             updateCameraState {
                 it.copy(
                     error = e.message
                 )
             }
-        }
-        catch (e:Exception){
+        } catch (e: Exception) {
             updateCameraState {
                 it.copy(
                     error = e.message
@@ -258,7 +339,8 @@ class CameraViewModel: ViewModel() {
         recording?.stop()
         recording = null
     }
-    fun hasCamera(context: Context,facing:Int):Boolean{
+
+    fun hasCamera(context: Context, facing: Int): Boolean {
         return try {
             val provider = ProcessCameraProvider.getInstance(context).get()
             val availableCameraInfos = provider.availableConcurrentCameraInfos.filter {
@@ -266,17 +348,40 @@ class CameraViewModel: ViewModel() {
                 provider.hasCamera(cameraSelector)
             }
             availableCameraInfos.isNotEmpty()
-        }catch (e:Exception){
+        } catch (e: Exception) {
             false
         }
-        fun getCurrentFlashMode():Int{
-            return flashMode
-        }
-        fun isGridEnabled():Boolean{
-            return isGridEnabled
-        }
-        fun currentLensFacing():Int{
-            return lensFacing
+    }
+
+    fun getCurrentFlashMode(): Int {
+        return flashMode
+    }
+
+    fun isGridEnabled(): Boolean {
+        return isGridEnabled
+    }
+
+    fun currentLensFacing(): Int {
+        return lensFacing
+    }
+
+    fun cleanupCamera() {
+        try {
+            cameraProvider?.unbindAll()
+            cameraProvider = null
+            camera = null
+            preview = null
+            imageCapture = null
+            videoCapture = null
+            recordingTimerJob?.cancel()
+            recordingTimerJob = null
+            recording = null
+        } catch (e: Exception) {
+            updateCameraState {
+                it.copy(
+                    error = "Giari phóng không thành công:${e.message}"
+                )
+            }
         }
     }
 }

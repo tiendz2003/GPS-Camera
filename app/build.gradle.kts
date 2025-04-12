@@ -1,4 +1,5 @@
 import java.text.SimpleDateFormat
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -28,6 +29,19 @@ android {
     }
 
     buildTypes {
+        debug {
+            val properties = Properties().apply {
+                load(rootProject.file("local.properties").inputStream())
+            }
+            val apiKey = checkNotNull(properties.getProperty("WEATHER_API_KEY")){
+                "Không tìm thấy API_KEY trong local.properties"
+            }
+            buildConfigField(
+                "String",
+                "WEATHER_API_KEY",
+                "\"$apiKey\""
+            )
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -45,12 +59,16 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
 dependencies {
     implementation("com.google.guava:guava:31.1-android")
-
+    implementation ("com.google.android.gms:play-services-location:21.3.0")
+    implementation ("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.10.0")
     // CameraX Core (Bắt buộc)
     implementation (libs.androidx.camera.core)
     implementation ("androidx.camera:camera-camera2:1.4.2")

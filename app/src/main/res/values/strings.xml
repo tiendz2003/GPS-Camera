@@ -42,8 +42,13 @@
     <string name="video">Video</string>
     <string name="location">Location</string>
     <string name="latlng" >Lat/Long</string>
-    <string name="time">Time\n</string>
+    <string name="time">1:51 PM</string>
+    <string name="temperature">30°C</string>
     <string name="date">Date</string>
-
+    <string name="united_states"><u>United States</u></string>
+    <string name="best_travel"><u>Best Travel</u></string>
+    <string name="memories"><u>Memories</u></string>
+    <string name="new_york"><u>New York</u></string>
+    <string name="times">Time\n</string>
 
 </resources>

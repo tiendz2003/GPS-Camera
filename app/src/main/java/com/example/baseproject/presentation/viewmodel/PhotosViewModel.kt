@@ -6,16 +6,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.baseproject.data.models.Photo
+import com.example.baseproject.domain.MapLocationRepository
 import com.example.baseproject.domain.MediaRepository
+import com.example.baseproject.domain.WeatherRepository
+import com.example.baseproject.utils.LocationResult
 import com.example.baseproject.utils.Resource
 import kotlinx.coroutines.launch
 
 class PhotosViewModel(
-    private val repository: MediaRepository
+    private val repository: MediaRepository,
 ): ViewModel()  {
+
     private val _photos = MutableLiveData<Resource<List<Photo>>>()
     val photos: LiveData<Resource<List<Photo>>> = _photos
-
     private val _selectedPhoto = MutableLiveData<Photo>()
     val selectedPhoto: LiveData<Photo> = _selectedPhoto
     fun loadPhotosFromAlbum(albumId: String){

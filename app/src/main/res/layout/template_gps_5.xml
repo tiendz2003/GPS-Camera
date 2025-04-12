@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardMapThumbnail"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        app:cardCornerRadius="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/ivMapThumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="map"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img_default_map" />
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/containerInfo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:padding="4dp"
+        android:background="@drawable/border_rounded_template"
+        app:layout_constraintBottom_toBottomOf="@id/cardMapThumbnail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/cardMapThumbnail"
+        app:layout_constraintTop_toTopOf="@id/cardMapThumbnail">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/containerInfo"
+            app:layout_constraintEnd_toEndOf="@id/containerInfo"
+            app:layout_constraintTop_toTopOf="@id/containerInfo"
+            android:background="@drawable/stitched_border_background"
+            android:padding="6dp"
+            >
+
+            <TextView
+                android:id="@+id/tvLocationName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="cursive"
+                android:text="New York City, United States"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvLatLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Lat: 16.0544"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvLocationName" />
+
+            <TextView
+                android:id="@+id/tvLongLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Long: 16.0544"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/tvLatLabel"
+                app:layout_constraintStart_toEndOf="@id/tvLatLabel" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivSun"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_sun"
+                app:layout_constraintBottom_toBottomOf="@id/tvTemperature"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tvTemperature" />
+
+            <TextView
+                android:id="@+id/tvTemperature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="8dp"
+                android:text="32°C"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                app:layout_constraintStart_toEndOf="@id/ivSun"
+                app:layout_constraintTop_toBottomOf="@id/tvLatLabel" />
+
+            <TextView
+                android:id="@+id/tvDateTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Friday, 05 Jan 2024 11:15"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/tvTemperature"
+                app:layout_constraintStart_toEndOf="@id/tvTemperature" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

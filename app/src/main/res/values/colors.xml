@@ -5,6 +5,7 @@
     <color name="colorStrokePink">#DF8DEF</color>
     <color name="colorSecondary">#E290FF</color>
     <color name="black">#FF000000</color>
+    <color name="black50">#80000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="lightWhite">#EEF0FF</color>
     <color name="bottom_nav_color">#FFFFFF</color>

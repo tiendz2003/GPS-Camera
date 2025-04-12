@@ -8,12 +8,6 @@ data class CustomTemplateModel(val id: String, val name: String, val icon: Int, 
     companion object {
         fun getCustomTemplates(context: Context) =
             arrayListOf<CustomTemplateModel>(
-              /*  CustomTemplateModel(
-                    CustomTemplateConfig.MAP,
-                    context.getString(R.string.map),
-                    R.drawable.ic_location,
-                    true
-                ),*/
                 CustomTemplateModel(
                     CustomTemplateConfig.LOCATION,
                     context.getString(R.string.location),
@@ -26,7 +20,7 @@ data class CustomTemplateModel(val id: String, val name: String, val icon: Int, 
                 ),
                 CustomTemplateModel(
                     CustomTemplateConfig.TIME,
-                    context.getString(R.string.time),
+                    context.getString(R.string.times),
                     R.drawable.ic_custom_time
                 ),
                 CustomTemplateModel(
@@ -38,3 +32,18 @@ data class CustomTemplateModel(val id: String, val name: String, val icon: Int, 
             )
     }
 }
+data class TemplateDataModel(
+    val location: String? = null,
+    val lat: String? = null,
+    val long: String? = null,
+    val temperature: String? = null,
+    val currentTime: String? = null,
+    val currentDate: String? = null
+)
+data class TemplateState(
+    val selectedTemplateId: Int? = null,
+    val showLocation: Boolean = true,
+    val showTemperature: Boolean = true,
+    val showTime: Boolean = true,
+    val showDate: Boolean = true
+)

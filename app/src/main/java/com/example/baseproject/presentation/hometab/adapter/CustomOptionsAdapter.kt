@@ -24,7 +24,7 @@ class CustomOptionsAdapter(
         fun bind(item: CustomTemplateModel,position: Int) {
             with(binding){
                 tvControlName.text = item.name
-                 ivControlIcon.setImageResource(item.icon)
+                ivControlIcon.setImageResource(item.icon)
 
                 if (item.isSelected) {
                     cardControlIcon.strokeWidth = 4

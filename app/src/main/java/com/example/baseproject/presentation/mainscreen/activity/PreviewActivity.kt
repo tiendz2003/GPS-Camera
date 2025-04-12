@@ -15,7 +15,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.example.baseproject.presentation.hometab.adapter.PreviewOptionsAdapter
 import com.example.baseproject.presentation.mainscreen.fragment.CustomOptionsFragment
 import com.example.baseproject.presentation.mainscreen.fragment.PreviewOptionsFragment
 import com.example.baseproject.presentation.viewmodel.PreviewViewModel
@@ -26,7 +25,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class PreviewActivity : BaseActivity<ActivityPreviewBinding>(ActivityPreviewBinding::inflate) {
     private var isImage = true
     private var videoUri: Uri? = null
-    private var previewOptionsAdapter: PreviewOptionsAdapter? = null
     private val previewViewModel: PreviewViewModel by viewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

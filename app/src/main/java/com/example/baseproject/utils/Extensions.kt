@@ -4,10 +4,13 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.Typeface
 import android.util.DisplayMetrics
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
@@ -17,6 +20,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.baseproject.R
+import com.example.baseproject.data.models.TemplateDataModel
+import com.example.baseproject.map_template.DailyTemplateV1
+import com.example.baseproject.map_template.DailyTemplateV2
+import com.example.baseproject.map_template.DailyTemplateV3
+import com.example.baseproject.map_template.DailyTemplateV4
+import com.example.baseproject.map_template.DailyTemplateV5
+import com.example.baseproject.map_template.TravelTemplateV1
+import com.example.baseproject.map_template.TravelTemplateV2
 import com.example.baseproject.presentation.custom.HorizontalSpaceItemDecoration
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.tabs.TabLayout
@@ -112,7 +123,67 @@ fun Int.formatDuration(): String {
     val seconds = this % 60
     return String.format("%02d:%02d:%02d", hours, minutes, seconds)
 }
+fun TextView.underline() {
+    paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
+}
 
+fun FrameLayout.addTemplate(
+    context: Context,
+    type: String,
+    data: TemplateDataModel,
+    imageMap: Any? = null
+){
+    this.removeAllViews()
+    val layoutParams = FrameLayout.LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+    )
+    layoutParams.gravity = Gravity.BOTTOM
+    when(type){
+        Config.TEMPLATE_1 -> {
+            val templateView = DailyTemplateV1(context, null)
+            templateView.layoutParams = layoutParams
+            templateView.setData(data)
+            this.addView(templateView)
+        }
+        Config.TEMPLATE_2 -> {
+            val templateView = DailyTemplateV2(context, null)
+            templateView.layoutParams = layoutParams
+            templateView.setData(data)
+            this.addView(templateView)
+        }
+        Config.TEMPLATE_3 -> {
+            val templateView = DailyTemplateV3(context, null)
+            templateView.layoutParams = layoutParams
+            templateView.setData(data)
+            this.addView(templateView)
+        }
+        Config.TEMPLATE_4 -> {
+            val templateView = DailyTemplateV4(context, null)
+            templateView.layoutParams = layoutParams
+            templateView.setData(data)
+            this.addView(templateView)
+        }
+        Config.TEMPLATE_5 -> {
+            val templateView = DailyTemplateV5(context, null)
+            templateView.layoutParams = layoutParams
+            templateView.setData(data)
+            this.addView(templateView)
+        }
+        Config.TEMPLATE_6 -> {
+            val templateView = TravelTemplateV1(context, null)
+            templateView.layoutParams = layoutParams
+            templateView.setData(data)
+            this.addView(templateView)
+        }
+        Config.TEMPLATE_7 -> {
+            val templateView = TravelTemplateV2(context, null)
+            templateView.layoutParams = layoutParams
+            templateView.setData(data)
+            this.addView(templateView)
+        }
+    }
+}
  fun Activity.startCountdownAnimation(view: View) {
      view.visible()
      view.animate()

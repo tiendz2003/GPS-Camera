@@ -18,11 +18,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.baseproject.R
 import com.example.baseproject.bases.BaseActivity
+import com.example.baseproject.data.models.TemplateDataModel
 import com.example.baseproject.databinding.ActivityCameraBinding
 import com.example.baseproject.presentation.viewmodel.CameraViewModel
 import com.example.baseproject.utils.BitmapHolder
+import com.example.baseproject.utils.Config
 import com.example.baseproject.utils.PermissionManager
 import com.example.baseproject.utils.SharePrefUtils
+import com.example.baseproject.utils.addTemplate
 import com.example.baseproject.utils.gone
 import com.example.baseproject.utils.invisible
 import com.example.baseproject.utils.visible
@@ -58,6 +61,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
         }else{
             PermissionManager.requestPermissions(requestCameraPermissionLauncher,cameraPermission)
         }
+        cameraViewModel.updateTemplateData()
         val savedTimer = SharePrefUtils.getTimerPref()
         cameraViewModel.updateCameraState {
             it.copy(
@@ -162,6 +166,10 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                         Log.d("CameraActivity", "gone")
                         binding.tvCountDown.gone()
                     }
+                    cameraState.templateData?.let {
+                        Log.d("CameraActivity", "observeViewModel: $it")
+                        initTemplate(it)
+                    }
                 }
             }
         }
@@ -244,6 +252,13 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
             else -> R.drawable.ic_time
         }
         binding.imvTimer.setImageResource(iconRes)
+    }
+    private fun initTemplate(template: TemplateDataModel) {
+        binding.templateOverlayContainer.addTemplate(
+            this,
+            Config.TEMPLATE_7,
+            template
+        )
     }
     fun updateCameraMode(isVideoMode: Boolean) {
         with(binding){

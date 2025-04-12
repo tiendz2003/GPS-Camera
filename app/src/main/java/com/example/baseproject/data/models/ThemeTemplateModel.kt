@@ -1,6 +1,7 @@
 package com.example.baseproject.data.models
 
 import android.os.Parcelable
+import com.example.baseproject.utils.Config
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -14,77 +15,77 @@ data class ThemeTemplateModel(
         fun getTemplate():List<ThemeTemplateModel>{
             val listTemplate = arrayListOf(
                 ThemeTemplateModel(
-                    id = "1",
+                    id = Config.TEMPLATE_1,
                     image ="file:///android_asset/theme/daily_theme_1.webp",
                     type = TemplateType.DAILY
                 ),
                 ThemeTemplateModel(
-                    id = "2",
+                    id = Config.TEMPLATE_2,
                     image ="file:///android_asset/theme/daily_theme_2.webp",
                     type = TemplateType.DAILY
                 ),
                 ThemeTemplateModel(
-                    id = "3",
+                    id = Config.TEMPLATE_3,
                     image ="file:///android_asset/theme/daily_theme_3.webp",
                     type = TemplateType.DAILY
                 ),
                 ThemeTemplateModel(
-                    id = "4",
+                    id = Config.TEMPLATE_4,
                     image ="file:///android_asset/theme/daily_theme_4.webp",
                     type = TemplateType.DAILY
                 ),
                 ThemeTemplateModel(
-                    id = "5",
+                    id = Config.TEMPLATE_5,
                     image ="file:///android_asset/theme/daily_theme_5.webp",
                     type = TemplateType.DAILY
                 ),
                 ThemeTemplateModel(
-                    id = "6",
+                    id = Config.TEMPLATE_6,
                     image ="file:///android_asset/theme/travel_theme_1.webp",
                     type = TemplateType.TRAVEL
                 ),
                 ThemeTemplateModel(
-                    id = "7",
+                    id = Config.TEMPLATE_7,
                     image ="file:///android_asset/theme/travel_theme_2.webp",
                     type = TemplateType.TRAVEL
                 ),
                 ThemeTemplateModel(
-                    id = "8",
+                    id = Config.TEMPLATE_8,
                     image ="file:///android_asset/theme/travel_theme_3.webp",
                     type = TemplateType.TRAVEL
                 ),
                 ThemeTemplateModel(
-                    id = "9",
+                    id = Config.TEMPLATE_9,
                     image ="file:///android_asset/theme/travel_theme_4.webp",
                     type = TemplateType.TRAVEL
                 ),
                 ThemeTemplateModel(
-                    id = "10",
+                    id = Config.TEMPLATE_10,
                     image ="file:///android_asset/theme/travel_theme_5.webp",
                     type = TemplateType.TRAVEL
                 ),
                 ThemeTemplateModel(
-                    id = "11",
+                    id = Config.TEMPLATE_11,
                     image ="file:///android_asset/theme/gps_theme_1.webp",
                     type = TemplateType.GPS
                 ),
                 ThemeTemplateModel(
-                    id = "12",
+                    id = Config.TEMPLATE_12,
                     image ="file:///android_asset/theme/gps_theme_2.webp",
                     type = TemplateType.GPS
                 ),
                 ThemeTemplateModel(
-                    id = "13",
+                    id = Config.TEMPLATE_13,
                     image ="file:///android_asset/theme/gps_theme_3.webp",
                     type = TemplateType.GPS
                 ),
                 ThemeTemplateModel(
-                    id = "14",
+                    id = Config.TEMPLATE_14,
                     image ="file:///android_asset/theme/gps_theme_4.webp",
                     type = TemplateType.GPS
                 ),
                 ThemeTemplateModel(
-                    id = "15",
+                    id = Config.TEMPLATE_15,
                     image ="file:///android_asset/theme/gps_theme_5.webp",
                     type = TemplateType.GPS
                 )

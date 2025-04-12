@@ -1,5 +1,6 @@
 package com.example.baseproject.presentation.viewmodel
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.os.Build
@@ -21,7 +22,12 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.baseproject.data.models.TemplateDataModel
+import com.example.baseproject.domain.MapLocationRepository
+import com.example.baseproject.domain.WeatherRepository
 import com.example.baseproject.presentation.mainscreen.activity.CameraState
+import com.example.baseproject.utils.LocationResult
+import com.example.baseproject.utils.Resource
 import com.example.baseproject.utils.formatDuration
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -36,8 +42,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.Executors
+import kotlin.text.format
 
-class CameraViewModel : ViewModel() {
+class CameraViewModel(
+    private val weatherRepository: WeatherRepository,
+    private val locationRepository: MapLocationRepository
+) : ViewModel() {
     private val _cameraState = MutableStateFlow<CameraState>(CameraState())
     val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
 
@@ -56,7 +66,7 @@ class CameraViewModel : ViewModel() {
     private var isFullScreen = false
     private var isVideoMode = false
 
-    private var recordingTimerJob: Job ?= null
+    private var recordingTimerJob: Job? = null
     private var tempFile: File? = null
 
     fun updateCameraState(update: (CameraState) -> CameraState) {
@@ -160,6 +170,7 @@ class CameraViewModel : ViewModel() {
     fun toggleFullScreen() {
         isFullScreen = !isFullScreen
     }
+
     fun toggleCameraMode() {
         isVideoMode = !isVideoMode
         updateCameraState {
@@ -168,13 +179,15 @@ class CameraViewModel : ViewModel() {
             )
         }
     }
-    fun isVideoMode(): Boolean{
+
+    fun isVideoMode(): Boolean {
         return isVideoMode
     }
-    fun startRecordingTime(){
+
+    fun startRecordingTime() {
         var second = 0
         recordingTimerJob = viewModelScope.launch {
-            while (isActive){
+            while (isActive) {
                 updateCameraState {
                     it.copy(
                         recordingDuration = second.formatDuration()
@@ -185,7 +198,8 @@ class CameraViewModel : ViewModel() {
             }
         }
     }
-    private fun stopRecordingTimer(){
+
+    private fun stopRecordingTimer() {
         recordingTimerJob?.cancel()
         recordingTimerJob = null
         updateCameraState {
@@ -194,6 +208,7 @@ class CameraViewModel : ViewModel() {
             )
         }
     }
+
     fun getCurrentScreenState(): Boolean {
         return isFullScreen
     }
@@ -338,6 +353,75 @@ class CameraViewModel : ViewModel() {
     private fun stopVideoRecording() {
         recording?.stop()
         recording = null
+    }
+
+    fun selectedTemplate(templateId: String?) {
+
+        updateCameraState {
+            it.copy(
+                selectedTemplateId = templateId
+            )
+        }
+    }
+
+    @SuppressLint("DefaultLocale")
+    fun updateTemplateData() {
+        viewModelScope.launch {
+            try {
+                val locationResult = locationRepository.getCurrentLocation()
+                var location: String? = null
+                var lat: String? = null
+                var lon: String? = null
+                var temperature: String? = null
+                when (locationResult) {
+                    is LocationResult.Address -> {}
+                    is LocationResult.Error -> {}
+                    LocationResult.PermissionDenied -> {}
+                    is LocationResult.Success -> {
+                        val currentLocation = locationResult.location
+                        lat = String.format("%.6f", currentLocation.latitude)
+                        lon = String.format("%.6f", currentLocation.longitude)
+                        val addressResult =
+                            locationRepository.getAddressFromLocation(currentLocation)
+                        if (addressResult is LocationResult.Address) {
+                            location = addressResult.address
+                        }
+                        val tempResult = weatherRepository.getCurrentTemp(currentLocation)
+                        if (tempResult is Resource.Success) {
+                            temperature = tempResult.data
+                        } else {
+                            val fakeTemp = weatherRepository.getFakeTemp()
+                            if (fakeTemp is Resource.Success) {
+                                temperature = fakeTemp.data
+                            }
+                        }
+                    }
+                }
+                val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+                val currentDate = dateFormat.format(Date())
+                val currentTime = timeFormat.format(Date())
+
+                updateCameraState {
+                    it.copy(
+                        templateData = TemplateDataModel(
+                            location = location,
+                            lat = lat,
+                            long = lon,
+                            temperature = temperature,
+                            currentTime = currentTime,
+                            currentDate = currentDate
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                updateCameraState {
+                    it.copy(
+                        error = e.message
+                    )
+                }
+            }
+        }
     }
 
     fun hasCamera(context: Context, facing: Int): Boolean {

@@ -38,7 +38,7 @@ class CameraRepositoryImpl: CameraRepository {
                 fos = imageUri?.let { resolver.openOutputStream(it) }
             }
             fos?.use {
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, it)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
             }
                 contentValues.clear()
                 contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0)

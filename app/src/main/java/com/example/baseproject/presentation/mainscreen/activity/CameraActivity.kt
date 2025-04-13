@@ -1,5 +1,6 @@
 package com.example.baseproject.presentation.mainscreen.activity
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -34,15 +35,17 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding::inflate) {
     private val cameraViewModel: CameraViewModel by viewModel()
-    private val cameraPermission = arrayOf(android.Manifest.permission.CAMERA, android.Manifest.permission.RECORD_AUDIO)
-    private val requestCameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-        val allGranted = permissions.entries.all { it.value }
-        if(allGranted){
-            startCamera()
-        }else{
-            Toast.makeText(this, "Cần cấp quyền", Toast.LENGTH_SHORT).show()
+    private val cameraPermission =
+        arrayOf(android.Manifest.permission.CAMERA, android.Manifest.permission.RECORD_AUDIO)
+    private val requestCameraPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val allGranted = permissions.entries.all { it.value }
+            if (allGranted) {
+                startCamera()
+            } else {
+                Toast.makeText(this, "Cần cấp quyền", Toast.LENGTH_SHORT).show()
+            }
         }
-    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,17 +54,19 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
     }
 
     override fun initData() {
-
+        cameraViewModel.updateTemplateData()
     }
 
     override fun initView() {
 
-        if(PermissionManager.hasPermissions(this,cameraPermission)){
+        if (PermissionManager.hasPermissions(this, cameraPermission)) {
             startCamera()
-        }else{
-            PermissionManager.requestPermissions(requestCameraPermissionLauncher,cameraPermission)
+        } else {
+            PermissionManager.requestPermissions(requestCameraPermissionLauncher, cameraPermission)
         }
-        cameraViewModel.updateTemplateData()
+        initTemplate(
+            TemplateDataModel.getDefaultTemplateData()
+        )
         val savedTimer = SharePrefUtils.getTimerPref()
         cameraViewModel.updateCameraState {
             it.copy(
@@ -80,14 +85,15 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
             }
             imvGird.setOnClickListener {
                 cameraViewModel.enableGrid()
-                gridOverlay.visibility = if (cameraViewModel.isGridEnabled()) View.VISIBLE else View.GONE
+                gridOverlay.visibility =
+                    if (cameraViewModel.isGridEnabled()) View.VISIBLE else View.GONE
             }
 
             imvSwitchCamera.setOnClickListener {
                 toggleCamera()
             }
             tvFunction.setOnClickListener {
-                if(cameraViewModel.isVideoMode()){
+                if (cameraViewModel.isVideoMode()) {
                     updateCameraMode(false)
                     cameraViewModel.toggleCameraMode()
                 }
@@ -99,37 +105,41 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                 }
             }
             imvTakeCapture.setOnClickListener {
-                if(cameraViewModel.isVideoMode()){
+                if (cameraViewModel.isVideoMode()) {
                     toggleVideoRecording()
-                }else{
+                } else {
                     val selectedTimer = cameraViewModel.cameraState.value.selectedTimerDuration
-                    if(selectedTimer > 0){
+                    if (selectedTimer > 0) {
                         takeCountdownPicture(selectedTimer)
-                    }else{
+                    } else {
                         takePicture()
                     }
                 }
             }
             imvFlash.setOnClickListener {
                 if (cameraViewModel.currentLensFacing() == CameraSelector.LENS_FACING_FRONT) {
-                    Toast.makeText(this@CameraActivity, "Camera trc ko hỗ trợ flash", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@CameraActivity,
+                        "Camera trc ko hỗ trợ flash",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     return@setOnClickListener
                 }
                 toggleFlashMode()
                 updateFlashIcon(cameraViewModel.getCurrentFlashMode())
             }
             imvTimer.setOnClickListener {
-               setCountDownTimer()
+                setCountDownTimer()
             }
             imvFullScreen.setOnClickListener {
                 cameraViewModel.toggleFullScreen()
-                if(cameraViewModel.getCurrentScreenState()){
+                if (cameraViewModel.getCurrentScreenState()) {
                     binding.clRoot.transitionToEnd()
                     binding.imvFullScreen.setImageResource(R.drawable.ic_full_exit)
                     binding.flCamera.elevation = -1f
                     binding.clHeader.elevation = 10f
                     binding.clBottom.elevation = 10f
-                }else{
+                } else {
                     binding.clRoot.transitionToStart()
                     binding.imvFullScreen.setImageResource(R.drawable.ic_full)
                     binding.flCamera.elevation = 0f
@@ -139,21 +149,23 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
             }
         }
     }
-    fun observeViewModel() {
+
+    @SuppressLint("SetTextI18n")
+    private fun observeViewModel() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED){
-                cameraViewModel.cameraState.collect{cameraState->
-                    cameraState.captureImageBitmap?.let {bitmap->
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                cameraViewModel.cameraState.collect { cameraState ->
+                    cameraState.captureImageBitmap?.let { bitmap ->
                         Log.d("CameraActivity", "observeViewModel: $bitmap")
                         navigateToPreviewImage(bitmap)
                     }
-                    cameraState.previewUri?.let {uri->
+                    cameraState.previewUri?.let { uri ->
                         navigateToPreviewVideo(uri)
                     }
                     cameraState.error?.let {
                         Toast.makeText(this@CameraActivity, it, Toast.LENGTH_SHORT).show()
                     }
-                    cameraState.recordingDuration?.let {duration->
+                    cameraState.recordingDuration?.let { duration ->
                         binding.tvDurationVideo.text = duration
                     }
                     updateRecordingUI(cameraState.isRecording)
@@ -174,10 +186,13 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
             }
         }
     }
+
     private fun navigateToPreviewImage(imgBitmap: Bitmap) {
         val intent = Intent(this, PreviewActivity::class.java).apply {
             putExtra("IS_IMAGE", true)
             BitmapHolder.bitmap = imgBitmap
+            putExtra("TEMPLATE_DATA", cameraViewModel.cameraState.value.templateData)
+            putExtra("TEMPLATE_ID", cameraViewModel.cameraState.value.selectedTemplateId)
         }
         cameraViewModel.updateCameraState {
             it.copy(
@@ -186,7 +201,8 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
         }
         startActivity(intent)
     }
-    fun navigateToPreviewVideo(videoUri: Uri) {
+
+    private fun navigateToPreviewVideo(videoUri: Uri) {
         val intent = Intent(this, PreviewActivity::class.java).apply {
             putExtra("IS_IMAGE", false)
             putExtra("VIDEO_URI", videoUri.toString())
@@ -198,36 +214,44 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
         }
         startActivity(intent)
     }
-    fun startCamera() {
-        cameraViewModel.initializeCamera(this,binding.previewView,this)
+
+    private fun startCamera() {
+        cameraViewModel.initializeCamera(this, binding.previewView, this)
     }
-    fun takePicture() {
+
+    private fun takePicture() {
         cameraViewModel.takePhoto()
     }
-    fun takeCountdownPicture(timerSeconds: Int){
+
+    private fun takeCountdownPicture(timerSeconds: Int) {
         cameraViewModel.takePhoto(timerSeconds)
     }
-    fun toggleCamera() {
-        cameraViewModel.toggleCamera(binding.previewView,this)
+
+    private fun toggleCamera() {
+        cameraViewModel.toggleCamera(binding.previewView, this)
     }
-    fun toggleFlashMode() {
-        cameraViewModel.toggleFlashMode(binding.previewView,this)
+
+    private fun toggleFlashMode() {
+        cameraViewModel.toggleFlashMode(binding.previewView, this)
     }
-    fun toggleVideoRecording() {
+
+    private fun toggleVideoRecording() {
         cameraViewModel.toggleVideoRecording(this)
         updateRecordingUI(cameraViewModel.cameraState.value.isRecording)
     }
-    private fun updateFlashIcon(flashMode:Int){
-        val flashIcon =when(flashMode){
+
+    private fun updateFlashIcon(flashMode: Int) {
+        val flashIcon = when (flashMode) {
             ImageCapture.FLASH_MODE_OFF -> R.drawable.ic_flash_off
             ImageCapture.FLASH_MODE_ON -> R.drawable.ic_flash_on
             else -> R.drawable.ic_flash_off
         }
         binding.imvFlash.setImageResource(flashIcon)
     }
+
     private fun setCountDownTimer() {
         val currentTimerValue = cameraViewModel.cameraState.value.selectedTimerDuration
-        val newTimerValue = when(currentTimerValue) {
+        val newTimerValue = when (currentTimerValue) {
             0 -> 3
             3 -> 5
             5 -> 10
@@ -243,8 +267,9 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
         updateTimerIcon(newTimerValue)
 
     }
+
     private fun updateTimerIcon(timerValue: Int) {
-        val iconRes = when(timerValue) {
+        val iconRes = when (timerValue) {
             0 -> R.drawable.ic_time
             3 -> R.drawable.ic_time_3s
             5 -> R.drawable.ic_time_5s
@@ -253,39 +278,44 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
         }
         binding.imvTimer.setImageResource(iconRes)
     }
+
     private fun initTemplate(template: TemplateDataModel) {
+        val templateId = Config.TEMPLATE_4
+        cameraViewModel.selectedTemplate(
+            templateId
+        )
         binding.templateOverlayContainer.addTemplate(
             this,
-            Config.TEMPLATE_7,
+            templateId,
             template
         )
     }
-    fun updateCameraMode(isVideoMode: Boolean) {
-        with(binding){
-           if(isVideoMode){
-               tvFunction.setBackgroundResource(android.R.color.transparent)
-               tvFunction.setTextColor(Color.WHITE)
 
-               tvOption.setBackgroundResource(R.drawable.bg_btn_photo)
-               tvOption.setTextColor(Color.BLACK)
+    private fun updateCameraMode(isVideoMode: Boolean) {
+        with(binding) {
+            if (isVideoMode) {
+                tvFunction.setBackgroundResource(android.R.color.transparent)
+                tvFunction.setTextColor(Color.WHITE)
 
-               imvTakeCapture.setImageResource(R.drawable.ic_record_video)
-           }else{
-               tvFunction.setBackgroundResource(R.drawable.bg_btn_photo)
-               tvFunction.setTextColor(Color.BLACK)
-              // tvFunction.setTextColor(ContextCompat.getColor(this@CameraActivity, R.style.medium_500.toInt()))
+                tvOption.setBackgroundResource(R.drawable.bg_btn_photo)
+                tvOption.setTextColor(Color.BLACK)
 
-               tvOption.setBackgroundResource(android.R.color.transparent)
-               tvOption.setTextColor(Color.WHITE)
-              // tvOption.setTextColor(ContextCompat.getColor(this@CameraActivity, R.style.medium_500_v2.toInt()))
+                imvTakeCapture.setImageResource(R.drawable.ic_record_video)
+            } else {
+                tvFunction.setBackgroundResource(R.drawable.bg_btn_photo)
+                tvFunction.setTextColor(Color.BLACK)
 
-               imvTakeCapture.setImageResource(R.drawable.ic_take_photo)
-           }
+                tvOption.setBackgroundResource(android.R.color.transparent)
+                tvOption.setTextColor(Color.WHITE)
+
+                imvTakeCapture.setImageResource(R.drawable.ic_take_photo)
+            }
         }
     }
+
     private fun updateRecordingUI(isRecording: Boolean) {
         with(binding) {
-            if(isRecording) {
+            if (isRecording) {
                 imvTakeCapture.setImageResource(R.drawable.ic_record_video)
                 tvDurationVideo.visible()
                 tvFunction.invisible()
@@ -302,6 +332,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
             }
         }
     }
+
     override fun onDestroy() {
         super.onDestroy()
         cameraViewModel.cleanupCamera()

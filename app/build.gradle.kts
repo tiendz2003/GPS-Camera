@@ -29,7 +29,7 @@ android {
     }
 
     buildTypes {
-        debug {
+        /*debug {
             val properties = Properties().apply {
                 load(rootProject.file("local.properties").inputStream())
             }
@@ -41,7 +41,7 @@ android {
                 "WEATHER_API_KEY",
                 "\"$apiKey\""
             )
-        }
+        }*/
         release {
             isMinifyEnabled = false
             proguardFiles(

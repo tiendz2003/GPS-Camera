@@ -3,9 +3,12 @@ package com.example.baseproject.utils
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
+import android.os.Build
+import android.os.Parcelable
 import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.View
@@ -182,6 +185,14 @@ fun FrameLayout.addTemplate(
             templateView.setData(data)
             this.addView(templateView)
         }
+    }
+}
+inline fun <reified T:Parcelable> Intent.parcelable(key: String): T? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        this.getParcelableExtra(key, T::class.java)
+    } else {
+        @Suppress("DEPRECATION")
+        this.getParcelableExtra(key)
     }
 }
  fun Activity.startCountdownAnimation(view: View) {

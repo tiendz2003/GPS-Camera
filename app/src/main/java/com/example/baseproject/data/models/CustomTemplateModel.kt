@@ -1,13 +1,15 @@
 package com.example.baseproject.data.models
 
 import android.content.Context
+import android.os.Parcelable
 import com.example.baseproject.R
 import com.example.baseproject.utils.CustomTemplateConfig
+import kotlinx.parcelize.Parcelize
 
 data class CustomTemplateModel(val id: String, val name: String, val icon: Int, var isSelected: Boolean = false, var isActive: Boolean = true) {
     companion object {
         fun getCustomTemplates(context: Context) =
-            arrayListOf<CustomTemplateModel>(
+            arrayListOf(
                 CustomTemplateModel(
                     CustomTemplateConfig.LOCATION,
                     context.getString(R.string.location),
@@ -32,6 +34,7 @@ data class CustomTemplateModel(val id: String, val name: String, val icon: Int, 
             )
     }
 }
+@Parcelize
 data class TemplateDataModel(
     val location: String? = null,
     val lat: String? = null,
@@ -39,7 +42,20 @@ data class TemplateDataModel(
     val temperature: String? = null,
     val currentTime: String? = null,
     val currentDate: String? = null
-)
+):Parcelable{
+    companion object{
+        fun getDefaultTemplateData(): TemplateDataModel {
+            return TemplateDataModel(
+                location = "Hanoi",
+                lat = "21.0285",
+                long = "105.8542",
+                temperature = "25°C",
+                currentTime = "12:00 PM",
+                currentDate = "01/01/2025"
+            )
+        }
+    }
+}
 data class TemplateState(
     val selectedTemplateId: Int? = null,
     val showLocation: Boolean = true,

@@ -18,7 +18,7 @@ class WeatherRepositoryImpl(
                     lat = location.latitude,
                     lon = location.longitude,
                 )
-                if (response.isSuccessful && response.body() != null) {
+                if (response.isSuccessful) {
                     val currentCondition = response.body()?.currentCondition?.firstOrNull()
                     if(currentCondition != null){
                         val temp = "${currentCondition.tempC}°C"

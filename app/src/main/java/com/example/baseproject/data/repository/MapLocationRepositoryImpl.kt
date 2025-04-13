@@ -13,7 +13,9 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import java.util.Locale
 import kotlin.coroutines.resume
 
@@ -22,72 +24,78 @@ class MapLocationRepositoryImpl(private val context: Context) : MapLocationRepos
         LocationServices.getFusedLocationProviderClient(context)
 
     override suspend fun getCurrentLocation(): LocationResult =
-        suspendCancellableCoroutine { continuation ->
-            try {
-                val locationRequest = LocationRequest.Builder(
-                    Priority.PRIORITY_HIGH_ACCURACY,
-                    0L
-                ).setWaitForAccurateLocation(true)
-                    .setMinUpdateIntervalMillis(0L)
-                    .setMaxUpdateDelayMillis(0L)
-                    .setMaxUpdates(1)
-                    .build()
-                val locationCallback = object : LocationCallback() {
-                    override fun onLocationResult(locationResult: com.google.android.gms.location.LocationResult) {
-                        val location = locationResult.lastLocation
-                        fusedLocationClient.removeLocationUpdates(this)
-                        if (location != null) {
-                            continuation.resume(LocationResult.Success(location))
-                        } else {
-                            continuation.resume(LocationResult.Error("Không tìm thấy vị trí"))
-                        }
-                    }
-                }
-                fusedLocationClient.requestLocationUpdates(
-                    locationRequest,
-                    locationCallback,
-                    Looper.getMainLooper()
-                )
-                continuation.invokeOnCancellation {
-                    fusedLocationClient.removeLocationUpdates(locationCallback)
-                }
-            } catch (e: SecurityException) {
-                continuation.resume(LocationResult.Error("Không có quyền truy cập vị trí:${e.message}"))
-            } catch (e: Exception) {
-                continuation.resume(LocationResult.Error("Lỗi lấy vị trí:${e.message}"))
-            }
-        }
+       withContext(Dispatchers.IO){
+           suspendCancellableCoroutine { continuation ->
+               try {
+                   val locationRequest = LocationRequest.Builder(
+                       Priority.PRIORITY_HIGH_ACCURACY,
+                       0L
+                   )//.setWaitForAccurateLocation(true)
+                       .setMinUpdateIntervalMillis(0L)
+                       .setMaxUpdateDelayMillis(0L)
+                       .setMaxUpdates(1)
+                       .build()
+                   val locationCallback = object : LocationCallback() {
+                       override fun onLocationResult(locationResult: com.google.android.gms.location.LocationResult) {
+                           val location = locationResult.lastLocation
+                           fusedLocationClient.removeLocationUpdates(this)
+                           if (location != null) {
+                               continuation.resume(LocationResult.Success(location))
+                           } else {
+                               continuation.resume(LocationResult.Error("Không tìm thấy vị trí"))
+                           }
+                       }
+                   }
+                   fusedLocationClient.requestLocationUpdates(
+                       locationRequest,
+                       locationCallback,
+                       Looper.getMainLooper()
+                   )
+                   continuation.invokeOnCancellation {
+                       fusedLocationClient.removeLocationUpdates(locationCallback)
+                   }
+               } catch (e: SecurityException) {
+                   continuation.resume(LocationResult.Error("Không có quyền truy cập vị trí:${e.message}"))
+               } catch (e: Exception) {
+                   continuation.resume(LocationResult.Error("Lỗi lấy vị trí:${e.message}"))
+               }
+           }
+       }
 
     override suspend fun getAddressFromLocation(location: Location): LocationResult =
-        suspendCancellableCoroutine { continuation ->
-            val geoCoder = Geocoder(context, Locale.getDefault())
-            try {
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-                    geoCoder.getFromLocation(location.latitude, location.longitude, 1){addresses->
-                        if(addresses.isNotEmpty()){
+        withContext(Dispatchers.IO) {
+            suspendCancellableCoroutine { continuation ->
+                val geoCoder by lazy {
+                    Geocoder(context, Locale.getDefault())
+                }
+                try {
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+                        geoCoder.getFromLocation(location.latitude, location.longitude, 1){addresses->
+                            if(addresses.isNotEmpty()){
+                                val address = addresses[0]
+                                val addressText = getFormatAddress(address)
+                                continuation.resume(LocationResult.Address(addressText))
+                            }else{
+                                continuation.resume(LocationResult.Address("Không rõ địa chỉ"))
+                            }
+                        }
+                    }else{
+                        val addresses= geoCoder.getFromLocation(
+                            location.latitude,
+                            location.longitude,
+                            1
+                        )
+                        if (addresses?.isNotEmpty() == true) {
                             val address = addresses[0]
                             val addressText = getFormatAddress(address)
                             continuation.resume(LocationResult.Address(addressText))
-                        }else{
+                        } else {
                             continuation.resume(LocationResult.Address("Không rõ địa chỉ"))
                         }
                     }
-                }else{
-                    val addresses= geoCoder.getFromLocation(
-                        location.latitude,
-                        location.longitude,
-                        1
-                    )
-                    if (addresses?.isNotEmpty() == true) {
-                        val address = addresses[0]
-                        val addressText = getFormatAddress(address)
-                        continuation.resume(LocationResult.Address(addressText))
-                    } else {
-                        continuation.resume(LocationResult.Address("Không rõ địa chỉ"))
-                    }
+                }catch (e: Exception){
+                    continuation.resume(LocationResult.Error("Lỗi lấy địa chỉ:${e.message}"))
                 }
-            }catch (e: Exception){
-                continuation.resume(LocationResult.Error("Lỗi lấy địa chỉ:${e.message}"))
             }
         }
     private fun getFormatAddress(address: Address): String{
@@ -100,5 +108,4 @@ class MapLocationRepositoryImpl(private val context: Context) : MapLocationRepos
             else -> "Không tìm thấy địa chỉ"
         }
     }
-
 }

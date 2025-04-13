@@ -29,7 +29,9 @@ import com.example.baseproject.presentation.mainscreen.activity.CameraState
 import com.example.baseproject.utils.LocationResult
 import com.example.baseproject.utils.Resource
 import com.example.baseproject.utils.formatDuration
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -68,6 +70,8 @@ class CameraViewModel(
 
     private var recordingTimerJob: Job? = null
     private var tempFile: File? = null
+
+
 
     fun updateCameraState(update: (CameraState) -> CameraState) {
         return _cameraState.update(update)
@@ -356,7 +360,6 @@ class CameraViewModel(
     }
 
     fun selectedTemplate(templateId: String?) {
-
         updateCameraState {
             it.copy(
                 selectedTemplateId = templateId
@@ -368,40 +371,57 @@ class CameraViewModel(
     fun updateTemplateData() {
         viewModelScope.launch {
             try {
-                val locationResult = locationRepository.getCurrentLocation()
                 var location: String? = null
                 var lat: String? = null
                 var lon: String? = null
                 var temperature: String? = null
-                when (locationResult) {
-                    is LocationResult.Address -> {}
-                    is LocationResult.Error -> {}
-                    LocationResult.PermissionDenied -> {}
-                    is LocationResult.Success -> {
-                        val currentLocation = locationResult.location
-                        lat = String.format("%.6f", currentLocation.latitude)
-                        lon = String.format("%.6f", currentLocation.longitude)
-                        val addressResult =
-                            locationRepository.getAddressFromLocation(currentLocation)
-                        if (addressResult is LocationResult.Address) {
-                            location = addressResult.address
-                        }
-                        val tempResult = weatherRepository.getCurrentTemp(currentLocation)
-                        if (tempResult is Resource.Success) {
-                            temperature = tempResult.data
-                        } else {
-                            val fakeTemp = weatherRepository.getFakeTemp()
-                            if (fakeTemp is Resource.Success) {
-                                temperature = fakeTemp.data
-                            }
-                        }
-                    }
+
+                val locationDeferred = async {
+                    locationRepository.getCurrentLocation()
                 }
+
                 val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                 val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
                 val currentDate = dateFormat.format(Date())
                 val currentTime = timeFormat.format(Date())
 
+                when (val locationResult = locationDeferred.await()) {
+                    is LocationResult.Success -> {
+                        val currentLocation = locationResult.location
+                        lat = String.format("%.6f", currentLocation.latitude)
+                        lon = String.format("%.6f", currentLocation.longitude)
+
+                        val addressDeferred = async {
+                            locationRepository.getAddressFromLocation(currentLocation)
+                        }
+                        val tempDeferred = async {
+                            weatherRepository.getCurrentTemp(currentLocation)
+                        }
+
+                        val addressResult = addressDeferred.await()
+                        if (addressResult is LocationResult.Address) {
+                            location = addressResult.address
+                        }
+
+                        val tempResult = tempDeferred.await()
+                        if (tempResult is Resource.Success) {
+                            temperature = tempResult.data
+                        } else {
+                            val fakeTempDeferred = async(Dispatchers.IO) {
+                                weatherRepository.getFakeTemp()
+                            }
+                            val fakeTemp = fakeTempDeferred.await()
+                            if (fakeTemp is Resource.Success) {
+                                temperature = fakeTemp.data
+                            }
+                        }
+                    }
+                    else -> {
+                        //
+                    }
+                }
+
+                // Cập nhật
                 updateCameraState {
                     it.copy(
                         templateData = TemplateDataModel(

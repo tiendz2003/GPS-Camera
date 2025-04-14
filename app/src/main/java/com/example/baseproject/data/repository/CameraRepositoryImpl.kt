@@ -5,12 +5,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.net.Uri
-import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
-import com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS
-import com.arthenica.mobileffmpeg.FFmpeg
 import com.example.baseproject.domain.CameraRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -22,6 +19,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.core.graphics.createBitmap
+import com.arthenica.ffmpegkit.FFmpegKit
+import com.arthenica.ffmpegkit.ReturnCode
 
 class CameraRepositoryImpl: CameraRepository {
     override suspend fun saveImageToGallery(context: Context, bitmap: Bitmap): Uri? = withContext(Dispatchers.IO){
@@ -89,9 +88,11 @@ class CameraRepositoryImpl: CameraRepository {
             videoUri?.let {uri->
                 context.contentResolver.update(uri,contentValues,null,null)
             }
+            Log.d("VideoProcessor", "Video saved at: $videoUri")
             return@withContext videoUri
         }catch (e:Exception){
             e.printStackTrace()
+            Log.e("VideoProcessor", "Error: ${e.message}")
             return@withContext null
         }finally {
             if(sourceUri.scheme =="file"){
@@ -102,7 +103,7 @@ class CameraRepositoryImpl: CameraRepository {
 
     override suspend fun processVideoWithTemplate(
         context: Context,
-        inputVideoUri: Uri,
+        videoUri: Uri,
         templateView: View
     ): Uri? = withContext(Dispatchers.Default) {
         try {
@@ -113,14 +114,17 @@ class CameraRepositoryImpl: CameraRepository {
             val tempInputFile = File(tempDir, "input_video.mp4")
             val tempTemplateFile = File(tempDir, "template_overlay.png")
             val tempOutputFile = File(tempDir, "output_video.mp4")
-
-            context.contentResolver.openInputStream(inputVideoUri)?.use { input ->
+            //luu vào file tạm
+            context.contentResolver.openInputStream(videoUri)?.use { input ->
                 FileOutputStream(tempInputFile).use { output ->
                     input.copyTo(output)
                 }
             }
 
-            exportTemplateToImage(templateView, tempTemplateFile.absolutePath)
+           if(!exportTemplateToImage(templateView, tempTemplateFile.absolutePath)){
+                Log.e("VideoProcessor", "Không export được template vào ảnh")
+                return@withContext null
+            }
 
             // Xử lý video với FFmpeg
             val cmd = arrayOf(
@@ -128,27 +132,54 @@ class CameraRepositoryImpl: CameraRepository {
                 "-i", tempInputFile.absolutePath,
                 "-i", tempTemplateFile.absolutePath,
                 "-filter_complex", "[0:v][1:v]overlay=(main_w-overlay_w)/2:main_h-overlay_h",
-               // "-c:v", "mpeg4", // Dùng encoder mpeg4 - nhanh hơn libx264
+                "-c:v", "libx264", // Dùng encoder mpeg4 - nhanh hơn libx264
                 "-preset", "ultrafast", // Tăng tốc nếu dùng libx264 (dự phòng)
                 "-pix_fmt", "yuv420p", // Đảm bảo file có thể phát trong mọi trình phát
                 "-c:a", "copy", // Giữ lại âm thanh gốc, không encode lại
                 "-movflags", "+faststart", // Tối ưu phát video ngay khi tải
                 tempOutputFile.absolutePath
+            ).joinToString(" ")
+
+            val session = FFmpegKit.executeAsync(cmd, { session ->
+                if(ReturnCode.isSuccess(session.returnCode)){
+                    Log.i("VideoProcessor", "Thành công siuuuu")
+                    if (!tempOutputFile.exists()) {
+                        Log.e("VideoProcessor", "Output file không tồn tại mặc dù FFmpeg thành công")
+                    } else {
+                        Log.d("VideoProcessor", "Output file size: ${tempOutputFile.length()} bytes")
+                        // Thử lưu vào thư viện
+                        //val result = saveVideoToGallery(context, Uri.fromFile(tempOutputFile))
+                      //  Log.d("VideoProcessor", "Kết quả lưu vào thư viện: $result")
+                       /* if (result == null) {
+                            Log.e("VideoProcessor", "saveVideoToGallery trả về null")
+                        }*/
+                    }
+                }else if(ReturnCode.isCancel(session.returnCode)){
+                    Log.i("VideoProcessor", "Hủy quá trình lưu")
+                }else{
+                    Log.e("VideoProcessor", "Luu thất bại rc=${session.returnCode}")
+                }
+            },{log->
+                Log.d("VideoProcessor", log.message)
+            },{statistics->
+                Log.d("FFmpegKit", "Processing time: ${statistics.time}")
+            }
             )
 
-
-
-            val rc = FFmpeg.execute(cmd)
-
-            if (rc == RETURN_CODE_SUCCESS) {
-                // Lưu video vào thư viện
-                return@withContext saveVideoToGallery(context, Uri.fromFile(tempOutputFile))
+            if (ReturnCode.isSuccess(session.returnCode)) {
+                Log.i("VideoProcessor", "Xử lý video thành công")
+                // Lưu video vào thư viện xoa file tạm
+                val result = saveVideoToGallery(context, Uri.fromFile(tempOutputFile))
+                tempInputFile.delete()
+                tempTemplateFile.delete()
+                tempOutputFile.delete()
+                return@withContext result
             } else {
-                Log.e("FFmpeg", "Command failed with rc=${rc} and output: ${FFmpeg.listExecutions()}")
+                Log.e("FFmpeg", "THẤT BẠI  rc=${session.returnCode})}")
                 return@withContext null
             }
         } catch (e: Exception) {
-            Log.e("VideoProcessor", "Error processing video", e)
+            Log.e("VideoProcessor", "Lỗi khi xử lý video", e)
             return@withContext null
         }
     }

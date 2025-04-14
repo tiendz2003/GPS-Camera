@@ -27,8 +27,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS
-import com.arthenica.mobileffmpeg.FFmpeg
 import com.example.baseproject.data.models.TemplateDataModel
 import com.example.baseproject.domain.CameraRepository
 import com.example.baseproject.domain.MapLocationRepository
@@ -307,6 +305,7 @@ class CameraViewModel(
 
     fun startVideoRecording(context: Context) {
         val videoCapture = this.videoCapture ?: return
+        tempFile?.delete()
         try {
             tempFile = File(
                 context.cacheDir,
@@ -314,11 +313,15 @@ class CameraViewModel(
                     SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
                 }.mp4"
             )
+            Log.d(
+                "CameraViewModel",
+                "Video file path: ${tempFile?.absolutePath}"
+            )
             val fileOutputOptions = FileOutputOptions.Builder(tempFile!!).build()
             recording = videoCapture.output.prepareRecording(context, fileOutputOptions)
                 .apply {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        //withAudioEnabled()
+                        withAudioEnabled()
                     }
                 }
                 .start(ContextCompat.getMainExecutor(context)) { recordEvent ->
@@ -336,31 +339,44 @@ class CameraViewModel(
                             } else {
                                 viewModelScope.launch {
                                     try {
+                                        updateCameraState {
+                                            it.copy(
+                                                isLoading = true, error = null
+                                            )
+                                        }
                                         // Lấy tham chiếu đến template view
                                         val templateView = _cameraState.value.templateView
-                                        if (templateView != null) {
+                                        val savedUri = if (templateView != null) {
                                             // Xử lý video với template
-                                            val savedUri = cameraRepository.processVideoWithTemplate(
+                                            cameraRepository.processVideoWithTemplate(
                                                 context,
                                                 Uri.fromFile(tempFile),
                                                 templateView
                                             )
-                                            updateCameraState {
-                                                it.copy(previewUri = savedUri)
-                                            }
                                         } else {
                                             // Fallback nếu không có template view
-                                            val savedUri = cameraRepository.saveVideoToGallery(
+                                            cameraRepository.saveVideoToGallery(
                                                 context,
                                                 Uri.fromFile(tempFile)
                                             )
-                                            updateCameraState {
-                                                it.copy(previewUri = savedUri)
-                                            }
+                                        }
+                                        Log.d(
+                                            "CameraViewModel",
+                                            "Video saved to: $savedUri"
+                                        )
+                                        updateCameraState {
+                                            it.copy(
+                                                previewUri = savedUri,
+                                                isLoading = false,
+                                                error = if (savedUri == null) "Lưu video không thành công" else null
+                                            )
                                         }
                                     } catch (e: Exception) {
                                         updateCameraState {
-                                            it.copy(error = "Lưu video không thành công: ${e.message}")
+                                            it.copy(
+                                                error = "Lưu video không thành công: ${e.message}",
+                                                isLoading = false
+                                            )
                                         }
                                     }
                                 }
@@ -368,9 +384,25 @@ class CameraViewModel(
                         }
                     }
                 }
+        } catch (e: SecurityException) {
+            updateCameraState {
+                it.copy(
+                    error = "Không có quyền truy cập camera:${e.message}",
+                    isRecording = false,
+                    isLoading = false
+                )
+            }
+        } catch (e: IllegalStateException) {
+            updateCameraState {
+                it.copy(
+                    error = "Không thể bắt đầu quay video:${e.message}",
+                    isRecording = false,
+                    isLoading = false
+                )
+            }
         } catch (e: Exception) {
             updateCameraState {
-                it.copy(error = e.message)
+                it.copy(error = e.message, isRecording = false, isLoading = false)
             }
         }
     }

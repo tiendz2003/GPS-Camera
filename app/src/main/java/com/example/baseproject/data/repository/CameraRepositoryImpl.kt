@@ -21,6 +21,8 @@ import java.util.Locale
 import androidx.core.graphics.createBitmap
 import com.arthenica.ffmpegkit.FFmpegKit
 import com.arthenica.ffmpegkit.ReturnCode
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class CameraRepositoryImpl: CameraRepository {
     override suspend fun saveImageToGallery(context: Context, bitmap: Bitmap): Uri? = withContext(Dispatchers.IO){
@@ -140,33 +142,22 @@ class CameraRepositoryImpl: CameraRepository {
                 tempOutputFile.absolutePath
             ).joinToString(" ")
 
-            val session = FFmpegKit.executeAsync(cmd, { session ->
-                if(ReturnCode.isSuccess(session.returnCode)){
-                    Log.i("VideoProcessor", "Thành công siuuuu")
-                    if (!tempOutputFile.exists()) {
-                        Log.e("VideoProcessor", "Output file không tồn tại mặc dù FFmpeg thành công")
-                    } else {
-                        Log.d("VideoProcessor", "Output file size: ${tempOutputFile.length()} bytes")
-                        // Thử lưu vào thư viện
-                        //val result = saveVideoToGallery(context, Uri.fromFile(tempOutputFile))
-                      //  Log.d("VideoProcessor", "Kết quả lưu vào thư viện: $result")
-                       /* if (result == null) {
-                            Log.e("VideoProcessor", "saveVideoToGallery trả về null")
-                        }*/
+            val returnCode = suspendCoroutine<ReturnCode?> { continuation ->
+                FFmpegKit.executeAsync(cmd,
+                    { session ->
+                        continuation.resume(session.returnCode)
+                        Log.i("VideoProcessor", "FFmpeg execution completed with code: ${session.returnCode}")
+                    },
+                    { log ->
+                        Log.d("VideoProcessor", log.message)
+                    },
+                    { statistics ->
+                        Log.d("FFmpegKit", "Processing time: ${statistics.time}")
                     }
-                }else if(ReturnCode.isCancel(session.returnCode)){
-                    Log.i("VideoProcessor", "Hủy quá trình lưu")
-                }else{
-                    Log.e("VideoProcessor", "Luu thất bại rc=${session.returnCode}")
-                }
-            },{log->
-                Log.d("VideoProcessor", log.message)
-            },{statistics->
-                Log.d("FFmpegKit", "Processing time: ${statistics.time}")
+                )
             }
-            )
 
-            if (ReturnCode.isSuccess(session.returnCode)) {
+            if (ReturnCode.isSuccess(returnCode)) {
                 Log.i("VideoProcessor", "Xử lý video thành công")
                 // Lưu video vào thư viện xoa file tạm
                 val result = saveVideoToGallery(context, Uri.fromFile(tempOutputFile))
@@ -175,7 +166,7 @@ class CameraRepositoryImpl: CameraRepository {
                 tempOutputFile.delete()
                 return@withContext result
             } else {
-                Log.e("FFmpeg", "THẤT BẠI  rc=${session.returnCode})}")
+                Log.e("FFmpeg", "THẤT BẠI  rc=${returnCode})}")
                 return@withContext null
             }
         } catch (e: Exception) {

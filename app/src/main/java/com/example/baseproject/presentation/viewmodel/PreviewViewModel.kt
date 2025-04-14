@@ -51,33 +51,5 @@ class PreviewViewModel(
             }
         }
     }
-    fun saveVideoToGallery(context: Context, uri: Uri) {
-        viewModelScope.launch {
-            updatePreviewState {
-                it.copy(
-                    isSaving = true
-                )
-            }
-            try {
-                val uri = cameraRepository.saveVideoToGallery(context, uri)
-                updatePreviewState {
-                    it.copy(
-                        savedVideoUri = uri
-                    )
-                }
-            }catch (e: Exception){
-                updatePreviewState {
-                    it.copy(
-                        error = e.message
-                    )
-                }
-            }finally {
-                updatePreviewState {
-                    it.copy(
-                        isSaving = false
-                    )
-                }
-            }
-        }
-    }
+
 }

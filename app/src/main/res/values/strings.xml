@@ -41,7 +41,7 @@
     <string name="photo">Photo</string>
     <string name="video">Video</string>
     <string name="location">Location</string>
-    <string name="latlng" >Lat/Long</string>
+    <string name="latlng">Lat/Long</string>
     <string name="time">1:51 PM</string>
     <string name="temperature">30°C</string>
     <string name="date">Date</string>

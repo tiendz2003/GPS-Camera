@@ -2,14 +2,12 @@ package com.example.baseproject.presentation.mainscreen.activity
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import com.example.baseproject.bases.BaseActivity
 import com.example.baseproject.databinding.ActivityPreviewBinding
 import com.example.baseproject.utils.BitmapHolder
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
@@ -27,10 +25,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
 
-class PreviewActivity : BaseActivity<ActivityPreviewBinding>(ActivityPreviewBinding::inflate) {
-    private var isImage = true
-    private var videoUri: Uri? = null
+class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPreviewBinding::inflate) {
+
     private val previewViewModel: PreviewViewModel by viewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,10 +37,8 @@ class PreviewActivity : BaseActivity<ActivityPreviewBinding>(ActivityPreviewBind
     }
 
     override fun initData() {
-        isImage = intent.getBooleanExtra("IS_IMAGE", true)
         val templateData = intent.parcelable<TemplateDataModel>("TEMPLATE_DATA")
         val templateId = intent.getStringExtra("TEMPLATE_ID")
-        if (isImage) {
             val bitmap = BitmapHolder.bitmap
             if (bitmap != null) {
                 displayImageWithTemplate(bitmap, templateData, templateId)
@@ -49,15 +46,6 @@ class PreviewActivity : BaseActivity<ActivityPreviewBinding>(ActivityPreviewBind
                 Toast.makeText(this, "Không nhận được ảnh", Toast.LENGTH_SHORT).show()
                 finish()
             }
-        } else {
-            val videoUriString = intent.getStringExtra("VIDEO_URI")
-            if (videoUri != null) {
-                videoUri = videoUriString?.toUri()
-                //previewvideo
-            } else {
-
-            }
-        }
 
     }
 
@@ -83,19 +71,19 @@ class PreviewActivity : BaseActivity<ActivityPreviewBinding>(ActivityPreviewBind
                 previewViewModel.previewUiState.collect { previewUiState ->
                     previewUiState.savedImageUri?.let {
                         Toast.makeText(
-                            this@PreviewActivity,
+                            this@PreviewImageActivity,
                             "Lưu ảnh thành công",
                             Toast.LENGTH_SHORT
                         ).show()
                         finish()
                     }
                     if (previewUiState.isSaving) {
-                        Toast.makeText(this@PreviewActivity, "Đang lưu ảnh", Toast.LENGTH_SHORT)
+                        Toast.makeText(this@PreviewImageActivity, "Đang lưu ảnh", Toast.LENGTH_SHORT)
                             .show()
                     }
                     previewUiState.error?.let {
                         Toast.makeText(
-                            this@PreviewActivity,
+                            this@PreviewImageActivity,
                             "Lưu ảnh thất bại :${it} ",
                             Toast.LENGTH_SHORT
                         ).show()
@@ -127,10 +115,9 @@ class PreviewActivity : BaseActivity<ActivityPreviewBinding>(ActivityPreviewBind
         lifecycleScope.launch {
             try {
                 val combineBitmap = withContext(Dispatchers.Default) {
-                    val originBitmap = Bitmap.createBitmap(
+                    val originBitmap = createBitmap(
                         binding.previewContainer.width,
-                        binding.previewContainer.height,
-                        Bitmap.Config.ARGB_8888
+                        binding.previewContainer.height
                     )
                     withContext(Dispatchers.Main) {
                         val canvas = Canvas(originBitmap)
@@ -138,11 +125,11 @@ class PreviewActivity : BaseActivity<ActivityPreviewBinding>(ActivityPreviewBind
                     }
                     originBitmap
                 }
-                previewViewModel.saveImageToGallery(this@PreviewActivity, combineBitmap)
+                previewViewModel.saveImageToGallery(this@PreviewImageActivity, combineBitmap)
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
-                        this@PreviewActivity,
+                        this@PreviewImageActivity,
                         "Lưu ảnh thất bại: ${e.message}",
                         Toast.LENGTH_SHORT
                     ).show()
@@ -151,12 +138,7 @@ class PreviewActivity : BaseActivity<ActivityPreviewBinding>(ActivityPreviewBind
         }
     }
     private fun resizeBitmap(bitmap:Bitmap): Bitmap {
-       val resizeBitmap = Bitmap.createScaledBitmap(
-            bitmap,
-            binding.previewContainer.width,
-            binding.previewContainer.height,
-            true
-        )
+       val resizeBitmap = bitmap.scale(binding.previewContainer.width, binding.previewContainer.height)
         return resizeBitmap
     }
     private fun setupViewPager() {

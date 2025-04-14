@@ -29,19 +29,19 @@ android {
     }
 
     buildTypes {
-        /*debug {
+        debug {
             val properties = Properties().apply {
                 load(rootProject.file("local.properties").inputStream())
             }
-            val apiKey = checkNotNull(properties.getProperty("WEATHER_API_KEY")){
+            val apiKey = checkNotNull(properties.getProperty("MAP_API_KEY")){
                 "Không tìm thấy API_KEY trong local.properties"
             }
             buildConfigField(
                 "String",
-                "WEATHER_API_KEY",
+                "MAP_API_KEY",
                 "\"$apiKey\""
             )
-        }*/
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -69,9 +69,11 @@ dependencies {
     implementation ("com.squareup.retrofit2:retrofit:2.11.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation ("com.squareup.okhttp3:logging-interceptor:4.10.0")
-    // CameraX Core (Bắt buộc)
+    implementation ("com.arthenica:mobile-ffmpeg-full:4.4.LTS")
+
     implementation (libs.androidx.camera.core)
     implementation ("androidx.camera:camera-camera2:1.4.2")
+    implementation ("androidx.camera:camera-effects:1.4.2")
     // CameraX Lifecycle để tự động quản lý camera theo lifecycle
     implementation (libs.androidx.camera.lifecycle)
     // CameraX View để hiển thị preview

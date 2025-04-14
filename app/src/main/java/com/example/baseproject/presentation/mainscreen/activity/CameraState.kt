@@ -2,9 +2,11 @@ package com.example.baseproject.presentation.mainscreen.activity
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.view.View
 import com.example.baseproject.data.models.TemplateDataModel
 
 data class CameraState(
+    val isLoading : Boolean = false,
     val captureImageBitmap:Bitmap ?= null,
     val previewUri : Uri?= null,
     val countDownTimer:Int = 0,
@@ -15,5 +17,6 @@ data class CameraState(
     val recordingDuration: String? = null,
     val error : String? = null,
     val selectedTemplateId: String? = null,
-    val templateData: TemplateDataModel? = null
+    val templateData: TemplateDataModel? = null,
+    val templateView: View? = null
 )

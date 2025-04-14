@@ -2,13 +2,18 @@ package com.example.baseproject.presentation.viewmodel
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.net.Uri
 import android.os.Build
+import android.util.Log
+import android.view.View
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
+import androidx.camera.effects.OverlayEffect
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.FileOutputOptions
 import androidx.camera.video.Quality
@@ -22,7 +27,10 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS
+import com.arthenica.mobileffmpeg.FFmpeg
 import com.example.baseproject.data.models.TemplateDataModel
+import com.example.baseproject.domain.CameraRepository
 import com.example.baseproject.domain.MapLocationRepository
 import com.example.baseproject.domain.WeatherRepository
 import com.example.baseproject.presentation.mainscreen.activity.CameraState
@@ -39,7 +47,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -48,7 +58,8 @@ import kotlin.text.format
 
 class CameraViewModel(
     private val weatherRepository: WeatherRepository,
-    private val locationRepository: MapLocationRepository
+    private val locationRepository: MapLocationRepository,
+    private val cameraRepository: CameraRepository
 ) : ViewModel() {
     private val _cameraState = MutableStateFlow<CameraState>(CameraState())
     val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
@@ -70,7 +81,6 @@ class CameraViewModel(
 
     private var recordingTimerJob: Job? = null
     private var tempFile: File? = null
-
 
 
     fun updateCameraState(update: (CameraState) -> CameraState) {
@@ -295,26 +305,22 @@ class CameraViewModel(
         }
     }
 
-    private fun startVideoRecording(context: Context) {
+    fun startVideoRecording(context: Context) {
         val videoCapture = this.videoCapture ?: return
         try {
             tempFile = File(
                 context.cacheDir,
                 "video_${
-                    SimpleDateFormat(
-                        "yyyyMMdd_HHmmss",
-                        Locale.getDefault()
-                    ).format(Date())
+                    SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
                 }.mp4"
             )
             val fileOutputOptions = FileOutputOptions.Builder(tempFile!!).build()
-            recording = videoCapture.output.prepareRecording(
-                context, fileOutputOptions
-            ).apply {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    withAudioEnabled()
+            recording = videoCapture.output.prepareRecording(context, fileOutputOptions)
+                .apply {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        //withAudioEnabled()
+                    }
                 }
-            }
                 .start(ContextCompat.getMainExecutor(context)) { recordEvent ->
                     when (recordEvent) {
                         is VideoRecordEvent.Start -> {
@@ -325,34 +331,51 @@ class CameraViewModel(
                             isRecording = false
                             if (recordEvent.hasError()) {
                                 updateCameraState {
-                                    it.copy(
-                                        error = "Khoong tao duoc video: " + recordEvent.error
-                                    )
+                                    it.copy(error = "Không tạo được video: " + recordEvent.error)
                                 }
                             } else {
-                                updateCameraState {
-                                    it.copy(
-                                        previewUri = Uri.fromFile(tempFile)
-                                    )
+                                viewModelScope.launch {
+                                    try {
+                                        // Lấy tham chiếu đến template view
+                                        val templateView = _cameraState.value.templateView
+                                        if (templateView != null) {
+                                            // Xử lý video với template
+                                            val savedUri = cameraRepository.processVideoWithTemplate(
+                                                context,
+                                                Uri.fromFile(tempFile),
+                                                templateView
+                                            )
+                                            updateCameraState {
+                                                it.copy(previewUri = savedUri)
+                                            }
+                                        } else {
+                                            // Fallback nếu không có template view
+                                            val savedUri = cameraRepository.saveVideoToGallery(
+                                                context,
+                                                Uri.fromFile(tempFile)
+                                            )
+                                            updateCameraState {
+                                                it.copy(previewUri = savedUri)
+                                            }
+                                        }
+                                    } catch (e: Exception) {
+                                        updateCameraState {
+                                            it.copy(error = "Lưu video không thành công: ${e.message}")
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
-        } catch (e: SecurityException) {
-            updateCameraState {
-                it.copy(
-                    error = e.message
-                )
-            }
         } catch (e: Exception) {
             updateCameraState {
-                it.copy(
-                    error = e.message
-                )
+                it.copy(error = e.message)
             }
         }
     }
+
+
 
     private fun stopVideoRecording() {
         recording?.stop()
@@ -366,7 +389,6 @@ class CameraViewModel(
             )
         }
     }
-
     @SuppressLint("DefaultLocale")
     fun updateTemplateData() {
         viewModelScope.launch {

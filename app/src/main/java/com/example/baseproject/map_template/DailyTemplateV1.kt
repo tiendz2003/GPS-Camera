@@ -31,43 +31,4 @@ class DailyTemplateV1(context: Context?, attrs: AttributeSet?) : BaseCustomView(
         binding.tvTime.text = data.currentTime
         binding.tvTemperature.text = data.temperature
     }
-
-  /*  @SuppressLint("SetTextI18n")
-    override fun setData(data: TemplateDataModel) {
-        val pref = SharePrefUtils.getInstance(context)
-
-        val isShowTime = pref.showTime()
-        val isShowDate = pref.showDate()
-        val isShowLocation = pref.showLocation()
-        val isShowWatermark = pref.showWatermark()
-
-        // Vị trí
-        binding.tvCity.text = data.city.uppercase()
-        binding.tvAddress.text = data.address
-        binding.tvCity.setVisibleGone(isShowLocation)
-        binding.tvAddress.setVisibleGone(isShowLocation)
-
-        // Watermark
-        binding.tvAppName.setVisibleGone(isShowWatermark)
-        binding.imvLogo.setVisibleGone(isShowWatermark)
-
-        // Thời gian & ngày
-        when {
-            isShowTime && isShowDate -> {
-                binding.tvTime.visible()
-                binding.tvTime.text = "${data.time} ${data.date}"
-            }
-            isShowTime -> {
-                binding.tvTime.visible()
-                binding.tvTime.text = data.time
-            }
-            isShowDate -> {
-                binding.tvTime.visible()
-                binding.tvTime.text = data.date
-            }
-            else -> {
-                binding.tvTime.gone()
-            }
-        }
-    }*/
 }

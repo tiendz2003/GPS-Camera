@@ -11,7 +11,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.lifecycle.Lifecycle
@@ -160,7 +159,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                         navigateToPreviewImage(bitmap)
                     }
                     cameraState.previewUri?.let { uri ->
-                        navigateToPreviewVideo(uri)
+                        //saveVideoToGallery(uri)
                     }
                     cameraState.error?.let {
                         Toast.makeText(this@CameraActivity, it, Toast.LENGTH_SHORT).show()
@@ -188,8 +187,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
     }
 
     private fun navigateToPreviewImage(imgBitmap: Bitmap) {
-        val intent = Intent(this, PreviewActivity::class.java).apply {
-            putExtra("IS_IMAGE", true)
+        val intent = Intent(this, PreviewImageActivity::class.java).apply {
             BitmapHolder.bitmap = imgBitmap
             putExtra("TEMPLATE_DATA", cameraViewModel.cameraState.value.templateData)
             putExtra("TEMPLATE_ID", cameraViewModel.cameraState.value.selectedTemplateId)
@@ -203,10 +201,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
     }
 
     private fun navigateToPreviewVideo(videoUri: Uri) {
-        val intent = Intent(this, PreviewActivity::class.java).apply {
-            putExtra("IS_IMAGE", false)
-            putExtra("VIDEO_URI", videoUri.toString())
-        }
+        val intent = Intent(this, PreviewImageActivity::class.java)
         cameraViewModel.updateCameraState {
             it.copy(
                 previewUri = null
@@ -281,14 +276,21 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
 
     private fun initTemplate(template: TemplateDataModel) {
         val templateId = Config.TEMPLATE_4
-        cameraViewModel.selectedTemplate(
-            templateId
-        )
+        cameraViewModel.selectedTemplate(templateId)
+
+        // Tạo template trên màn hình camera
         binding.templateOverlayContainer.addTemplate(
             this,
             templateId,
             template
         )
+
+        // Lưu tham chiếu đến template view
+        cameraViewModel.updateCameraState {
+            it.copy(
+                templateView = binding.templateOverlayContainer
+            )
+        }
     }
 
     private fun updateCameraMode(isVideoMode: Boolean) {

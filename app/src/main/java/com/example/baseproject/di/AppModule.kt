@@ -31,7 +31,7 @@ object AppModule {
         single { provideWeatherApiService(get()) }
         viewModel { AlbumViewModel(get()) }
         viewModel { PhotosViewModel(get()) }
-        viewModel { CameraViewModel(get(), get()) }
+        viewModel { CameraViewModel(get(), get(),get()) }
         viewModel { PreviewViewModel(get()) }
 
     }

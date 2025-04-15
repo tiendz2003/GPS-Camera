@@ -14,9 +14,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-light"
         android:text="New York, United States"
-        android:textColor="@android:color/white"
-        android:textSize="22sp"
-        android:textStyle="normal"
+        style="@style/abril_style"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -26,8 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="@string/time"
-        android:textColor="@android:color/white"
-        android:textSize="20sp"
+        style="@style/aboreto_style"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvLocation" />
@@ -38,8 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="FRI. 05 JAN"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
+        style="@style/alumni_style"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvTime" />
 
@@ -49,8 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="@string/temperature"
-        android:textColor="@android:color/white"
-        android:textSize="19sp"
+        style="@style/aboreto_style"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvDate" />
 

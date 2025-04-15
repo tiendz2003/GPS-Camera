@@ -26,8 +26,7 @@
         android:layout_weight="1"
         android:gravity="center"
         android:text="Lat: 16.0544"
-        android:textColor="@color/white"
-        android:textSize="12sp" />
+        style="@style/afacad_style" />
 
     <View
         android:layout_width="1dp"
@@ -42,8 +41,7 @@
         android:layout_weight="1"
         android:gravity="center"
         android:text="Long: 16.0544"
-        android:textColor="@color/white"
-        android:textSize="12sp" />
+        style="@style/afacad_style" />
 </LinearLayout>
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/imv_map"
@@ -75,11 +73,10 @@
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:textAllCaps="true"
-            android:textSize="24sp"
-            app:autoSizeMaxTextSize="24dp"
-            app:autoSizeMinTextSize="16dp"
+            style="@style/seoul_style"
+            app:autoSizeMaxTextSize="24sp"
+            app:autoSizeMinTextSize="16sp"
             app:autoSizeTextType="uniform"
-            android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -91,8 +88,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textSize="12sp"
-            android:textColor="@color/white"
+            style="@style/afacad_style"
             android:maxLines="2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_city"
@@ -135,8 +131,7 @@
                 android:layout_marginTop="4dp"
                 android:maxLines="1"
                 android:textAllCaps="true"
-                android:textSize="14sp"
-                android:textColor="@color/white"
+                style="@style/jakarta_style"
                 app:autoSizeMaxTextSize="14dp"
                 app:autoSizeMinTextSize="10dp"
                 app:autoSizeTextType="uniform"

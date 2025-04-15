@@ -23,7 +23,7 @@
     <style name="bold_700">
         <item name="fontFamily">@font/nunito_sans_bold</item>
         <item name="fontWeight">700</item>
-        <item name="android:textSize">17dp</item>
+        <item name="android:textSize">17sp</item>
         <item name="android:textColor">@color/white</item>
         <item name="fontStyle">normal</item>
     </style>
@@ -36,5 +36,159 @@
     <style name="circleImageView" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">10%</item>
+    </style>
+    <style name="abyssinica_style">
+        <item name="fontFamily">@font/abyssinicasil</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="jakarta_style">
+        <item name="fontFamily">@font/plusjakartasans</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="abril_style">
+        <item name="fontFamily">@font/abrilfatface</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="qwitcher_style">
+        <item name="fontFamily">@font/qwitcher_grypen</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="acme_style">
+        <item name="fontFamily">@font/acme</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="aboreto_style">
+        <item name="fontFamily">@font/aboreto</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="actor_style">
+        <item name="fontFamily">@font/actor</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="alumni_style">
+        <item name="fontFamily">@font/nunito_sans_regular</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="asul_style">
+        <item name="fontFamily">@font/nunito_sans_regular</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="asap_style">
+        <item name="fontFamily">@font/nunito_sans_regular</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="aoboshi_style">
+        <item name="fontFamily">@font/aoboshione</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="abhaya_style">
+        <item name="fontFamily">@font/abhayalibre</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="bigshoulder_style">
+        <item name="fontFamily">@font/big_shoulders_inline</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="boogaloo_style">
+        <item name="fontFamily">@font/boogaloo</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="purple_purse_style">
+        <item name="fontFamily">@font/purplepurse</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="poller_one_style">
+        <item name="fontFamily">@font/pollerone</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="rasa_style">
+        <item name="fontFamily">@font/rasa</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="aladin_style">
+        <item name="fontFamily">@font/aladin</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="red_rose_style">
+        <item name="fontFamily">@font/redrose</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="afacad_style">
+        <item name="fontFamily">@font/afacad</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="able_style">
+        <item name="fontFamily">@font/abel</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
+    </style>
+    <style name="seoul_style">
+        <item name="fontFamily">@font/seoul_hangang</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontStyle">normal</item>
     </style>
 </resources>

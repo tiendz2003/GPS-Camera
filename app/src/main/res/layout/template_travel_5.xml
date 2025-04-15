@@ -3,9 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_rounded_background"
+    android:layout_margin="16dp"
     android:padding="16dp">
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -18,49 +19,46 @@
 
     <TextView
         android:id="@+id/tvTime"
+        style="@style/aladin_style"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:text="02:50 PM"
-        android:textColor="@android:color/white"
-        android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/tvTimeToTravel"
-        app:layout_constraintEnd_toStartOf="@+id/layoutWeather"
-        app:layout_constraintHorizontal_bias="0.562"
-        app:layout_constraintStart_toEndOf="@id/tvTimeToTravel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tvTimeToTravel"
         app:layout_constraintVertical_bias="0.0" />
+
 
     <LinearLayout
         android:id="@+id/layoutWeather"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginStart="8dp"
-        app:layout_constraintTop_toTopOf="@+id/tvTimeToTravel"
-        app:layout_constraintBottom_toBottomOf="@+id/tvTimeToTravel"
-        app:layout_constraintStart_toEndOf="@+id/tvTime">
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.535"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
 
         <ImageView
             android:id="@+id/ivSun"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/ic_sun"
-            android:contentDescription="Sun" />
+            android:contentDescription="Sun"
+            android:src="@drawable/ic_sun" />
 
         <TextView
             android:id="@+id/tvTemperature"
+            style="@style/jakarta_style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="32°C"
-            android:textColor="@color/white"
-            android:textSize="16sp"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="8dp"
-            android:layout_gravity="center_horizontal" />
+            android:text="32°C" />
     </LinearLayout>
-
 
     <TextView
         android:id="@+id/tvDate"
@@ -68,15 +66,14 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="Fri, 05 Jan 2024"
-        android:textColor="#CCCCCC"
-        android:textSize="14sp"
+        style="@style/afacad_style"
         app:layout_constraintStart_toStartOf="@id/tvTime"
         app:layout_constraintTop_toBottomOf="@id/tvTime" />
 
     <ImageView
         android:id="@+id/ivLocationIcon"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
         android:src="@drawable/ic_location"
         app:layout_constraintBottom_toBottomOf="@id/tvLocation"
         app:layout_constraintStart_toStartOf="parent"
@@ -89,8 +86,7 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="8dp"
         android:text="New York, United Stated"
-        android:textColor="@color/white"
-        android:textSize="16sp"
+        style="@style/red_rose_style"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/ivLocationIcon"
         app:layout_constraintTop_toBottomOf="@id/tvDate" />

@@ -39,13 +39,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="NEW YORK"
-                android:textColor="@android:color/black"
+                android:textColor="@android:color/transparent"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp" />
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp" />
         </FrameLayout>
 
         <TextView
@@ -53,8 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Brooklyn, 103386 New York, United States"
-            android:textColor="@android:color/white"
-            android:textSize="12sp"
+            style="@style/afacad_style"
             android:layout_marginTop="4dp"
             android:singleLine="true"
             android:ellipsize="end" />
@@ -87,7 +84,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="22°C"
-                android:textColor="@android:color/white"
+                style="@style/jakarta_style"
                 android:textSize="12sp"
                 android:layout_marginStart="4dp" />
         </LinearLayout>

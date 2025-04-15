@@ -28,12 +28,12 @@ class TravelTemplateV2(context: Context?, attrs: AttributeSet?) : BaseCustomView
 
     override fun initStyleable(mTypedArray: TypedArray?) {}
     @SuppressLint("SetTextI18n")
-    override fun setData(data: TemplateDataModel,templateState: TemplateState?) {
+    override fun setData(data: TemplateDataModel, state: TemplateState?) {
         with(binding){
             tvDate.text = data.currentDate
             tvLocation.text = data.location
             tvTime.text = data.currentTime
-            templateState?.let {
+            state?.let {
                 updateVisibility(it)
             }
         }

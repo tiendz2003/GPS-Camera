@@ -5,9 +5,9 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_rounded_background"
+    android:layout_margin="16dp"
     android:padding="8dp">
 
-    <!-- Location Row with Icon -->
     <ImageView
         android:id="@+id/ivLocationIcon"
         android:layout_width="20dp"
@@ -22,10 +22,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="United Stated"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
         android:textStyle="bold"
-        android:fontFamily="serif"
+        style="@style/purple_purse_style"
         android:layout_marginStart="8dp"
         app:layout_constraintStart_toEndOf="@id/ivLocationIcon"
         app:layout_constraintTop_toTopOf="parent" />
@@ -44,8 +42,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="HOLIDAYS"
-        android:textColor="@android:color/white"
-        android:textSize="14sp"
+        style="@style/poller_one_style"
         android:textStyle="bold"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
@@ -66,8 +63,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="22°C"
-        android:textColor="@android:color/white"
-        android:textSize="14sp"
+        style="@style/jakarta_style"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toEndOf="@id/ivWeatherIcon"
@@ -78,7 +74,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Friday, 05 Jan"
-        android:textColor="@android:color/white"
+        style="@style/jakarta_style"
         android:textSize="16sp"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"

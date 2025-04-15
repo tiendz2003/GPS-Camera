@@ -24,10 +24,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="United States"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
+        style="@style/abyssinica_style"
         android:textStyle="bold"
-
         app:layout_constraintBottom_toTopOf="@+id/guidelineBottom"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/guidelineTop" />
@@ -37,8 +35,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="1:23 PM"
-        android:textColor="@android:color/white"
+        android:fontFamily="@font/plusjakartasans"
         android:textSize="26sp"
+        android:textColor="@android:color/white"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="@id/guidelineTop"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -48,8 +47,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="22°C"
-        android:textColor="@android:color/white"
-        android:textSize="14sp"
+        style="@style/jakarta_style"
         app:layout_constraintTop_toTopOf="@id/guidelineBottom"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="4dp" />
@@ -68,8 +66,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Clouds"
-        android:textColor="@android:color/white"
-        android:textSize="14sp"
+        style="@style/jakarta_style"
         app:layout_constraintTop_toTopOf="@id/ivWeatherIcon"
         app:layout_constraintStart_toEndOf="@id/ivWeatherIcon"  />
 
@@ -78,8 +75,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Friday-05-Jan-2024"
-        android:textColor="@android:color/white"
-        android:textSize="14sp"
+        style="@style/jakarta_style"
         app:layout_constraintTop_toTopOf="@id/guidelineBottom"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="4dp" />

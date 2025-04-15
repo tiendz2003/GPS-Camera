@@ -12,9 +12,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-light"
         android:text="@string/time"
-        android:textColor="@android:color/white"
-        android:textSize="24sp"
-        android:textStyle="normal"
+        style="@style/bigshoulder_style"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,8 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="01 Aprial 2025"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
+        style="@style/boogaloo_style"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@+id/tvTime"
         app:layout_constraintTop_toBottomOf="@+id/tvTime" />
@@ -49,9 +46,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="New York,US"
-            android:textColor="@android:color/white"
-            android:textAllCaps="true"
-            android:textSize="18sp" />
+            style="@style/acme_style"
+            android:textAllCaps="true" />
 
     </LinearLayout>
 

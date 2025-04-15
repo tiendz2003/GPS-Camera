@@ -15,7 +15,7 @@
         android:ellipsize="end"
         android:gravity="center"
         android:maxLines="1"
-        android:textColor="@color/white"
+        style="@style/jakarta_style"
         android:paddingHorizontal="16dp"
         android:paddingVertical="10dp"
         tools:text="Quan Hoa, Cau Giay, Ha Noi" />
@@ -73,17 +73,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Latitude"
-                    android:textColor="@color/white"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
+                    style="@style/jakarta_style"
+                    />
 
                 <TextView
                     android:id="@+id/tv_lat_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="15.154N"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
+                    style="@style/aboreto_style"
+                    android:textSize="18sp"
+                    />
             </LinearLayout>
 
             <LinearLayout
@@ -101,17 +101,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Longitude"
-                    android:textColor="@color/white"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
+                    style="@style/jakarta_style" />
 
                 <TextView
                     android:id="@+id/tv_long_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="107.123E"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
+                    style="@style/aboreto_style"
+                    android:textSize="18sp" />
             </LinearLayout>
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -120,8 +118,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:textColor="@color/white"
-                android:textSize="13sp"
+                style="@style/jakarta_style"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/ll_lat"
                 tools:text="1:23 PM" />
@@ -132,8 +129,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
-                android:textColor="@color/white"
-                android:textSize="13sp"
+                style="@style/jakarta_style"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_time"
                 tools:text="Friday, 05, Jan, 2024" />

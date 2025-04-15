@@ -36,11 +36,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:maxLines="1"
-            android:textSize="14sp"
-            android:textColor="@color/white"
+            style="@style/jakarta_style"
             android:drawableStart="@drawable/ic_cloud_travel"
-            app:autoSizeMaxTextSize="18dp"
-            app:autoSizeMinTextSize="14dp"
+            app:autoSizeMaxTextSize="18sp"
+            app:autoSizeMinTextSize="14sp"
             app:autoSizeTextType="uniform"
             android:text="@string/temperature" />
         <View
@@ -64,10 +63,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:maxLines="1"
-            android:textSize="14sp"
-            android:textColor="@color/white"
-            app:autoSizeMaxTextSize="18dp"
-            app:autoSizeMinTextSize="14dp"
+            style="@style/jakarta_style"
+            app:autoSizeMaxTextSize="18sp"
+            app:autoSizeMinTextSize="14sp"
             app:autoSizeTextType="uniform"
             android:text="05-01-2024" />
         <View
@@ -86,10 +84,9 @@
         android:layout_marginHorizontal="8dp"
         android:layout_marginTop="16dp"
         android:text="HOLIDAYS"
-        android:textColor="@color/white"
         android:textStyle="bold"
         android:textAlignment="center"
-        android:textSize="16sp"
+        style="@style/aoboshi_style"
         android:layout_width="0dp"
         android:layout_height="wrap_content"/>
 
@@ -108,11 +105,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
-            android:textColor="@color/white"
+            style="@style/abhaya_style"
             android:drawableEnd="@drawable/ic_love_travel"
             android:drawablePadding="2dp"
             android:textAllCaps="true"
-            android:textSize="19sp"
             android:text="I" />
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -120,8 +116,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAllCaps="true"
-            android:textSize="19sp"
-            android:textColor="@color/white"
+            style="@style/abhaya_style"
             android:text="New York, United States" />
     </LinearLayout>
 

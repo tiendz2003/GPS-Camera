@@ -1,65 +1,73 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_rounded_background"
+    android:layout_margin="8dp"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/tvI"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="I"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <ImageView
-        android:id="@+id/ivHeart"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginStart="4dp"
-        android:src="@drawable/ic_love_travel"
-        app:layout_constraintBottom_toBottomOf="@id/tvI"
-        app:layout_constraintStart_toEndOf="@id/tvI"
-        app:layout_constraintTop_toTopOf="@id/tvI" />
+        <TextView
+            android:id="@+id/tvI"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="I"
+            style="@style/abhaya_style"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tvTravelling"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:text="Travelling"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/tvI"
-        app:layout_constraintStart_toEndOf="@id/ivHeart"
-        app:layout_constraintTop_toTopOf="@id/tvI" />
+        <ImageView
+            android:id="@+id/ivHeart"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="4dp"
+            android:src="@drawable/ic_love_travel"
+            app:layout_constraintStart_toEndOf="@id/tvI"
+            app:layout_constraintTop_toTopOf="@id/tvI"
+            app:layout_constraintBottom_toBottomOf="@id/tvI" />
 
-    <ImageView
-        android:id="@+id/ivPlane"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginStart="8dp"
-        android:src="@drawable/ic_plane"
-        app:layout_constraintBottom_toBottomOf="@id/tvTravelling"
-        app:layout_constraintStart_toEndOf="@id/tvTravelling"
-        app:layout_constraintTop_toTopOf="@id/tvTravelling" />
+        <TextView
+            android:id="@+id/tvTravelling"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="Travelling"
+            style="@style/abhaya_style"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/ivHeart"
+            app:layout_constraintTop_toTopOf="@id/tvI"
+            app:layout_constraintBottom_toBottomOf="@id/tvI" />
 
-    <ImageView
-        android:id="@+id/ivGlobe"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginStart="4dp"
-        android:src="@drawable/ic_earth"
-        app:layout_constraintBottom_toBottomOf="@id/tvTravelling"
-        app:layout_constraintStart_toEndOf="@id/ivPlane"
-        app:layout_constraintTop_toTopOf="@id/tvTravelling" />
+        <ImageView
+            android:id="@+id/ivPlane"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_plane"
+            app:layout_constraintStart_toEndOf="@id/tvTravelling"
+            app:layout_constraintTop_toTopOf="@id/tvTravelling"
+            app:layout_constraintBottom_toBottomOf="@id/tvTravelling" />
+
+        <ImageView
+            android:id="@+id/ivGlobe"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="4dp"
+            android:src="@drawable/ic_earth"
+            app:layout_constraintStart_toEndOf="@id/ivPlane"
+            app:layout_constraintTop_toTopOf="@id/ivPlane"
+            app:layout_constraintBottom_toBottomOf="@id/ivPlane" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
         android:id="@+id/divider"
@@ -67,9 +75,9 @@
         android:layout_height="1dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/dashed_line"
-        app:layout_constraintEnd_toEndOf="@+id/ivGlobe"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvTravelling" />
+        app:layout_constraintEnd_toEndOf="@+id/headerGroup"
+        app:layout_constraintStart_toStartOf="@+id/headerGroup"
+        app:layout_constraintTop_toBottomOf="@id/headerGroup" />
 
     <TextView
         android:id="@+id/tvTime"
@@ -77,20 +85,22 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="12:00 PM"
-        android:textColor="@android:color/white"
+        style="@style/abhaya_style"
         android:textSize="32sp"
         android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/divider"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/tvTime"
-        app:layout_constraintStart_toStartOf="@+id/tvTime"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/tvTime"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
             android:id="@+id/ivLocationIcon"
@@ -105,9 +115,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:text="New York, United States"
-            android:textColor="@android:color/white"
-            android:textSize="16sp" />
+            style="@style/rasa_style" />
     </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

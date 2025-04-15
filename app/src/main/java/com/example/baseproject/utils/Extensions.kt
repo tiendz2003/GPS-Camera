@@ -23,14 +23,24 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.baseproject.R
+import com.example.baseproject.bases.BaseCustomView
 import com.example.baseproject.data.models.TemplateDataModel
+import com.example.baseproject.data.models.TemplateState
 import com.example.baseproject.map_template.DailyTemplateV1
 import com.example.baseproject.map_template.DailyTemplateV2
 import com.example.baseproject.map_template.DailyTemplateV3
 import com.example.baseproject.map_template.DailyTemplateV4
 import com.example.baseproject.map_template.DailyTemplateV5
+import com.example.baseproject.map_template.GPSTemplateV1
+import com.example.baseproject.map_template.GPSTemplateV2
+import com.example.baseproject.map_template.GPSTemplateV3
+import com.example.baseproject.map_template.GPSTemplateV4
+import com.example.baseproject.map_template.GPSTemplateV5
 import com.example.baseproject.map_template.TravelTemplateV1
 import com.example.baseproject.map_template.TravelTemplateV2
+import com.example.baseproject.map_template.TravelTemplateV3
+import com.example.baseproject.map_template.TravelTemplateV4
+import com.example.baseproject.map_template.TravelTemplateV5
 import com.example.baseproject.presentation.custom.HorizontalSpaceItemDecoration
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.tabs.TabLayout
@@ -134,6 +144,7 @@ fun FrameLayout.addTemplate(
     context: Context,
     type: String,
     data: TemplateDataModel,
+    templateState: TemplateState? = null,
     imageMap: Any? = null
 ){
     this.removeAllViews()
@@ -141,50 +152,38 @@ fun FrameLayout.addTemplate(
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
     )
+    if (this.width == 0 || this.height == 0) {
+        this.measure(
+            View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(300, View.MeasureSpec.EXACTLY)
+        )
+        this.layout(0, 0, 1080, 300)
+    }
     layoutParams.gravity = Gravity.BOTTOM
-    when(type){
-        Config.TEMPLATE_1 -> {
-            val templateView = DailyTemplateV1(context, null)
-            templateView.layoutParams = layoutParams
-            templateView.setData(data)
-            this.addView(templateView)
+    val templateView = when(type){
+        Config.TEMPLATE_1 -> DailyTemplateV1(context, null)
+        Config.TEMPLATE_2 -> DailyTemplateV2(context, null)
+        Config.TEMPLATE_3 -> DailyTemplateV3(context, null)
+        Config.TEMPLATE_4 -> DailyTemplateV4(context, null)
+        Config.TEMPLATE_5 -> DailyTemplateV5(context, null)
+        Config.TEMPLATE_6 -> TravelTemplateV1(context, null)
+        Config.TEMPLATE_7 -> TravelTemplateV2(context, null)
+        Config.TEMPLATE_8 -> TravelTemplateV3(context, null)
+        Config.TEMPLATE_9 -> TravelTemplateV4(context, null)
+        Config.TEMPLATE_10 -> TravelTemplateV5(context, null)
+        Config.TEMPLATE_11 -> GPSTemplateV1(context, null)
+        Config.TEMPLATE_12 -> GPSTemplateV2(context, null)
+        Config.TEMPLATE_13 -> GPSTemplateV3(context, null)
+        Config.TEMPLATE_14 -> GPSTemplateV4(context, null)
+        Config.TEMPLATE_15 -> GPSTemplateV5(context, null)
+        else -> {
+            Config.TEMPLATE_1
         }
-        Config.TEMPLATE_2 -> {
-            val templateView = DailyTemplateV2(context, null)
-            templateView.layoutParams = layoutParams
-            templateView.setData(data)
-            this.addView(templateView)
-        }
-        Config.TEMPLATE_3 -> {
-            val templateView = DailyTemplateV3(context, null)
-            templateView.layoutParams = layoutParams
-            templateView.setData(data)
-            this.addView(templateView)
-        }
-        Config.TEMPLATE_4 -> {
-            val templateView = DailyTemplateV4(context, null)
-            templateView.layoutParams = layoutParams
-            templateView.setData(data)
-            this.addView(templateView)
-        }
-        Config.TEMPLATE_5 -> {
-            val templateView = DailyTemplateV5(context, null)
-            templateView.layoutParams = layoutParams
-            templateView.setData(data)
-            this.addView(templateView)
-        }
-        Config.TEMPLATE_6 -> {
-            val templateView = TravelTemplateV1(context, null)
-            templateView.layoutParams = layoutParams
-            templateView.setData(data)
-            this.addView(templateView)
-        }
-        Config.TEMPLATE_7 -> {
-            val templateView = TravelTemplateV2(context, null)
-            templateView.layoutParams = layoutParams
-            templateView.setData(data)
-            this.addView(templateView)
-        }
+    }
+    if(templateView is BaseCustomView){
+        templateView.layoutParams = layoutParams
+        templateView.setData(data,templateState)
+        this.addView(templateView)
     }
 }
 inline fun <reified T:Parcelable> Intent.parcelable(key: String): T? {

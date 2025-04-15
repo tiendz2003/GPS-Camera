@@ -24,7 +24,7 @@ import com.example.baseproject.presentation.viewmodel.CameraViewModel
 import com.example.baseproject.utils.BitmapHolder
 import com.example.baseproject.utils.Config
 import com.example.baseproject.utils.PermissionManager
-import com.example.baseproject.utils.SharePrefUtils
+import com.example.baseproject.utils.SharePrefManager
 import com.example.baseproject.utils.addTemplate
 import com.example.baseproject.utils.gone
 import com.example.baseproject.utils.invisible
@@ -66,7 +66,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
         initTemplate(
             TemplateDataModel.getDefaultTemplateData()
         )
-        val savedTimer = SharePrefUtils.getTimerPref()
+        val savedTimer = SharePrefManager.getTimerPref()
         cameraViewModel.updateCameraState {
             it.copy(
                 selectedTimerDuration = savedTimer
@@ -253,7 +253,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
             else -> 0
         }
 
-        SharePrefUtils.setTimerPref(newTimerValue)
+        SharePrefManager.setTimerPref(newTimerValue)
         cameraViewModel.updateCameraState {
             it.copy(
                 selectedTimerDuration = newTimerValue

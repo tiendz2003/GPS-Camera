@@ -5,6 +5,7 @@ import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.widget.RelativeLayout
 import com.example.baseproject.data.models.TemplateDataModel
+import com.example.baseproject.data.models.TemplateState
 
 abstract class BaseCustomView : RelativeLayout {
     private var attrs: AttributeSet? = null
@@ -54,7 +55,8 @@ abstract class BaseCustomView : RelativeLayout {
     abstract fun initData()
     abstract fun initStyleable(mTypedArray: TypedArray?)
 
-    abstract fun setData(data: TemplateDataModel)
+    abstract fun setData(data: TemplateDataModel,state: TemplateState?=null)
+    abstract fun updateVisibility(state: TemplateState)
 
     open val templateId: Int = -1
 }

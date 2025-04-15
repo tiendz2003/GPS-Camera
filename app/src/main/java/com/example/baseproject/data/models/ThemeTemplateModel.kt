@@ -93,5 +93,8 @@ data class ThemeTemplateModel(
             )
             return listTemplate
         }
+        fun getThemeById(id: String): ThemeTemplateModel? {
+            return getTemplate().find { it.id == id }
+        }
     }
 }

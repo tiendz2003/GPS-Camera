@@ -60,6 +60,7 @@ data class TemplateState(
     val selectedTemplateId: Int? = null,
     val showLocation: Boolean = true,
     val showTemperature: Boolean = true,
+    val showLatLong: Boolean = true,
     val showTime: Boolean = true,
     val showDate: Boolean = true
 )

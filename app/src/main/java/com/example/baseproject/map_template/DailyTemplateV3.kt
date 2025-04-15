@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import com.example.baseproject.bases.BaseCustomView
 import com.example.baseproject.data.models.TemplateDataModel
+import com.example.baseproject.data.models.TemplateState
 import com.example.baseproject.databinding.TemplateDaily3Binding
 
 class DailyTemplateV3(context: Context?, attrs: AttributeSet?) : BaseCustomView(context, attrs) {
@@ -27,10 +28,23 @@ class DailyTemplateV3(context: Context?, attrs: AttributeSet?) : BaseCustomView(
 
     override fun initStyleable(mTypedArray: TypedArray?) {}
     @SuppressLint("SetTextI18n")
-    override fun setData(data: TemplateDataModel) {
-        binding.tvTime.text = data.currentTime
-        binding.tvDate.text = data.currentDate
-        binding.tvTemperature.text = data.temperature
-        binding.tvLocation.text = data.location
+    override fun setData(data: TemplateDataModel, state: TemplateState?) {
+        with(binding){
+            tvTime.text = data.currentTime
+            tvDate.text = data.currentDate
+            tvTemperature.text = data.temperature
+            tvLocation.text = data.location
+            state?.let {
+                updateVisibility(it)
+            }
+        }
+    }
+    override fun updateVisibility(state: TemplateState) {
+        with(binding){
+            tvLocation.visibility = if (state.showLocation) VISIBLE else GONE
+            tvDate.visibility = if (state.showDate) VISIBLE else GONE
+            tvTime.visibility = if (state.showTime) VISIBLE else GONE
+            tvTemperature.visibility = if (state.showTemperature) VISIBLE else GONE
+        }
     }
 }

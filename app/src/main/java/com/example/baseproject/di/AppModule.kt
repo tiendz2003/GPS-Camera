@@ -12,7 +12,7 @@ import com.example.baseproject.domain.WeatherRepository
 import com.example.baseproject.presentation.viewmodel.AlbumViewModel
 import com.example.baseproject.presentation.viewmodel.CameraViewModel
 import com.example.baseproject.presentation.viewmodel.PhotosViewModel
-import com.example.baseproject.presentation.viewmodel.PreviewViewModel
+import com.example.baseproject.presentation.viewmodel.PreviewShareViewModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidContext
@@ -32,7 +32,7 @@ object AppModule {
         viewModel { AlbumViewModel(get()) }
         viewModel { PhotosViewModel(get()) }
         viewModel { CameraViewModel(get(), get(),get()) }
-        viewModel { PreviewViewModel(get()) }
+        viewModel { PreviewShareViewModel(get()) }
 
     }
 

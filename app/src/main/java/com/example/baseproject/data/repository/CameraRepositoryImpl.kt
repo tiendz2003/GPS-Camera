@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.net.Uri
+import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
@@ -70,11 +71,14 @@ class CameraRepositoryImpl: CameraRepository {
             var videoUri:Uri? = null
             var inputStream:InputStream? = null
             inputStream = context.contentResolver.openInputStream(sourceUri)
-            val contentValues = ContentValues().apply {
-                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-                put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
-                put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM/GPS_CAMERA")
-                put(MediaStore.MediaColumns.IS_PENDING, 1)
+            val contentValues = ContentValues()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                 contentValues.apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                    put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM/GPS_CAMERA")
+                    put(MediaStore.MediaColumns.IS_PENDING, 1)
+                }
             }
             context.contentResolver.also { resolver ->
                 videoUri = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues)
@@ -127,36 +131,40 @@ class CameraRepositoryImpl: CameraRepository {
                 Log.e("VideoProcessor", "Không export được template vào ảnh")
                 return@withContext null
             }
+            Log.d("TemplateExport", "Template file exists: ${File(tempTemplateFile.absolutePath).exists()}, size: ${File(tempTemplateFile.absolutePath).length()}")
 
             // Xử lý video với FFmpeg
             val cmd = arrayOf(
-                "-y", // Ghi đè nếu output file tồn tại
-                "-i", tempInputFile.absolutePath,
-                "-i", tempTemplateFile.absolutePath,
-                "-filter_complex", "[0:v][1:v]overlay=(main_w-overlay_w)/2:main_h-overlay_h",
-                "-c:v", "libx264", // Dùng encoder mpeg4 - nhanh hơn libx264
-                "-preset", "ultrafast", // Tăng tốc nếu dùng libx264 (dự phòng)
-                "-pix_fmt", "yuv420p", // Đảm bảo file có thể phát trong mọi trình phát
-                "-c:a", "copy", // Giữ lại âm thanh gốc, không encode lại
-                "-movflags", "+faststart", // Tối ưu phát video ngay khi tải
+                "-y",//ghi đè file nếu đã tồn tại
+                "-i", tempInputFile.absolutePath,//video gốc
+                "-i", tempTemplateFile.absolutePath,//template
+                "-filter_complex", "[0:v][1:v]overlay=(main_w-overlay_w)/2:main_h-overlay_h",//vj tri template
+                "-c:v", "libx264",
+                "-preset", "ultrafast",//tăng tốc độ xử lý
+                "-pix_fmt", "yuv420p",
+                "-c:a", "aac",//mã hoá âm thanh
+                "-b:a", "128k",
+                "-movflags", "+faststart",//tối ưu phát
                 tempOutputFile.absolutePath
             ).joinToString(" ")
-
+            Log.d("FFmpegCommand", "CMD: $cmd")
+            // đợi xử lý xong và lấy return code
+            //GHi nhứo: executeAsync là hàm không đồng bộ, không chặn luồng chính
             val returnCode = suspendCoroutine<ReturnCode?> { continuation ->
                 FFmpegKit.executeAsync(cmd,
                     { session ->
                         continuation.resume(session.returnCode)
-                        Log.i("VideoProcessor", "FFmpeg execution completed with code: ${session.returnCode}")
+                        Log.i("VideoProcessor", "xu ly thanh cong FFmpeg code: ${session.returnCode}")
                     },
                     { log ->
-                        Log.d("VideoProcessor", log.message)
+                        Log.d("FFmpegKitLog", log.message)
                     },
                     { statistics ->
-                        Log.d("FFmpegKit", "Processing time: ${statistics.time}")
+                        Log.d("FFmpegKit", "Thoi gian: ${statistics.time}")
                     }
                 )
             }
-
+            //xử lý xong rồi ,lấy return code
             if (ReturnCode.isSuccess(returnCode)) {
                 Log.i("VideoProcessor", "Xử lý video thành công")
                 // Lưu video vào thư viện xoa file tạm
@@ -164,9 +172,11 @@ class CameraRepositoryImpl: CameraRepository {
                 tempInputFile.delete()
                 tempTemplateFile.delete()
                 tempOutputFile.delete()
+                tempDir.deleteRecursively()
                 return@withContext result
             } else {
                 Log.e("FFmpeg", "THẤT BẠI  rc=${returnCode})}")
+                tempDir.deleteRecursively()
                 return@withContext null
             }
         } catch (e: Exception) {
@@ -174,26 +184,35 @@ class CameraRepositoryImpl: CameraRepository {
             return@withContext null
         }
     }
-    private suspend fun exportTemplateToImage(templateView: View, outputPath: String): Boolean = withContext(Dispatchers.IO) {
-        try {
-            if (templateView.width == 0 || templateView.height == 0) {
+    private suspend fun exportTemplateToImage(templateView: View, outputPath: String): Boolean =
+        withContext(Dispatchers.Main) {
+            try {
+                Log.d("TemplateExport", "Kích thước template: ${templateView.width} x ${templateView.height}")
+
+                if (templateView.width == 0 || templateView.height == 0) {
+                    return@withContext false
+                }
+
+                // Tạo bitmap từ View trên Main thread
+                val bitmap = createBitmap(templateView.width, templateView.height)
+                val canvas = Canvas(bitmap)
+                templateView.draw(canvas)
+
+                // luu file ->IO
+                withContext(Dispatchers.IO) {
+                    val outputFile = File(outputPath)
+                    FileOutputStream(outputFile).use { outputStream ->
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                        outputStream.flush()
+                    }
+                    Log.d("TemplateExport", "Export thành công vào: $outputPath")
+                }
+
+                return@withContext true
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e("TemplateExport", "Lỗi khi export template: ${e.message}", e)
                 return@withContext false
             }
-
-            val bitmap = createBitmap(templateView.width, templateView.height)
-            val canvas = Canvas(bitmap)
-            templateView.draw(canvas)
-
-            val outputFile = File(outputPath)
-            val outputStream = FileOutputStream(outputFile)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-            outputStream.flush()
-            outputStream.close()
-
-            return@withContext true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return@withContext false
         }
-    }
 }

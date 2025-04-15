@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import com.example.baseproject.bases.BaseCustomView
 import com.example.baseproject.data.models.TemplateDataModel
+import com.example.baseproject.data.models.TemplateState
 import com.example.baseproject.databinding.TemplateGps1Binding
 
 class GPSTemplateV1(context: Context?, attrs: AttributeSet?) : BaseCustomView(context, attrs) {
@@ -27,12 +28,26 @@ class GPSTemplateV1(context: Context?, attrs: AttributeSet?) : BaseCustomView(co
 
     override fun initStyleable(mTypedArray: TypedArray?) {}
     @SuppressLint("SetTextI18n")
-    override fun setData(data: TemplateDataModel) {
+    override fun setData(data: TemplateDataModel,templateState: TemplateState?) {
         val part = data.location?.split(",")
         val city = part?.get(0)
-        binding.tvDate.text = data.currentDate
-        binding.tvTemp.text = data.temperature
-        binding.tvCity.text = city
-        binding.tvAddress.text = data.location
+        with(binding){
+            tvDate.text = data.currentDate
+            tvTemp.text = data.temperature
+            tvCity.text = city
+            tvAddress.text = data.location
+            templateState?.let {
+                updateVisibility(it)
+            }
+        }
+    }
+    override fun updateVisibility(state: TemplateState) {
+        with(binding){
+            tvCity.visibility = if (state.showLocation) VISIBLE else GONE
+            tvAddress.visibility = if (state.showLocation) VISIBLE else GONE
+            tvDate.visibility = if (state.showDate) VISIBLE else GONE
+            tvTemp.visibility = if (state.showTemperature) VISIBLE else GONE
+
+        }
     }
 }

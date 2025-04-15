@@ -33,23 +33,23 @@
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imv_map"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="100dp"
             android:scaleType="centerCrop"
             android:src="@drawable/img_default_map"
-            app:layout_constraintBottom_toBottomOf="@id/cl_content"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/cl_content"
-            app:shapeAppearanceOverlay="@style/circleImageView"
-            />
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/circleImageView" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cl_content"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/imv_map"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/imv_map"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="@+id/imv_map">
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/line2"
@@ -62,10 +62,10 @@
                 android:id="@+id/ll_lat"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginStart="8dp"
-                app:layout_constraintStart_toStartOf="parent"
+                android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="@id/line2"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
@@ -81,8 +81,8 @@
                     android:id="@+id/tv_lat_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
                     android:text="15.154N"
+                    android:textColor="@color/white"
                     android:textSize="16sp" />
             </LinearLayout>
 
@@ -90,18 +90,18 @@
                 android:id="@+id/ll_long"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginStart="8dp"
-                app:layout_constraintStart_toStartOf="@id/line2"
+                android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/line2"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
                     android:id="@+id/tv_long_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
                     android:text="Longitude"
+                    android:textColor="@color/white"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
@@ -109,8 +109,8 @@
                     android:id="@+id/tv_long_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
                     android:text="107.123E"
+                    android:textColor="@color/white"
                     android:textSize="16sp" />
             </LinearLayout>
 
@@ -120,8 +120,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:textSize="13sp"
                 android:textColor="@color/white"
+                android:textSize="13sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/ll_lat"
                 tools:text="1:23 PM" />
@@ -132,8 +132,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
-                android:textSize="13sp"
                 android:textColor="@color/white"
+                android:textSize="13sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_time"
                 tools:text="Friday, 05, Jan, 2024" />

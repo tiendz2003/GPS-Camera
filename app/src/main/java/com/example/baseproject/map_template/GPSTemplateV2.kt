@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import com.example.baseproject.bases.BaseCustomView
 import com.example.baseproject.data.models.TemplateDataModel
+import com.example.baseproject.data.models.TemplateState
 import com.example.baseproject.databinding.TemplateGps2Binding
 
 class GPSTemplateV2(context: Context?, attrs: AttributeSet?) : BaseCustomView(context, attrs) {
@@ -27,11 +28,26 @@ class GPSTemplateV2(context: Context?, attrs: AttributeSet?) : BaseCustomView(co
 
     override fun initStyleable(mTypedArray: TypedArray?) {}
     @SuppressLint("SetTextI18n")
-    override fun setData(data: TemplateDataModel) {
-        binding.tvDate.text = data.currentDate
-        binding.tvTime.text = data.currentTime
-        binding.tvAddress.text = data.location
-        binding.tvLatValue.text = data.lat
-        binding.tvLongValue.text = data.long
+    override fun setData(data: TemplateDataModel,state: TemplateState?) {
+        with(binding){
+            tvDate.text = data.currentDate
+            tvTime.text = data.currentTime
+            tvAddress.text = data.location
+            tvLatValue.text = data.lat
+            tvLongValue.text = data.long
+            state?.let {
+                updateVisibility(it)
+            }
+        }
+    }
+
+    override fun updateVisibility(state: TemplateState) {
+        with(binding){
+            tvAddress.visibility = if (state.showLocation) VISIBLE else GONE
+            tvDate.visibility = if (state.showDate) VISIBLE else GONE
+            tvTime.visibility = if (state.showTime) VISIBLE else GONE
+            tvLatValue.visibility = if (state.showLatLong) VISIBLE else GONE
+            tvLongValue.visibility = if (state.showLatLong) VISIBLE else GONE
+        }
     }
 }

@@ -17,7 +17,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.baseproject.data.models.TemplateDataModel
 import com.example.baseproject.presentation.mainscreen.fragment.CustomOptionsFragment
 import com.example.baseproject.presentation.mainscreen.fragment.PreviewOptionsFragment
-import com.example.baseproject.presentation.viewmodel.PreviewViewModel
+import com.example.baseproject.presentation.viewmodel.PreviewShareViewModel
 import com.example.baseproject.utils.addTemplate
 import com.example.baseproject.utils.parcelable
 import com.google.android.material.tabs.TabLayoutMediator
@@ -30,22 +30,26 @@ import androidx.core.graphics.scale
 
 class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPreviewBinding::inflate) {
 
-    private val previewViewModel: PreviewViewModel by viewModel()
+    private val previewViewModel: PreviewShareViewModel by viewModel()
+    private var templateData: TemplateDataModel? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
     }
 
     override fun initData() {
-        val templateData = intent.parcelable<TemplateDataModel>("TEMPLATE_DATA")
+        templateData = intent.parcelable<TemplateDataModel>("TEMPLATE_DATA")
         val templateId = intent.getStringExtra("TEMPLATE_ID")
-            val bitmap = BitmapHolder.bitmap
-            if (bitmap != null) {
-                displayImageWithTemplate(bitmap, templateData, templateId)
-            } else {
-                Toast.makeText(this, "Không nhận được ảnh", Toast.LENGTH_SHORT).show()
-                finish()
-            }
+        if (templateData != null && templateId != null) {
+            previewViewModel.setSelectedTemplate(templateId)
+        }
+        val bitmap = BitmapHolder.bitmap
+        if (bitmap != null) {
+            displayImageWithTemplate(bitmap, templateData, templateId)
+        } else {
+            Toast.makeText(this, "Không nhận được ảnh", Toast.LENGTH_SHORT).show()
+            finish()
+        }
 
     }
 
@@ -78,7 +82,11 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
                         finish()
                     }
                     if (previewUiState.isSaving) {
-                        Toast.makeText(this@PreviewImageActivity, "Đang lưu ảnh", Toast.LENGTH_SHORT)
+                        Toast.makeText(
+                            this@PreviewImageActivity,
+                            "Đang lưu ảnh",
+                            Toast.LENGTH_SHORT
+                        )
                             .show()
                     }
                     previewUiState.error?.let {
@@ -88,6 +96,18 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
                             Toast.LENGTH_SHORT
                         ).show()
                         finish()
+                    }
+                    if(previewViewModel.selectedTemplateId.value != null){
+                        updateTemplate(previewViewModel.selectedTemplateId.value!!)
+                    }
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                previewViewModel.selectedTemplateId.collect { templateId ->
+                    if (templateId != null) {
+                        updateTemplate(templateId)
                     }
                 }
             }
@@ -108,10 +128,20 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
             )
         }
     }
-
+    fun updateTemplate(templateId: String) {
+        binding.templateContainer.removeAllViews()
+        templateData?.let {
+            binding.templateContainer.addTemplate(
+                this,
+                templateId,
+                it,
+                previewViewModel.previewUiState.value.templateState
+            )
+        }
+    }
     private fun saveImage() {
 
-       // val bitmap = BitmapHolder.bitmap
+        // val bitmap = BitmapHolder.bitmap
         lifecycleScope.launch {
             try {
                 val combineBitmap = withContext(Dispatchers.Default) {
@@ -137,10 +167,13 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
             }
         }
     }
-    private fun resizeBitmap(bitmap:Bitmap): Bitmap {
-       val resizeBitmap = bitmap.scale(binding.previewContainer.width, binding.previewContainer.height)
+
+    private fun resizeBitmap(bitmap: Bitmap): Bitmap {
+        val resizeBitmap =
+            bitmap.scale(binding.previewContainer.width, binding.previewContainer.height)
         return resizeBitmap
     }
+
     private fun setupViewPager() {
         val pagerAdapter = PreviewPagerAdapter(this)
         binding.viewPager.apply {

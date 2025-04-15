@@ -27,7 +27,7 @@ class CustomOptionsAdapter(
                 ivControlIcon.setImageResource(item.icon)
 
                 if (item.isSelected) {
-                    cardControlIcon.strokeWidth = 4
+                    cardControlIcon.strokeWidth = 3
                     cardControlIcon.strokeColor = ContextCompat.getColor(root.context, R.color.colorPrimary)
                 } else {
                     cardControlIcon.strokeWidth = 0

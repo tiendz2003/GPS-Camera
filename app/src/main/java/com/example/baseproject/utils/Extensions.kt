@@ -44,6 +44,9 @@ import com.example.baseproject.map_template.TravelTemplateV5
 import com.example.baseproject.presentation.custom.HorizontalSpaceItemDecoration
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.tabs.TabLayout
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlin.math.roundToInt
 
 fun View.gone() {
@@ -95,6 +98,28 @@ fun RecyclerView.setupHorizontal(adapter: RecyclerView.Adapter<*>) {
         LinearLayoutManager.HORIZONTAL, false
     )
 }
+@SuppressLint("DefaultLocale")
+fun Long.kbToMb(): String {
+    val kb = this.toLong()
+    val mb = kb / 1024
+    return if (mb < 1) {
+        "$kb KB"
+    } else {
+        String.format("%.2f MB", mb.toFloat() / 1024)
+    }
+    }
+fun Long.formatCapturedTime(): String {
+    val sdf = SimpleDateFormat("h:mm a dd/MM/yyyy", Locale.getDefault())
+    return sdf.format(Date(this))
+}
+@SuppressLint("DefaultLocale")
+fun Long.formatDuration(): String {
+    val seconds = (this / 1000).toInt()
+    val hours = seconds / 3600
+    val minutes = (seconds % 3600) / 60
+    val remainingSeconds = seconds % 60
+    return String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds)
+}
  fun RecyclerView.scrollToCenter(position: Int) {
     val layoutManager = this.layoutManager as? LinearLayoutManager ?: return
     val itemCount = adapter?.itemCount?:0
@@ -131,10 +156,9 @@ fun ImageView.loadImageIcon(url: Any) {
 }
 @SuppressLint("DefaultLocale")
 fun Int.formatDuration(): String {
-    val hours = this / 3600
-    val minutes = (this % 3600) / 60
-    val seconds = this % 60
-    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+    val minutes = this / 1000 / 60
+    val seconds = this / 1000 % 60
+    return String.format("%02d:%02d", minutes, seconds)
 }
 fun TextView.underline() {
     paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG

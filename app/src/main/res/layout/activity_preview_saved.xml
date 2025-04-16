@@ -57,6 +57,13 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/controlsContainer"
         app:layout_constraintTop_toBottomOf="@+id/topBar" />
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/controlsContainer"
+        app:layout_constraintTop_toBottomOf="@+id/topBar" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/controlsContainer"

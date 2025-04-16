@@ -2,18 +2,17 @@ package com.example.baseproject.presentation.hometab.activities
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Rect
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.baseproject.R
 import com.example.baseproject.bases.BaseActivity
 import com.example.baseproject.databinding.ActivitySelectedImageBinding
 import com.example.baseproject.presentation.hometab.adapter.PhotoAdapter
+import com.example.baseproject.presentation.mainscreen.activity.PreviewImageActivity
 import com.example.baseproject.presentation.viewmodel.PhotosViewModel
+import com.example.baseproject.utils.BitmapHolder
 import com.example.baseproject.utils.GridSpacingItemDecoration
 import com.example.baseproject.utils.Resource
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -35,7 +34,7 @@ class SelectImageActivity : BaseActivity<ActivitySelectedImageBinding>(ActivityS
     private var albumId: String? = null
     private var albumName: String? = null
     private var adapter: PhotoAdapter? = null
-    private val albumsViewModel: PhotosViewModel by viewModel()
+    private val photoViewModel: PhotosViewModel by viewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -45,7 +44,7 @@ class SelectImageActivity : BaseActivity<ActivitySelectedImageBinding>(ActivityS
         albumId = intent.getStringExtra(ALBUM_ID)
         albumName = intent.getStringExtra(ALBUM_NAME)
         albumId?.let { albumId ->
-            albumsViewModel.loadPhotosFromAlbum(albumId)
+            photoViewModel.loadPhotosFromAlbum(albumId)
         }
     }
 
@@ -59,7 +58,11 @@ class SelectImageActivity : BaseActivity<ActivitySelectedImageBinding>(ActivityS
     }
     private fun setupRecycleView(){
         adapter = PhotoAdapter {photo->
-
+            startActivity(
+                Intent(this, PreviewImageActivity::class.java).apply {
+                    putExtra("PHOTO", photo)
+                }
+            )
         }
         binding.rcvImage.apply {
             val spanCount = 3
@@ -82,7 +85,7 @@ class SelectImageActivity : BaseActivity<ActivitySelectedImageBinding>(ActivityS
         binding.tvTitle.text = albumName
     }
     private fun observeViewModel(){
-        albumsViewModel.photos.observe(this){resource->
+        photoViewModel.photos.observe(this){ resource->
             when(resource){
                 is Resource.Loading -> {
 
@@ -90,7 +93,7 @@ class SelectImageActivity : BaseActivity<ActivitySelectedImageBinding>(ActivityS
                 is Resource.Success->{
                     resource.data?.let {photos->
                         val photosByDate = photos.groupBy {photo->
-                            SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(photo.dateAdded))
+                            SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(photo.dateAdded * 1000))
                         }
                         adapter?.submitList(photosByDate)
                     }

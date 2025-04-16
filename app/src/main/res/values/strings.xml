@@ -50,5 +50,11 @@
     <string name="memories"><u>Memories</u></string>
     <string name="new_york"><u>New York</u></string>
     <string name="times">Time\n</string>
+    <string name="warning">Are you sure you want to \nDelete this item?</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="warning_title">Warning</string>
+    <string name="saved_video">Saved video</string>
+    <string name="saved_image">Saved image</string>
 
 </resources>

@@ -2,6 +2,7 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.BaseProject" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="fontFamily">@font/nunito_sans_regular</item>
+        <item name="fontWeight">400</item>
     </style>
 
     <style name="Theme.BaseProject" parent="Base.Theme.BaseProject" />
@@ -14,5 +15,21 @@
         <item name="itemIconSize">22dp</item> <!-- Kích thước icon nhỏ hơn -->
         <item name="itemPaddingTop">4dp</item> <!-- Padding trên nhỏ hơn -->
         <item name="itemPaddingBottom">4dp</item> <!-- Padding dưới nhỏ hơn -->
+    </style>
+    <style name="BottomSheetDialogTheme" parent="ThemeOverlay.Material3.DayNight.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/CustomBottomSheet</item>
+    </style>
+
+    <style name="CustomBottomSheet" parent="Widget.Material3.BottomSheet">
+        <item name="shapeAppearance">@style/ShapeAppearance.BottomSheet</item>
+        <item name="backgroundTint">@color/white</item>
+    </style>
+
+    <style name="ShapeAppearance.BottomSheet" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
     </style>
 </resources>

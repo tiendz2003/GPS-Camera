@@ -77,11 +77,14 @@ class MediaRepositoryImpl (private val context: Context): MediaRepository {
             val photos = mutableListOf<Photo>()
             val projection = arrayOf(
                 MediaStore.Images.Media._ID,
-                MediaStore.Images.Media.DATE_TAKEN,
+                //MediaStore.Images.Media.DATE_TAKEN,
+                MediaStore.Images.Media.DATE_ADDED,
+                MediaStore.Images.Media.SIZE,
+                MediaStore.Images.Media.DISPLAY_NAME
             )
             val selection = "${MediaStore.Images.Media.BUCKET_ID} = ?"
             val selectionArgs = arrayOf(albumId)
-            val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC"
+            val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
 
             val query = context.contentResolver.query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
@@ -93,20 +96,24 @@ class MediaRepositoryImpl (private val context: Context): MediaRepository {
 
             query?.use { cursor ->
                 val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-                val dateTakenColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN)
+                val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
                 while (cursor.moveToNext()){
                     val id = cursor.getLong(idColumn)
-                    val dateTaken = cursor.getLong(dateTakenColumn)
                     val contentUri  = ContentUris.withAppendedId(
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                         id
                     )
+                    val size = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE))
+                    val name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME))
+                    val dateAdded = cursor.getLong(dateAddedColumn)
                     photos.add(
                         Photo(
                             id = id,
                             path = contentUri,
-                            dateAdded = dateTaken,
-                            albumId = albumId
+                            dateAdded = dateAdded,
+                            albumId = albumId,
+                            size = size,
+                            name = name
                         )
                     )
                 }
@@ -114,4 +121,59 @@ class MediaRepositoryImpl (private val context: Context): MediaRepository {
             photos
         }
 
+    override suspend fun getVideoFromAlbum(albumId: String): List<Photo> =
+        withContext(Dispatchers.IO){
+            val videos = mutableListOf<Photo>()
+            val projection = arrayOf(
+                MediaStore.Video.Media._ID,
+                //MediaStore.Images.Media.DATE_TAKEN,
+                MediaStore.Video.Media.DATE_ADDED,
+                MediaStore.Video.Media.SIZE,
+                MediaStore.Video.Media.DISPLAY_NAME,
+                MediaStore.Video.Media.DURATION,
+            )
+            val selection = "${MediaStore.Video.Media.BUCKET_ID} = ?"
+            val selectionArgs = arrayOf(albumId)
+            val sortOrder = "${MediaStore.Video.Media.DATE_ADDED} DESC"
+
+            val query = context.contentResolver.query(
+                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                sortOrder
+            )
+
+            query?.use { cursor ->
+                val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID)
+                val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED)
+                val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
+                val nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME)
+                val sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE)
+                while (cursor.moveToNext()){
+                    val id = cursor.getLong(idColumn)
+                    val contentUri  = ContentUris.withAppendedId(
+                        MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                        id
+                    )
+                    val size = cursor.getLong(sizeColumn)
+                    val name = cursor.getString(nameColumn)
+                    val duration = cursor.getLong(durationColumn)
+                    val dateAdded = cursor.getLong(dateAddedColumn)
+                    videos.add(
+                        Photo(
+                            id = id,
+                            path = contentUri,
+                            dateAdded = dateAdded,
+                            albumId = albumId,
+                            size = size,
+                            name = name,
+                            duration = duration,
+                            isVideo = true
+                        )
+                    )
+                }
+            }
+            videos
+        }
 }

@@ -16,7 +16,6 @@ class AlbumViewModel(
     private val _albums = MutableLiveData<Resource<List<Album>>>()
     val albums: MutableLiveData<Resource<List<Album>>> = _albums
 
-
     init {
         loadAlbums()
     }
@@ -31,7 +30,4 @@ class AlbumViewModel(
             }
         }
     }
-
-
-
 }

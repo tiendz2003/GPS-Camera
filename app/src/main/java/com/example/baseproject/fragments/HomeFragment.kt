@@ -6,6 +6,7 @@ import com.example.baseproject.bases.BaseFragment
 import com.example.baseproject.databinding.FragmentHomeBinding
 import com.example.baseproject.data.models.ThemeTemplateModel
 import com.example.baseproject.presentation.hometab.activities.EditAlbumLibraryActivity
+import com.example.baseproject.presentation.hometab.activities.MediaSavedActivity
 import com.example.baseproject.presentation.hometab.activities.PreviewTemplateActivity
 import com.example.baseproject.presentation.hometab.activities.TemplatesActivity
 import com.example.baseproject.presentation.hometab.adapter.ThemeTemplateAdapter
@@ -36,6 +37,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         binding.editPhotoCard.setOnClickListener {
             val intent = Intent(requireContext(), EditAlbumLibraryActivity::class.java)
             startActivity(intent)
+        }
+        binding.savedImageCard.setOnClickListener {
+            startActivity(MediaSavedActivity.getIntent(requireContext(),false))
+        }
+        binding.savedVideoCard.setOnClickListener {
+            startActivity(MediaSavedActivity.getIntent(requireContext(), true))
         }
     }
     fun navToPreview(selectedTemplate: ThemeTemplateModel) {

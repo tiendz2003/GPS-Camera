@@ -63,9 +63,9 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
         } else {
             PermissionManager.requestPermissions(requestCameraPermissionLauncher, cameraPermission)
         }
-        initTemplate(
+       /* initTemplate(
             TemplateDataModel.getDefaultTemplateData()
-        )
+        )*/
         val savedTimer = SharePrefManager.getTimerPref()
         cameraViewModel.updateCameraState {
             it.copy(
@@ -199,17 +199,6 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
         }
         startActivity(intent)
     }
-
-    private fun navigateToPreviewVideo(videoUri: Uri) {
-        val intent = Intent(this, PreviewImageActivity::class.java)
-        cameraViewModel.updateCameraState {
-            it.copy(
-                previewUri = null
-            )
-        }
-        startActivity(intent)
-    }
-
     private fun startCamera() {
         cameraViewModel.initializeCamera(this, binding.previewView, this)
     }

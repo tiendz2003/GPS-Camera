@@ -1,12 +1,20 @@
 package com.example.baseproject
 
 import android.content.Context
+import androidx.work.Configuration
+import androidx.work.Constraints
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.baseproject.di.AppModule
+import com.example.baseproject.worker.LoadDataTemplateWorker
 import com.snake.squad.adslib.AdsApplication
+import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
+import java.util.concurrent.TimeUnit
 
-class MyApplication: AdsApplication("", isProduction = true) {
+class MyApplication : AdsApplication("", isProduction = true) {
     companion object {
         lateinit var appContext: Context
     }
@@ -18,6 +26,32 @@ class MyApplication: AdsApplication("", isProduction = true) {
             androidContext(this@MyApplication)
             modules(AppModule.appModule)
         }
+        val workerFactory: LoadDataTemplateWorker.Factory by inject()
+        val config = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .setMinimumLoggingLevel(android.util.Log.INFO)
+            .build()
+        WorkManager.initialize(this, config)
+        scheduleDataTemplateWorker()
     }
 
+    private fun scheduleDataTemplateWorker() {
+        val constrain = Constraints.Builder()
+            .setRequiredNetworkType(androidx.work.NetworkType.CONNECTED)
+            .build()
+        val workRequest = PeriodicWorkRequestBuilder<LoadDataTemplateWorker>(
+            15, TimeUnit.MINUTES,
+            15, TimeUnit.MINUTES
+        )
+            .setConstraints(constrain)
+            .build()
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "LoadDataTemplateWorker",
+            androidx.work.ExistingPeriodicWorkPolicy.KEEP,
+            workRequest
+        )
+        val firstWork =
+            OneTimeWorkRequestBuilder<LoadDataTemplateWorker>().setConstraints(constrain).build()
+        WorkManager.getInstance(this).enqueue(firstWork)
+    }
 }

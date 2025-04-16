@@ -34,6 +34,7 @@ import com.example.baseproject.presentation.mainscreen.activity.CameraState
 import com.example.baseproject.utils.LocationResult
 import com.example.baseproject.utils.Resource
 import com.example.baseproject.utils.formatDuration
+import com.example.baseproject.worker.CacheDataTemplate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -56,7 +57,8 @@ import kotlin.text.format
 class CameraViewModel(
     private val weatherRepository: WeatherRepository,
     private val locationRepository: MapLocationRepository,
-    private val cameraRepository: CameraRepository
+    private val cameraRepository: CameraRepository,
+    private val cacheDataTemplate: CacheDataTemplate
 ) : ViewModel() {
     private val _cameraState = MutableStateFlow<CameraState>(CameraState())
     val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
@@ -116,7 +118,7 @@ class CameraViewModel(
         }
     }
 
-    fun bindCameraUseCase(previewView: PreviewView, lifecycleOwner: LifecycleOwner) {
+    private fun bindCameraUseCase(previewView: PreviewView, lifecycleOwner: LifecycleOwner) {
         val cameraProvider = this.cameraProvider ?: throw IllegalStateException("Chuwa khoi tao")
 
         //cameara selector
@@ -407,7 +409,6 @@ class CameraViewModel(
     }
 
 
-
     private fun stopVideoRecording() {
         recording?.stop()
         recording = null
@@ -420,82 +421,102 @@ class CameraViewModel(
             )
         }
     }
+
     @SuppressLint("DefaultLocale")
     fun updateTemplateData() {
-        viewModelScope.launch {
-            try {
-                var location: String? = null
-                var lat: String? = null
-                var lon: String? = null
-                var temperature: String? = null
-
-                val locationDeferred = async {
-                    locationRepository.getCurrentLocation()
-                }
-
-                val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-                val currentDate = dateFormat.format(Date())
-                val currentTime = timeFormat.format(Date())
-
-                when (val locationResult = locationDeferred.await()) {
-                    is LocationResult.Success -> {
-                        val currentLocation = locationResult.location
-                        lat = String.format("%.6f", currentLocation.latitude)
-                        lon = String.format("%.6f", currentLocation.longitude)
-
-                        val addressDeferred = async {
-                            locationRepository.getAddressFromLocation(currentLocation)
-                        }
-                        val tempDeferred = async {
-                            weatherRepository.getCurrentTemp(currentLocation)
-                        }
-
-                        val addressResult = addressDeferred.await()
-                        if (addressResult is LocationResult.Address) {
-                            location = addressResult.address
-                        }
-
-                        val tempResult = tempDeferred.await()
-                        if (tempResult is Resource.Success) {
-                            temperature = tempResult.data
-                        } else {
-                            val fakeTempDeferred = async(Dispatchers.IO) {
-                                weatherRepository.getFakeTemp()
-                            }
-                            val fakeTemp = fakeTempDeferred.await()
-                            if (fakeTemp is Resource.Success) {
-                                temperature = fakeTemp.data
-                            }
-                        }
-                    }
-                    else -> {
-                        //
-                    }
-                }
-
-                // Cập nhật
+        if (cacheDataTemplate.isCacheValid()) {
+            cacheDataTemplate.templateData.value?.let { cacheData ->
                 updateCameraState {
                     it.copy(
-                        templateData = TemplateDataModel(
-                            location = location,
-                            lat = lat,
-                            long = lon,
-                            temperature = temperature,
-                            currentTime = currentTime,
-                            currentDate = currentDate
-                        )
-                    )
-                }
-            } catch (e: Exception) {
-                updateCameraState {
-                    it.copy(
-                        error = e.message
+                        templateData = cacheData
                     )
                 }
             }
         }
+        if (!cacheDataTemplate.isCacheValid()) {
+            viewModelScope.launch {
+                try {
+                    var location: String? = null
+                    var lat: String? = null
+                    var lon: String? = null
+                    var temperature: String? = null
+
+                    val locationDeferred = async {
+                        locationRepository.getCurrentLocation()
+                    }
+
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+                    val currentDate = dateFormat.format(Date())
+                    val currentTime = timeFormat.format(Date())
+
+                    when (val locationResult = locationDeferred.await()) {
+                        is LocationResult.Success -> {
+                            val currentLocation = locationResult.location
+                            lat =
+                                String.format(Locale.getDefault(), "%.6f", currentLocation.latitude)
+                            lon = String.format(
+                                Locale.getDefault(),
+                                "%.6f",
+                                currentLocation.longitude
+                            )
+
+                            val addressDeferred = async {
+                                locationRepository.getAddressFromLocation(currentLocation)
+                            }
+                            val tempDeferred = async {
+                                weatherRepository.getCurrentTemp(currentLocation)
+                            }
+
+                            val addressResult = addressDeferred.await()
+                            if (addressResult is LocationResult.Address) {
+                                location = addressResult.address
+                            }
+
+                            val tempResult = tempDeferred.await()
+                            if (tempResult is Resource.Success) {
+                                temperature = tempResult.data
+                            } else {
+                                val fakeTempDeferred = async(Dispatchers.IO) {
+                                    weatherRepository.getFakeTemp()
+                                }
+                                val fakeTemp = fakeTempDeferred.await()
+                                if (fakeTemp is Resource.Success) {
+                                    temperature = fakeTemp.data
+                                }
+                            }
+                        }
+
+                        else -> {
+                            //
+                        }
+                    }
+
+                    // Cập nhật
+                    updateCameraState {
+                        it.copy(
+                            templateData = TemplateDataModel(
+                                location = location,
+                                lat = lat,
+                                long = lon,
+                                temperature = temperature,
+                                currentTime = currentTime,
+                                currentDate = currentDate
+                            )
+                        )
+                    }
+                } catch (e: Exception) {
+                    updateCameraState {
+                        it.copy(
+                            error = e.message
+                        )
+                    }
+                }
+            }
+        }
+
     }
+
 
     fun hasCamera(context: Context, facing: Int): Boolean {
         return try {

@@ -13,6 +13,8 @@ import com.example.baseproject.presentation.viewmodel.AlbumViewModel
 import com.example.baseproject.presentation.viewmodel.CameraViewModel
 import com.example.baseproject.presentation.viewmodel.PhotosViewModel
 import com.example.baseproject.presentation.viewmodel.PreviewShareViewModel
+import com.example.baseproject.worker.CacheDataTemplate
+import com.example.baseproject.worker.LoadDataTemplateWorker
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidContext
@@ -22,6 +24,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object AppModule {
+    private val cacheModule = module {
+        single { CacheDataTemplate() }
+        factory { LoadDataTemplateWorker.Factory(get(), get(), get()) }
+    }
     val appModule = module {
         single<MediaRepository> { MediaRepositoryImpl(androidContext()) }
         single<CameraRepository> { CameraRepositoryImpl() }
@@ -31,12 +37,12 @@ object AppModule {
         single { provideWeatherApiService(get()) }
         viewModel { AlbumViewModel(get()) }
         viewModel { PhotosViewModel(get()) }
-        viewModel { CameraViewModel(get(), get(),get()) }
+        viewModel { CameraViewModel(get(), get(),get(),get()) }
         viewModel { PreviewShareViewModel(get()) }
-
+        includes(cacheModule)
     }
 
-    fun provideRetrofit(): Retrofit {
+    private fun provideRetrofit(): Retrofit {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }

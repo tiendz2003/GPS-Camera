@@ -70,7 +70,7 @@ dependencies {
     implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation ("com.squareup.okhttp3:logging-interceptor:4.10.0")
     implementation("com.arthenica:ffmpeg-kit-min-gpl:6.0-2")
-
+    implementation ("androidx.work:work-runtime-ktx:2.10.0")
     implementation (libs.androidx.camera.core)
     implementation ("androidx.camera:camera-camera2:1.4.2")
     // CameraX Lifecycle để tự động quản lý camera theo lifecycle

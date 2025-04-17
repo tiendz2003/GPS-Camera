@@ -30,7 +30,7 @@ class MapLocationRepositoryImpl(private val context: Context) : MapLocationRepos
                    val locationRequest = LocationRequest.Builder(
                        Priority.PRIORITY_HIGH_ACCURACY,
                        0L
-                   )//.setWaitForAccurateLocation(true)
+                     )
                        .setMinUpdateIntervalMillis(0L)
                        .setMaxUpdateDelayMillis(0L)
                        .setMaxUpdates(1)

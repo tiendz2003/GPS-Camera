@@ -113,12 +113,12 @@ fun Long.formatCapturedTime(): String {
     return sdf.format(Date(this))
 }
 @SuppressLint("DefaultLocale")
-fun Long.formatDuration(): String {
+fun Int.formatCaptureDuration(): String {
     val seconds = (this / 1000).toInt()
     val hours = seconds / 3600
     val minutes = (seconds % 3600) / 60
     val remainingSeconds = seconds % 60
-    return String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds)
+    return String.format(Locale.getDefault(),"%02d:%02d:%02d", hours, minutes, remainingSeconds)
 }
  fun RecyclerView.scrollToCenter(position: Int) {
     val layoutManager = this.layoutManager as? LinearLayoutManager ?: return
@@ -156,6 +156,12 @@ fun ImageView.loadImageIcon(url: Any) {
 }
 @SuppressLint("DefaultLocale")
 fun Int.formatDuration(): String {
+    val minutes = this / 1000 / 60
+    val seconds = this / 1000 % 60
+    return String.format("%02d:%02d", minutes, seconds)
+}
+@SuppressLint("DefaultLocale")
+fun Long.formatDuration(): String {
     val minutes = this / 1000 / 60
     val seconds = this / 1000 % 60
     return String.format("%02d:%02d", minutes, seconds)
@@ -233,4 +239,13 @@ inline fun <reified T:Parcelable> Intent.parcelable(key: String): T? {
                 .start()
         }
         .start()
+}
+fun Date.formatToDate(): String {
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    return dateFormat.format(this)
+}
+
+fun Date.formatToTime(): String {
+    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+    return timeFormat.format(this)
 }

@@ -14,5 +14,4 @@ sealed class LocationResult{
     data class Success(val location: Location) : LocationResult()
     data class Address(val address: String) : LocationResult()
     data class Error(val message: String) : LocationResult()
-    object PermissionDenied : LocationResult()
 }

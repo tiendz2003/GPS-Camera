@@ -29,19 +29,20 @@ android {
     }
 
     buildTypes {
-        /*debug {
+        debug {
             val properties = Properties().apply {
                 load(rootProject.file("local.properties").inputStream())
             }
             val apiKey = checkNotNull(properties.getProperty("MAP_API_KEY")){
-                "Không tìm thấy API_KEY trong local.properties"
+                "404:NOT FOUND"
             }
+            resValue("string", "google_maps_key", apiKey)
             buildConfigField(
                 "String",
                 "MAP_API_KEY",
                 "\"$apiKey\""
             )
-        }*/
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -73,6 +74,7 @@ dependencies {
     implementation ("androidx.work:work-runtime-ktx:2.10.0")
     implementation (libs.androidx.camera.core)
     implementation ("androidx.camera:camera-camera2:1.4.2")
+    implementation ("com.google.android.libraries.places:places:4.2.0")
     // CameraX Lifecycle để tự động quản lý camera theo lifecycle
     implementation (libs.androidx.camera.lifecycle)
     // CameraX View để hiển thị preview
@@ -89,6 +91,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.play.services.maps)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

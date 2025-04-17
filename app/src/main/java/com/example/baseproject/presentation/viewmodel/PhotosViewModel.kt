@@ -7,21 +7,33 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.baseproject.data.models.Photo
 import com.example.baseproject.data.models.SortOption
+import com.example.baseproject.data.models.TemplateDataModel
 import com.example.baseproject.domain.MapLocationRepository
 import com.example.baseproject.domain.MediaRepository
 import com.example.baseproject.domain.WeatherRepository
 import com.example.baseproject.utils.LocationResult
 import com.example.baseproject.utils.Resource
+import com.example.baseproject.utils.formatToDate
+import com.example.baseproject.utils.formatToTime
+import com.example.baseproject.worker.CacheDataTemplate
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class PhotosViewModel(
     private val repository: MediaRepository,
+    private val cacheDataTemplate: CacheDataTemplate
 ) : ViewModel() {
 
     private val _photos = MutableLiveData<Resource<List<Photo>>>()
     val photos: LiveData<Resource<List<Photo>>> = _photos
     private val _selectedPhoto = MutableLiveData<Photo>()
     val selectedPhoto: LiveData<Photo> = _selectedPhoto
+    private val _cacheData = MutableStateFlow<TemplateDataModel?>(null)
+    val cacheData = _cacheData.asStateFlow()
     fun loadPhotosFromAlbum(albumId: String) {
         viewModelScope.launch {
             _photos.value = Resource.Loading()
@@ -85,10 +97,26 @@ class PhotosViewModel(
             SortOption.NAME -> loadedPhotos.sortedBy { it.name }
             SortOption.FILE_SIZE -> loadedPhotos.sortedByDescending { it.size }
             SortOption.DATE_ADDED -> loadedPhotos.sortedByDescending { it.dateAdded }
-            else -> loadedPhotos
         }
 
         _photos.value = Resource.Success(sortedPhotos)
+    }
+
+    fun getCacheDataTemplate() {
+        val now = Date()
+        if (cacheDataTemplate.isCacheValid()) {
+            cacheDataTemplate.templateData.value?.let {
+                Log.d("PhotosViewModel", "getCacheDataTemplate: $it")
+                _cacheData.value = TemplateDataModel(
+                    location = it.location,
+                    lat = it.lat,
+                    long = it.long,
+                    temperature = it.temperature,
+                    currentTime = now.formatToTime(),
+                    currentDate = now.formatToDate()
+                )
+            }
+        }
     }
 
     fun selectedPhoto(photo: Photo) {

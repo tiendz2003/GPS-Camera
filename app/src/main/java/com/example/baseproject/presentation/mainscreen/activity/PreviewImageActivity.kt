@@ -2,6 +2,7 @@ package com.example.baseproject.presentation.mainscreen.activity
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -27,6 +28,8 @@ import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
+import com.example.baseproject.utils.loadImageIcon
+import androidx.core.net.toUri
 
 class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPreviewBinding::inflate) {
 
@@ -40,17 +43,25 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
     override fun initData() {
         templateData = intent.parcelable<TemplateDataModel>("TEMPLATE_DATA")
         val templateId = intent.getStringExtra("TEMPLATE_ID")
+        val imgPath = intent.getStringExtra("IMAGE_PATH")
+        val isFromAlbum = intent.getBooleanExtra("FROM_ALBUM", false)
         if (templateData != null && templateId != null) {
             previewViewModel.setSelectedTemplate(templateId)
         }
-        val bitmap = BitmapHolder.bitmap
-        if (bitmap != null) {
-            displayImageWithTemplate(bitmap, templateData, templateId)
-        } else {
-            Toast.makeText(this, "Không nhận được ảnh", Toast.LENGTH_SHORT).show()
-            finish()
+        if(isFromAlbum){
+            val uri = imgPath?.toUri()
+            uri?.let {
+                displayEditImageWithTemplate(it, templateData, templateId)
+            }
+        }else{
+            val bitmap = BitmapHolder.bitmap
+            if (bitmap != null) {
+                displayImageWithTemplate(bitmap, templateData, templateId)
+            } else {
+                Toast.makeText(this, "Không nhận được ảnh", Toast.LENGTH_SHORT).show()
+                finish()
+            }
         }
-
     }
 
     override fun initView() {
@@ -120,6 +131,20 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
         templateId: String?
     ) {
         binding.imagePreview.setImageBitmap(bitmap)
+        if (templateData != null && templateId != null) {
+            binding.templateContainer.addTemplate(
+                this,
+                templateId,
+                templateData,
+            )
+        }
+    }
+    private fun displayEditImageWithTemplate(
+        uri: Uri,
+        templateData: TemplateDataModel?,
+        templateId: String?
+    ) {
+        binding.imagePreview.loadImageIcon(uri)
         if (templateData != null && templateId != null) {
             binding.templateContainer.addTemplate(
                 this,

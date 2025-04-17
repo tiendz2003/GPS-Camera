@@ -13,6 +13,7 @@ import com.example.baseproject.presentation.hometab.adapter.PhotoAdapter
 import com.example.baseproject.presentation.mainscreen.activity.PreviewImageActivity
 import com.example.baseproject.presentation.viewmodel.PhotosViewModel
 import com.example.baseproject.utils.BitmapHolder
+import com.example.baseproject.utils.Config
 import com.example.baseproject.utils.GridSpacingItemDecoration
 import com.example.baseproject.utils.Resource
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -46,6 +47,7 @@ class SelectImageActivity : BaseActivity<ActivitySelectedImageBinding>(ActivityS
         albumId?.let { albumId ->
             photoViewModel.loadPhotosFromAlbum(albumId)
         }
+        photoViewModel.getCacheDataTemplate()
     }
 
     override fun initView() {
@@ -60,7 +62,10 @@ class SelectImageActivity : BaseActivity<ActivitySelectedImageBinding>(ActivityS
         adapter = PhotoAdapter {photo->
             startActivity(
                 Intent(this, PreviewImageActivity::class.java).apply {
-                    putExtra("PHOTO", photo)
+                    putExtra("TEMPLATE_DATA", photoViewModel.cacheData.value)
+                    putExtra("TEMPLATE_ID", Config.TEMPLATE_10)
+                    putExtra("IMAGE_PATH", (photo.path).toString())
+                    putExtra("FROM_ALBUM", true)
                 }
             )
         }

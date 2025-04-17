@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.baseproject"
-    >
+    package="com.example.baseproject">
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -26,20 +24,26 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.BaseProject"
-        tools:targetApi="31" >
-        <provider
-            android:authorities="${applicationId}.androidx-startup"
-            android:name="androidx.startup.InitializationProvider"
-            android:exported="false"
-            tools:node="merge"
-            >
+        tools:targetApi="31">
+        <activity
+            android:name=".presentation.settingtab.activity.MapSettingActivity"
+            android:exported="false" />
 
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
             <meta-data
                 android:name="androidx.work.WorkManagerInitializer"
                 android:value="androidx.startup"
-                tools:node="remove"
-                />
+                tools:node="remove" />
         </provider>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
+
         <activity
             android:name=".presentation.mainscreen.activity.PreviewSavedActivity"
             android:exported="false" />
@@ -80,7 +84,7 @@
         <activity
             android:name=".presentation.hometab.activities.MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

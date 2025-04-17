@@ -28,10 +28,6 @@ class LoadDataTemplateWorker(
 
             val locationResult = locationRepository.getCurrentLocation()
 
-            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-            val currentDate = dateFormat.format(Date())
-            val currentTime = timeFormat.format(Date())
 
             if(locationResult is LocationResult.Success){
                 val currentLocation = locationResult.location
@@ -60,8 +56,6 @@ class LoadDataTemplateWorker(
                         lat = lat,
                         long = lon,
                         temperature = temperature,
-                        currentTime = currentTime,
-                        currentDate = currentDate
                     )
                 )
 

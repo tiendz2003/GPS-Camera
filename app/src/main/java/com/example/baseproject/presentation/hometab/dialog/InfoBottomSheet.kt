@@ -14,6 +14,7 @@ class InfoBottomSheet(
     private val onInfoClick: () -> Unit,
     private val onDeleteClick: () -> Unit,
 ) : BottomSheetDialogFragment() {
+
     override fun getTheme(): Int {
         return R.style.BottomSheetDialogTheme
     }

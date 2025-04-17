@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.net.Uri
 import android.os.Build
+import android.os.SystemClock
 import android.util.Log
 import android.view.View
 import androidx.camera.core.Camera
@@ -33,7 +34,10 @@ import com.example.baseproject.domain.WeatherRepository
 import com.example.baseproject.presentation.mainscreen.activity.CameraState
 import com.example.baseproject.utils.LocationResult
 import com.example.baseproject.utils.Resource
+import com.example.baseproject.utils.formatCaptureDuration
 import com.example.baseproject.utils.formatDuration
+import com.example.baseproject.utils.formatToDate
+import com.example.baseproject.utils.formatToTime
 import com.example.baseproject.worker.CacheDataTemplate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -79,8 +83,9 @@ class CameraViewModel(
     private var isVideoMode = false
 
     private var recordingTimerJob: Job? = null
+    private var countDownJob: Job? = null
     private var tempFile: File? = null
-
+    private var second = 0L
 
     fun updateCameraState(update: (CameraState) -> CameraState) {
         return _cameraState.update(update)
@@ -198,16 +203,16 @@ class CameraViewModel(
     }
 
     fun startRecordingTime() {
-        var second = 0
+        second = SystemClock.elapsedRealtime()
         recordingTimerJob = viewModelScope.launch {
             while (isActive) {
+                val elapsed = SystemClock.elapsedRealtime() - second
                 updateCameraState {
                     it.copy(
-                        recordingDuration = second.formatDuration()
+                        recordingDuration = elapsed.toInt().formatCaptureDuration()
                     )
                 }
                 delay(1000)
-                second++
             }
         }
     }
@@ -230,7 +235,8 @@ class CameraViewModel(
         isGridEnabled = !isGridEnabled
     }
 
-    fun takePhoto(timerSeconds: Int = 0) {
+    fun takePhoto() {
+        val timerSeconds = _cameraState.value.selectedTimerDuration
         if (timerSeconds > 0) {
             countToCapturePhoto(timerSeconds)
         } else {
@@ -254,7 +260,54 @@ class CameraViewModel(
         }
 
     }
-
+    fun setCaptureTime(timerSecond:Int){
+        updateCameraState {
+            it.copy(
+                selectedTimerDuration = timerSecond
+            )
+        }
+    }
+    fun startCaptureCountDown() {
+        val timerDuration = _cameraState.value.selectedTimerDuration
+        if(timerDuration <=0){
+            capturePhoto()
+            return
+        }
+        countDownJob?.cancel()
+        countDownJob = viewModelScope.launch() {
+            try {
+                for (i in timerDuration downTo 1) {
+                    updateCameraState {
+                        it.copy(
+                            countDownTimer = i,
+                            isCountDown = true
+                        )
+                    }
+                    delay(1000)
+                }
+                updateCameraState { it.copy(countDownTimer = 0, isCountDown = false) }//reset
+                capturePhoto()
+            }catch (e:Exception) {
+                updateCameraState {
+                    it.copy(
+                        error = "Lỗi đếm ngược: ${e.message}",
+                        isCountDown = false,
+                        countDownTimer = 0
+                    )
+                }
+            }
+        }
+    }
+    fun cancelCountDown() {
+        countDownJob?.cancel()
+        countDownJob = null
+        updateCameraState {
+            it.copy(
+                isCountDown = false,
+                countDownTimer = 0
+            )
+        }
+    }
     private fun capturePhoto() {
         val imageCapture = this.imageCapture ?: return
         imageCapture.takePicture(
@@ -363,7 +416,7 @@ class CameraViewModel(
                                         }
                                         Log.d(
                                             "CameraViewModel",
-                                            "Video saved to: $savedUri"
+                                            "Luu video: $savedUri"
                                         )
                                         updateCameraState {
                                             it.copy(
@@ -424,11 +477,20 @@ class CameraViewModel(
 
     @SuppressLint("DefaultLocale")
     fun updateTemplateData() {
+
+        val now = Date()
         if (cacheDataTemplate.isCacheValid()) {
             cacheDataTemplate.templateData.value?.let { cacheData ->
                 updateCameraState {
                     it.copy(
-                        templateData = cacheData
+                        templateData = TemplateDataModel(
+                            location = cacheData.location,
+                            lat = cacheData.lat,
+                            long = cacheData.long,
+                            temperature = cacheData.temperature,
+                            currentTime = now.formatToTime(),
+                            currentDate = now.formatToDate()
+                        )
                     )
                 }
             }
@@ -441,16 +503,10 @@ class CameraViewModel(
                     var lon: String? = null
                     var temperature: String? = null
 
-                    val locationDeferred = async {
-                        locationRepository.getCurrentLocation()
-                    }
+                    val locationResult = locationRepository.getCurrentLocation()
 
-                    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-                    val currentDate = dateFormat.format(Date())
-                    val currentTime = timeFormat.format(Date())
 
-                    when (val locationResult = locationDeferred.await()) {
+                    when (locationResult) {
                         is LocationResult.Success -> {
                             val currentLocation = locationResult.location
                             lat =
@@ -477,10 +533,7 @@ class CameraViewModel(
                             if (tempResult is Resource.Success) {
                                 temperature = tempResult.data
                             } else {
-                                val fakeTempDeferred = async(Dispatchers.IO) {
-                                    weatherRepository.getFakeTemp()
-                                }
-                                val fakeTemp = fakeTempDeferred.await()
+                                val fakeTemp = weatherRepository.getFakeTemp()
                                 if (fakeTemp is Resource.Success) {
                                     temperature = fakeTemp.data
                                 }
@@ -500,8 +553,8 @@ class CameraViewModel(
                                 lat = lat,
                                 long = lon,
                                 temperature = temperature,
-                                currentTime = currentTime,
-                                currentDate = currentDate
+                                currentTime = now.formatToTime(),
+                                currentDate = now.formatToDate()
                             )
                         )
                     }
@@ -554,6 +607,7 @@ class CameraViewModel(
             recordingTimerJob?.cancel()
             recordingTimerJob = null
             recording = null
+            cancelCountDown()
         } catch (e: Exception) {
             updateCameraState {
                 it.copy(

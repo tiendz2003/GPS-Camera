@@ -11,6 +11,7 @@ import com.example.baseproject.domain.MediaRepository
 import com.example.baseproject.domain.WeatherRepository
 import com.example.baseproject.presentation.viewmodel.AlbumViewModel
 import com.example.baseproject.presentation.viewmodel.CameraViewModel
+import com.example.baseproject.presentation.viewmodel.MapSettingViewModel
 import com.example.baseproject.presentation.viewmodel.PhotosViewModel
 import com.example.baseproject.presentation.viewmodel.PreviewShareViewModel
 import com.example.baseproject.worker.CacheDataTemplate
@@ -36,9 +37,10 @@ object AppModule {
         single { provideRetrofit() }
         single { provideWeatherApiService(get()) }
         viewModel { AlbumViewModel(get()) }
-        viewModel { PhotosViewModel(get()) }
+        viewModel { PhotosViewModel(get(),get()) }
         viewModel { CameraViewModel(get(), get(),get(),get()) }
         viewModel { PreviewShareViewModel(get()) }
+        viewModel { MapSettingViewModel(get(),get()) }
         includes(cacheModule)
     }
 

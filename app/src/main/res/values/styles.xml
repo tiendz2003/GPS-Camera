@@ -16,6 +16,12 @@
         <item name="android:textColor">@color/black</item>
     </style>
 
+    <style name="RoundedImageViewStyle">
+        <item name="android:background">@drawable/rounded_blue_button</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
 
     <style name="medium_500">
         <item name="fontFamily">@font/nunito_sans_medium</item>

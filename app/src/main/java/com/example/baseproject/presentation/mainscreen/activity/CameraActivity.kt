@@ -28,6 +28,7 @@ import com.example.baseproject.utils.SharePrefManager
 import com.example.baseproject.utils.addTemplate
 import com.example.baseproject.utils.gone
 import com.example.baseproject.utils.invisible
+import com.example.baseproject.utils.startCountdownAnimation
 import com.example.baseproject.utils.visible
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -107,12 +108,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                 if (cameraViewModel.isVideoMode()) {
                     toggleVideoRecording()
                 } else {
-                    val selectedTimer = cameraViewModel.cameraState.value.selectedTimerDuration
-                    if (selectedTimer > 0) {
-                        takeCountdownPicture(selectedTimer)
-                    } else {
-                        takePicture()
-                    }
+                    cameraViewModel.takePhoto()
                 }
             }
             imvFlash.setOnClickListener {
@@ -168,14 +164,16 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                         binding.tvDurationVideo.text = duration
                     }
                     updateRecordingUI(cameraState.isRecording)
-                    if (cameraState.countDownTimer > 0) {
-                        binding.tvCountDown.visible()
-                        Log.d("CameraActivity", "observeViewModel: ${cameraState.countDownTimer}")
-                        binding.tvCountDown.text = cameraState.countDownTimer.toString()
-                        //startCountdownAnimation(binding.tvCountDown)
-                    } else {
-                        Log.d("CameraActivity", "gone")
-                        binding.tvCountDown.gone()
+                    when{
+                        cameraState.isCountDown && cameraState.countDownTimer> 0 -> {
+                            Log.d("CameraActivity", "observeViewModel: ${cameraState.countDownTimer}")
+                            binding.tvCountDown.text = cameraState.countDownTimer.toString()
+                            binding.tvCountDown.visible()
+                            startCountdownAnimation(binding.tvCountDown)
+                        }
+                        else ->{
+                            binding.tvCountDown.gone()
+                        }
                     }
                     cameraState.templateData?.let {
                         Log.d("CameraActivity", "observeViewModel: $it")
@@ -191,6 +189,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
             BitmapHolder.bitmap = imgBitmap
             putExtra("TEMPLATE_DATA", cameraViewModel.cameraState.value.templateData)
             putExtra("TEMPLATE_ID", cameraViewModel.cameraState.value.selectedTemplateId)
+            putExtra("FROM_ALBUM", false)
         }
         cameraViewModel.updateCameraState {
             it.copy(
@@ -208,7 +207,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
     }
 
     private fun takeCountdownPicture(timerSeconds: Int) {
-        cameraViewModel.takePhoto(timerSeconds)
+        cameraViewModel.takePhoto()
     }
 
     private fun toggleCamera() {
@@ -243,11 +242,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
         }
 
         SharePrefManager.setTimerPref(newTimerValue)
-        cameraViewModel.updateCameraState {
-            it.copy(
-                selectedTimerDuration = newTimerValue
-            )
-        }
+        cameraViewModel.setCaptureTime(newTimerValue)
         updateTimerIcon(newTimerValue)
 
     }
@@ -326,6 +321,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
 
     override fun onDestroy() {
         super.onDestroy()
+        cameraViewModel.cancelCountDown()
         cameraViewModel.cleanupCamera()
     }
 }

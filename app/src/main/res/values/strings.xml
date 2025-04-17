@@ -56,5 +56,7 @@
     <string name="warning_title">Warning</string>
     <string name="saved_video">Saved video</string>
     <string name="saved_image">Saved image</string>
+    <string name="search">Search</string>
+    <string name="find_location">Find location</string>
 
 </resources>

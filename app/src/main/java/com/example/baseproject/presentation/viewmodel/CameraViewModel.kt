@@ -260,16 +260,18 @@ class CameraViewModel(
         }
 
     }
-    fun setCaptureTime(timerSecond:Int){
+
+    fun setCaptureTime(timerSecond: Int) {
         updateCameraState {
             it.copy(
                 selectedTimerDuration = timerSecond
             )
         }
     }
+
     fun startCaptureCountDown() {
         val timerDuration = _cameraState.value.selectedTimerDuration
-        if(timerDuration <=0){
+        if (timerDuration <= 0) {
             capturePhoto()
             return
         }
@@ -287,7 +289,7 @@ class CameraViewModel(
                 }
                 updateCameraState { it.copy(countDownTimer = 0, isCountDown = false) }//reset
                 capturePhoto()
-            }catch (e:Exception) {
+            } catch (e: Exception) {
                 updateCameraState {
                     it.copy(
                         error = "Lỗi đếm ngược: ${e.message}",
@@ -298,6 +300,7 @@ class CameraViewModel(
             }
         }
     }
+
     fun cancelCountDown() {
         countDownJob?.cancel()
         countDownJob = null
@@ -308,6 +311,7 @@ class CameraViewModel(
             )
         }
     }
+
     private fun capturePhoto() {
         val imageCapture = this.imageCapture ?: return
         imageCapture.takePicture(

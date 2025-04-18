@@ -5,8 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.settingtab.activity.MapSettingActivity">
-
+    tools:context=".presentation.settingtab.activity.MapTypeActivity">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
@@ -29,7 +28,7 @@
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Location"
+            android:text="Map type"
             android:textColor="@android:color/black"
             android:textSize="25sp"
             android:textStyle="bold"
@@ -47,13 +46,12 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/mapView"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMapTypes"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:elevation="0dp"
+        android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topBar" />
-
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        tools:listitem="@layout/item_map_type" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -64,9 +64,9 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
         } else {
             PermissionManager.requestPermissions(requestCameraPermissionLauncher, cameraPermission)
         }
-       /* initTemplate(
-            TemplateDataModel.getDefaultTemplateData()
-        )*/
+        /* initTemplate(
+             TemplateDataModel.getDefaultTemplateData()
+         )*/
         val savedTimer = SharePrefManager.getTimerPref()
         cameraViewModel.updateCameraState {
             it.copy(
@@ -108,7 +108,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                 if (cameraViewModel.isVideoMode()) {
                     toggleVideoRecording()
                 } else {
-                    cameraViewModel.takePhoto()
+                    takePicture()
                 }
             }
             imvFlash.setOnClickListener {
@@ -133,11 +133,13 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                     binding.imvFullScreen.setImageResource(R.drawable.ic_full_exit)
                     binding.flCamera.elevation = -1f
                     binding.clHeader.elevation = 10f
+                    binding.tvCountDown.elevation = 10f
                     binding.clBottom.elevation = 10f
                 } else {
                     binding.clRoot.transitionToStart()
                     binding.imvFullScreen.setImageResource(R.drawable.ic_full)
                     binding.flCamera.elevation = 0f
+                    binding.tvCountDown.elevation = 0f
                     binding.clHeader.elevation = 0f
                     binding.clBottom.elevation = 0f
                 }
@@ -164,16 +166,13 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                         binding.tvDurationVideo.text = duration
                     }
                     updateRecordingUI(cameraState.isRecording)
-                    when{
-                        cameraState.isCountDown && cameraState.countDownTimer> 0 -> {
-                            Log.d("CameraActivity", "observeViewModel: ${cameraState.countDownTimer}")
-                            binding.tvCountDown.text = cameraState.countDownTimer.toString()
-                            binding.tvCountDown.visible()
-                            startCountdownAnimation(binding.tvCountDown)
-                        }
-                        else ->{
-                            binding.tvCountDown.gone()
-                        }
+                    if (cameraState.isCountDown && cameraState.countDownTimer > 0) {
+                        Log.d("CountingDown", "observeViewModel: ${cameraState.countDownTimer}")
+                        binding.tvCountDown.text = "${cameraState.countDownTimer}"
+                        binding.tvCountDown.visible()
+                        startCountdownAnimation(binding.tvCountDown)
+                    } else {
+                        binding.tvCountDown.gone()
                     }
                     cameraState.templateData?.let {
                         Log.d("CameraActivity", "observeViewModel: $it")
@@ -198,17 +197,15 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
         }
         startActivity(intent)
     }
+
     private fun startCamera() {
         cameraViewModel.initializeCamera(this, binding.previewView, this)
     }
 
     private fun takePicture() {
-        cameraViewModel.takePhoto()
+        cameraViewModel.startCaptureCountDown()
     }
 
-    private fun takeCountdownPicture(timerSeconds: Int) {
-        cameraViewModel.takePhoto()
-    }
 
     private fun toggleCamera() {
         cameraViewModel.toggleCamera(binding.previewView, this)

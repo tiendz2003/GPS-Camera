@@ -1,0 +1,50 @@
+package com.example.baseproject.presentation.settingtab.adapter
+
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.example.baseproject.data.models.FormatItem
+import com.example.baseproject.databinding.ItemFormatBinding
+
+class FormatAdapter(
+    private val items: List<FormatItem>,
+    private val onClick: (FormatItem) -> Unit,
+) : RecyclerView.Adapter<FormatAdapter.FormatViewHolder>() {
+    inner class FormatViewHolder(private val binding: ItemFormatBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: FormatItem) {
+            binding.apply {
+                tvFormatName.text = item.id
+                radioButton.isChecked = item.isSelected
+                root.setOnClickListener {
+                    onClick(item)
+                }
+                radioButton.setOnClickListener {
+                    onClick(item)
+                }
+            }
+        }
+    }
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): FormatViewHolder {
+        val binding = ItemFormatBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return FormatViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: FormatViewHolder, position: Int) {
+        holder.bind(items[position])
+    }
+
+    override fun getItemCount(): Int {
+        return items.size
+    }
+
+}

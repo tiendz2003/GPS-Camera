@@ -141,6 +141,16 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             />
+        <TextView
+            android:id="@+id/tv_count_down"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="80sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:visibility="visible"
+            android:layout_gravity="center"
+           />
     </FrameLayout>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_bottom"
@@ -263,17 +273,6 @@
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-    <TextView
-        android:id="@+id/tv_count_down"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="80sp"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+
 
 </androidx.constraintlayout.motion.widget.MotionLayout>

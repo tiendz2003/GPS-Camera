@@ -36,8 +36,7 @@ class PhotoAdapter(
     override fun getItemViewType(position: Int): Int {
         return when (items[position]) {
             is String -> VIEW_TYPE_DATE_HEADER
-            is Photo -> VIEW_TYPE_PHOTO
-            else -> throw IllegalArgumentException("Loi")
+            else  -> VIEW_TYPE_PHOTO
         }
     }
 

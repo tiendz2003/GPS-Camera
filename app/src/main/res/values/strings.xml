@@ -49,7 +49,7 @@
     <string name="best_travel"><u>Best Travel</u></string>
     <string name="memories"><u>Memories</u></string>
     <string name="new_york"><u>New York</u></string>
-    <string name="times">Time\n</string>
+    <string name="times">Time</string>
     <string name="warning">Are you sure you want to \nDelete this item?</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
@@ -58,5 +58,16 @@
     <string name="saved_image">Saved image</string>
     <string name="search">Search</string>
     <string name="find_location">Find location</string>
+    <string name="date_format">Date Format</string>
+    <string name="time_format">Time Format</string>
+    <string name="current_date_amp_time"><![CDATA[Current Date & Time]]></string>
+    <string name="custom_date_amp_time"><![CDATA[Custom Date & Time]]></string>
+    <string name="select_date_amp_time"><![CDATA[Select Date & Time]]></string>
+    <string name="save">Save</string>
+    <string name="tap_to_set">Tap to set</string>
+    <string name="select_time">Please select time</string>
+    <string name="select_date">Please select date</string>
+    <string name="celsius">Celcius</string>
+    <string name="fahrenheit">Fahrenheit</string>
 
 </resources>

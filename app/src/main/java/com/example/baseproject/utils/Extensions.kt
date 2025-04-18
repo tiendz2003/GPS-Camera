@@ -249,3 +249,7 @@ fun Date.formatToTime(): String {
     val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
     return timeFormat.format(this)
 }
+fun Date.formatToDateTime(): String {
+    val timeFormat = SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault())
+    return timeFormat.format(this)
+}

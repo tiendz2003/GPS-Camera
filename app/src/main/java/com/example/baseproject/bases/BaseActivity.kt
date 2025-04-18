@@ -3,6 +3,7 @@ package com.example.baseproject.bases
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
 import com.example.baseproject.utils.Common
@@ -19,6 +20,7 @@ abstract class BaseActivity<viewBinding : ViewBinding>(val inflater :(LayoutInfl
                 or View.SYSTEM_UI_FLAG_FULLSCREEN
                 or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(binding.root)
         localeConfiguration()
         initData()

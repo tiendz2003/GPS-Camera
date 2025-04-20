@@ -248,14 +248,17 @@ class PreviewSavedActivity :
             try {
                 val rowsDeleted = contentResolver.delete(photo.path, null, null)
                 if (rowsDeleted > 0) {
-                    Toast.makeText(this, "Image deleted successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this,
+                        getString(R.string.image_deleted_successfully), Toast.LENGTH_SHORT).show()
                     setResult(RESULT_OK)
                     finish()
                 } else {
-                    Toast.makeText(this, "Failed to delete image", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this,
+                        getString(R.string.failed_to_delete_image), Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("PreviewSavedActivity", "Lỗi xóa: ${e.message}")
+               // Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
             alertDialog.dismiss()
         }

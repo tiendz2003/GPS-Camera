@@ -64,7 +64,7 @@ class CameraViewModel(
     private val cameraRepository: CameraRepository,
     private val cacheDataTemplate: CacheDataTemplate
 ) : ViewModel() {
-    private val _cameraState = MutableStateFlow<CameraState>(CameraState())
+    private val _cameraState = MutableStateFlow(CameraState())
     val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
 
     private var cameraProvider: ProcessCameraProvider? = null
@@ -202,7 +202,7 @@ class CameraViewModel(
         return isVideoMode
     }
 
-    fun startRecordingTime() {
+    private fun startRecordingTime() {
         second = SystemClock.elapsedRealtime()
         recordingTimerJob = viewModelScope.launch {
             while (isActive) {
@@ -361,7 +361,7 @@ class CameraViewModel(
         }
     }
 
-    fun startVideoRecording(context: Context) {
+    private fun startVideoRecording(context: Context) {
         val videoCapture = this.videoCapture ?: return
         tempFile?.delete()
         try {

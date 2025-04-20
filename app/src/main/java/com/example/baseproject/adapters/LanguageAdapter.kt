@@ -11,55 +11,70 @@ import com.example.baseproject.databinding.ItemLanguageBinding
 import com.example.baseproject.data.models.LanguageModel
 import com.example.baseproject.utils.Common
 
-class LanguageAdapter(private val context: Context, private val languageList: MutableList<LanguageModel>) :
-    RecyclerView.Adapter<LanguageAdapter.ViewHolder>() {
+class LanguageAdapter(
+    private val context: Context,
+    private val languageList: MutableList<LanguageModel>,
+    private val onItemClick: (LanguageModel) -> Unit,
 
-    private var selectedLanguage = Common.getSelectedLanguage()
+    ) : RecyclerView.Adapter<LanguageAdapter.ViewHolder>() {
+    private var selectedPosition = RecyclerView.NO_POSITION
 
-    class ViewHolder(val binding: ItemLanguageBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class ViewHolder(val binding: ItemLanguageBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(language: LanguageModel, position: Int) {
+            binding.ivLanguage.setImageResource(language.img)
+            binding.languageName.text = context.getString(language.name)
+            binding.languageName.setHorizontallyScrolling(true)
+            binding.languageName.isSelected = true
+            if (position == selectedPosition) {
+                binding.layoutRoot.setBackgroundResource(R.drawable.bg_language_selected)
+                binding.languageName.typeface =
+                    ResourcesCompat.getFont(context, R.font.nunito_sans_semi_bold)
+            } else {
+                binding.layoutRoot.setBackgroundResource(R.drawable.bg_language_unselected)
+                binding.languageName.typeface =
+                    ResourcesCompat.getFont(context, R.font.nunito_sans_regular)
+            }
+            binding.root.setOnClickListener {
+                val previousSelected = selectedPosition
+                selectedPosition = position
+
+                if (previousSelected != RecyclerView.NO_POSITION) {
+                    notifyItemChanged(previousSelected)
+                }
+                notifyItemChanged(selectedPosition)
+                onItemClick(language)
+            }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        return ViewHolder(
-            ItemLanguageBinding.inflate(inflater, parent, false)
+        val binding = ItemLanguageBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
         )
+        return ViewHolder(binding)
     }
 
-    @SuppressLint("ResourceAsColor")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
         val language = languageList[position]
-        if (selectedLanguage == language){
-            holder.binding.layoutRoot.setBackgroundResource(R.drawable.bg_language_selected)
-            holder.binding.languageName.typeface = ResourcesCompat.getFont(context, R.font.nunito_sans_semi_bold)
-        }else{
-            holder.binding.layoutRoot.setBackgroundResource(R.drawable.bg_language_unselected)
-            holder.binding.languageName.typeface = ResourcesCompat.getFont(context, R.font.nunito_sans_regular)
+        holder.bind(language, position)
+    }
+
+    override fun getItemCount(): Int = languageList.size
+
+    fun getSelectedLanguage(): LanguageModel? {
+        return if (selectedPosition != RecyclerView.NO_POSITION)
+            languageList[selectedPosition]
+        else null
+    }
+
+    fun setSelectedLanguage(language: LanguageModel) {
+        val position = languageList.indexOf(language)
+        if (position != -1) {
+            selectedPosition = position
+            notifyItemChanged(position)
         }
-
-        holder.binding.ivLanguage.setImageResource(language.img)
-        holder.binding.languageName.text = context.getString(language.name)
-        holder.binding.languageName.setHorizontallyScrolling(true)
-        holder.binding.languageName.isSelected = true
-
-        holder.itemView.setOnClickListener {
-            selectedLanguage = language
-            notifyDataSetChanged()
-        }
-
     }
-
-    fun getSelectedPositionLanguage() : LanguageModel {
-        return selectedLanguage
-    }
-
-    fun setSelectedPositionLanguage(language: LanguageModel) {
-        selectedLanguage = language
-        notifyDataSetChanged()
-    }
-
-    override fun getItemCount(): Int {
-        return Common.getLanguageList().size
-    }
-
 }

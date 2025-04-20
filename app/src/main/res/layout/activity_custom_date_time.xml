@@ -30,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="Date &amp; Time Type"
+            android:text="@string/date_amp_time_type"
             android:textColor="@android:color/black"
             android:textSize="25sp"
             android:textStyle="bold"

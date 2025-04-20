@@ -5,12 +5,14 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.baseproject.R
 import com.example.baseproject.bases.BaseActivity
 import com.example.baseproject.databinding.ActivityPreviewTemplateBinding
 import com.example.baseproject.data.models.TemplateType
 import com.example.baseproject.data.models.ThemeTemplateModel
 import com.example.baseproject.presentation.custom.HorizontalSpaceItemDecoration
 import com.example.baseproject.presentation.hometab.adapter.PreviewOptionsAdapter
+import com.example.baseproject.utils.SharePrefManager
 import com.example.baseproject.utils.dpToPx
 import com.example.baseproject.utils.loadImageIcon
 import com.example.baseproject.utils.scrollToCenter
@@ -48,7 +50,7 @@ class PreviewTemplateActivity : BaseActivity<ActivityPreviewTemplateBinding>(
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
     }
-    fun updateSelectedPosition(position: Int){
+    private fun updateSelectedPosition(position: Int){
         detailTemplateAdapter.updateSelection(position)
     }
     override fun initData() {
@@ -69,18 +71,18 @@ class PreviewTemplateActivity : BaseActivity<ActivityPreviewTemplateBinding>(
         val themeList = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableArrayListExtra(THEME_LIST, ThemeTemplateModel::class.java) ?: arrayListOf()
         } else {
-            intent.getParcelableArrayListExtra<ThemeTemplateModel>(THEME_LIST) ?: arrayListOf()
+            intent.getParcelableArrayListExtra(THEME_LIST) ?: arrayListOf()
         }
         themeType?.let {
             binding.tvTitle.text = when (it) {
                 TemplateType.DAILY -> {
-                    "Daily"
+                    getString(R.string.daily)
                 }
                 TemplateType.TRAVEL -> {
-                    "Travel"
+                    getString(R.string.travel)
                 }
                 TemplateType.GPS -> {
-                    "GPS"
+                    getString(R.string.gps)
                 }
             }
         }
@@ -101,7 +103,20 @@ class PreviewTemplateActivity : BaseActivity<ActivityPreviewTemplateBinding>(
     }
 
     override fun initActionView() {
-
+        binding.ivBack.setOnClickListener {
+            finish()
+        }
+        binding.ivDone.setOnClickListener {
+            val selectedTemplate = detailTemplateAdapter.currentList.find { it.isSelected }
+            selectedTemplate?.let {
+                SharePrefManager.setDefaultTemplate(it.id)
+                val resultIntent = Intent().apply {
+                    putExtra("SELECTED_TEMPLATE_ID", it.id)
+                }
+                setResult(RESULT_OK, resultIntent)
+                finish()
+            }
+        }
     }
     private fun setupView(){
         binding.rvThemeOptions.apply {

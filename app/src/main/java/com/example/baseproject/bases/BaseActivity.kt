@@ -22,7 +22,6 @@ abstract class BaseActivity<viewBinding : ViewBinding>(val inflater :(LayoutInfl
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(binding.root)
-        localeConfiguration()
         initData()
         initView()
         initActionView()
@@ -44,13 +43,5 @@ abstract class BaseActivity<viewBinding : ViewBinding>(val inflater :(LayoutInfl
 
     abstract fun initActionView()
 
-    private fun localeConfiguration() {
-        val language = Common.getSelectedLanguage()
-        val locale = Locale(language.key)
-        Locale.setDefault(locale)
-        val configuration = resources.configuration
-        configuration.setLocale(locale)
-        resources.updateConfiguration(configuration, resources.displayMetrics)
-    }
 
 }

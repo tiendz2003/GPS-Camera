@@ -100,7 +100,8 @@
         android:layout_marginHorizontal="8dp"
         android:src="@drawable/ic_camera_daily"
         android:layout_width="0dp"
-        android:layout_height="60dp"/>
+        android:layout_height="60dp"
+        tools:visibility="visible" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_time"
@@ -110,6 +111,7 @@
         android:gravity="center"
         android:textAllCaps="true"
         style="@style/acme_style"
+        app:layout_goneMarginTop="6dp"
         app:autoSizeMaxTextSize="24sp"
         app:autoSizeMinTextSize="14sp"
         app:autoSizeTextType="uniform"

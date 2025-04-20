@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
 import android.content.Intent
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.baseproject.R
@@ -71,7 +72,7 @@ class MediaSavedActivity :
         }
     }
 
-    fun setupRecycleView() {
+    private fun setupRecycleView() {
         photoAdapter = PhotoAdapter(isVideo){ photo ->
             startActivityForResult(
                 PreviewSavedActivity.getIntent(this, photo),
@@ -109,7 +110,7 @@ class MediaSavedActivity :
             loadMediaData()
         }
     }
-    fun loadMediaData(){
+    private fun loadMediaData(){
         if (isVideo) {
             photosViewModel.loadVideosFromAppAlbum()
             binding.tvTitle.text = getString(R.string.saved_video)
@@ -118,7 +119,7 @@ class MediaSavedActivity :
             binding.tvTitle.text = getString(R.string.saved_image)
         }
     }
-    fun observeViewModel() {
+    private fun observeViewModel() {
         photosViewModel.photos.observe(this) { resource ->
             when (resource) {
                 is Resource.Loading -> {
@@ -130,8 +131,8 @@ class MediaSavedActivity :
                         val photoByDates = photos.groupBy { photo ->
                             val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                             dateFormat.format(Date(photo.dateAdded*1000))
-
                         }
+                        Log.d("MediaSavedActivity", "observeViewModel: ${photoByDates.size}")
                         photoAdapter?.submitList(photoByDates)
                     }
                 }

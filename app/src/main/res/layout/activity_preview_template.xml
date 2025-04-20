@@ -32,7 +32,7 @@
             android:ellipsize="marquee"
             android:fontFamily="@font/nunito_sans_bold"
             android:singleLine="true"
-            android:text="Daily"
+            android:text="@string/daily"
             android:textColor="@color/black"
             android:textSize="25sp"
             android:textStyle="bold" />

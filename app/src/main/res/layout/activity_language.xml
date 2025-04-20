@@ -37,7 +37,7 @@
             android:textStyle="bold"
             android:singleLine="true"
             android:fontFamily="@font/nunito_sans_bold"
-            android:text="@string/language"
+            android:text="@string/languages"
             android:textColor="@color/colorTextTitle"
             android:textSize="20sp"
             android:layout_marginStart="12dp"/>
@@ -46,7 +46,7 @@
             android:id="@+id/ivDone"
             android:layout_width="72dp"
             android:layout_height="40dp"
-            android:text="Apply"
+            android:text="@string/apply"
             android:textSize="16sp"
             android:gravity="center"
             android:textColor="@color/white"

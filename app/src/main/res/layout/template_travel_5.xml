@@ -1,15 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_rounded_background"
     android:layout_margin="16dp"
+    android:background="@drawable/bg_rounded_background"
     android:padding="16dp">
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <ImageView
         android:id="@+id/tvTimeToTravel"
         android:layout_width="60dp"
         android:layout_height="60dp"
@@ -20,27 +18,24 @@
     <TextView
         android:id="@+id/tvTime"
         style="@style/aladin_style"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
+        android:gravity="center"
         android:text="02:50 PM"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvTimeToTravel"
-        app:layout_constraintVertical_bias="0.0" />
-
+        app:layout_constraintEnd_toStartOf="@id/layoutWeather"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/tvTimeToTravel"
+        app:layout_constraintTop_toTopOf="@id/tvTimeToTravel" />
 
     <LinearLayout
         android:id="@+id/layoutWeather"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.535"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toTopOf="@id/tvTimeToTravel">
 
         <ImageView
             android:id="@+id/ivSun"
@@ -56,17 +51,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:text="32°C" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/tvDate"
+        style="@style/afacad_style"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="Fri, 05 Jan 2024"
-        style="@style/afacad_style"
+        app:layout_constraintEnd_toEndOf="@+id/tvTime"
         app:layout_constraintStart_toStartOf="@id/tvTime"
         app:layout_constraintTop_toBottomOf="@id/tvTime" />
 
@@ -75,20 +71,17 @@
         android:layout_width="22dp"
         android:layout_height="22dp"
         android:src="@drawable/ic_location"
-        app:layout_constraintBottom_toBottomOf="@id/tvLocation"
+        app:layout_constraintBottom_toBottomOf="@+id/tvLocation"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/tvLocation" />
+        app:layout_constraintTop_toTopOf="@+id/tvLocation" />
 
     <TextView
         android:id="@+id/tvLocation"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="8dp"
-        android:text="New York, United Stated"
         style="@style/red_rose_style"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/ivLocationIcon"
-        app:layout_constraintTop_toBottomOf="@id/tvDate" />
+        android:layout_width="321dp"
+        android:layout_height="wrap_content"
+        android:text="New York, United States"
+        app:layout_constraintStart_toEndOf="@+id/ivLocationIcon"
+        app:layout_constraintTop_toBottomOf="@+id/tvDate" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

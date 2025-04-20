@@ -23,8 +23,16 @@ class PreviewOptionsAdapter(
     fun updateSelection(position: Int) {
         val oldPosition = selectedPosition
         selectedPosition = position
+
+        val currentList = currentList.toMutableList()
+        currentList.forEachIndexed { index, item ->
+            item.isSelected = index == selectedPosition
+        }
+
         notifyItemChanged(oldPosition)
         notifyItemChanged(selectedPosition)
+
+        submitList(currentList)
     }
 
     fun getSelectedTheme(): ThemeTemplateModel? {

@@ -46,7 +46,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                 Toast.makeText(this, "Cần cấp quyền", Toast.LENGTH_SHORT).show()
             }
         }
-
+    private var templateId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +55,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
 
     override fun initData() {
         cameraViewModel.updateTemplateData()
+        templateId = SharePrefManager.getDefaultTemplate()
     }
 
     override fun initView() {
@@ -256,13 +257,13 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
     }
 
     private fun initTemplate(template: TemplateDataModel) {
-        val templateId = Config.TEMPLATE_4
+
         cameraViewModel.selectedTemplate(templateId)
 
         // Tạo template trên màn hình camera
         binding.templateOverlayContainer.addTemplate(
             this,
-            templateId,
+            templateId?:Config.TEMPLATE_1,
             template
         )
 

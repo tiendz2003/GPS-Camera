@@ -28,10 +28,10 @@ class CustomDateTimeActivity : BaseActivity<ActivityCustomDateTimeBinding>(
     }
 
     override fun initData() {
-        val savedOption = SharePrefManager.getString("DATE_TIME_OPTION", "current")
+        val savedOption = SharePrefManager.getString("DATE_TIME_OPTION", "current") ?: "current"
         selectedOption = savedOption
-        customDate = SharePrefManager.getString("CUSTOM_DATE", "")
-        customTime = SharePrefManager.getString("CUSTOM_TIME", "")
+        customDate = SharePrefManager.getString("CUSTOM_DATE", "") ?: ""
+        customTime = SharePrefManager.getString("CUSTOM_TIME", "") ?: ""
     }
 
     @SuppressLint("SetTextI18n")
@@ -71,15 +71,15 @@ class CustomDateTimeActivity : BaseActivity<ActivityCustomDateTimeBinding>(
 
     @SuppressLint("SetTextI18n")
     private fun showCustomDateTimeDialog() {
-       dialog = CustomDateTimeDialog(
+        dialog = CustomDateTimeDialog(
             this,
             customDate,
             customTime
         ) {
             selectedOption = "custom"
             setChecked(selectedOption)
-            customDate = dialog?.currDate?:""
-            customTime = dialog?.currTime?:""
+            customDate = dialog?.currDate ?: ""
+            customTime = dialog?.currTime ?: ""
             binding.custom.text = "$customDate $customTime"
         }
         dialog?.setCancelable(false)
@@ -101,6 +101,7 @@ class CustomDateTimeActivity : BaseActivity<ActivityCustomDateTimeBinding>(
                 binding.cbCheckCurrent.loadImageIcon(R.drawable.ic_selected)
                 binding.cbCheckCustom.loadImageIcon(R.drawable.ic_unchecked_language)
             }
+
             "custom" -> {
                 binding.cbCheckCurrent.loadImageIcon(R.drawable.ic_unchecked_language)
                 binding.cbCheckCustom.loadImageIcon(R.drawable.ic_selected)

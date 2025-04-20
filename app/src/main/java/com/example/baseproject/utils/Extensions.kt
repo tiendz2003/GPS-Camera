@@ -42,8 +42,11 @@ import com.example.baseproject.map_template.TravelTemplateV3
 import com.example.baseproject.map_template.TravelTemplateV4
 import com.example.baseproject.map_template.TravelTemplateV5
 import com.example.baseproject.presentation.custom.HorizontalSpaceItemDecoration
+import com.example.baseproject.presentation.hometab.adapter.ThemeTemplateAdapter
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.tabs.TabLayout
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -97,6 +100,35 @@ fun RecyclerView.setupHorizontal(adapter: RecyclerView.Adapter<*>) {
         context,
         LinearLayoutManager.HORIZONTAL, false
     )
+}
+// Utility extension function
+fun ThemeTemplateAdapter.updateSelection(selectedId: String): Boolean {
+    val currentList = this.currentList.toMutableList()
+    var changed = false
+
+    // Reset all items
+    currentList.forEach { item ->
+        if (item.isSelected) {
+            item.isSelected = false
+            changed = true
+        }
+    }
+
+    // Set new selection
+    currentList.find { it.id == selectedId }?.let { item ->
+        if (!item.isSelected) {
+            item.isSelected = true
+            changed = true
+        }
+    }
+
+    // Only update if needed
+    if (changed) {
+        this.submitList(null)
+        this.submitList(currentList)
+    }
+
+    return changed
 }
 @SuppressLint("DefaultLocale")
 fun Long.kbToMb(): String {
@@ -240,6 +272,7 @@ inline fun <reified T:Parcelable> Intent.parcelable(key: String): T? {
         }
         .start()
 }
+
 fun Date.formatToDate(): String {
     val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     return dateFormat.format(this)
@@ -252,4 +285,11 @@ fun Date.formatToTime(): String {
 fun Date.formatToDateTime(): String {
     val timeFormat = SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault())
     return timeFormat.format(this)
+}
+inline fun <reified T> Gson.fromJsonWithTypeToken(value: String): T {
+    return this.fromJson(value, object : TypeToken<T>() {}.type)
+}
+
+inline fun <reified T> Gson.toJsonWithTypeToken(obj: T): String {
+    return this.toJson(obj, object : TypeToken<T>() {}.type)
 }

@@ -8,7 +8,9 @@ import com.example.baseproject.databinding.ActivityTemplatesBinding
 import com.example.baseproject.data.models.TemplateType
 import com.example.baseproject.data.models.ThemeTemplateModel
 import com.example.baseproject.presentation.hometab.adapter.ThemeTemplateAdapter
+import com.example.baseproject.utils.SharePrefManager
 import com.example.baseproject.utils.setupHorizontal
+import com.example.baseproject.utils.updateSelection
 
 class TemplatesActivity :
     BaseActivity<ActivityTemplatesBinding>(ActivityTemplatesBinding::inflate) {
@@ -30,12 +32,8 @@ class TemplatesActivity :
     }
 
 
-    val listTheme = ThemeTemplateModel.getTemplate()
+    private val listTheme = ThemeTemplateModel.getTemplate()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-    }
 
     override fun initData() {
         Log.d("TemplatesActivity", "initData: $listTheme")
@@ -45,12 +43,21 @@ class TemplatesActivity :
         dailyAdapter.submitList(listDaily)
         travelAdapter.submitList(listTravel)
         gpsAdapter.submitList(listGps)
+        updateTemplateSelection()
     }
-
+    private fun updateTemplateSelection(){
+        gpsAdapter.updateSelection(SharePrefManager.getDefaultTemplate())
+        dailyAdapter.updateSelection(SharePrefManager.getDefaultTemplate())
+        travelAdapter.updateSelection(SharePrefManager.getDefaultTemplate())
+    }
     override fun initView() {
         setupRecyclerView()
     }
 
+    override fun onResume() {
+        super.onResume()
+        updateTemplateSelection()
+    }
     override fun initActionView() {
         binding.tvViewAllDaily.setOnClickListener {
             startActivity(DetailTemplateActivity.getIntent(this, TemplateType.DAILY))
@@ -75,7 +82,7 @@ class TemplatesActivity :
             setupHorizontal(gpsAdapter)
         }
     }
-    fun navToPreview(selectedTemplate: ThemeTemplateModel) {
+    private fun navToPreview(selectedTemplate: ThemeTemplateModel) {
         val themeType = selectedTemplate.type
         val filterList = ThemeTemplateModel.getTemplate().filter { it.type == themeType } as ArrayList<ThemeTemplateModel>
         val intent = PreviewTemplateActivity.getIntent(this, selectedTemplate, filterList,themeType)

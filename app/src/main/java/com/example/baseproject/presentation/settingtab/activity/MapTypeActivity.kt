@@ -54,25 +54,25 @@ class MapTypeActivity : BaseActivity<ActivityMapTypeBinding>(ActivityMapTypeBind
         val mapTypes = listOf(
             MapType(
                 id = 1,
-                name = "Normal",
+                name = getString(R.string.normal),
                 type = GoogleMap.MAP_TYPE_NORMAL,
                 thumbnailRes = R.drawable.img_map_normal
             ),
             MapType(
                 id = 2,
-                name = "Hybrid",
+                name = getString(R.string.hybrid),
                 type = GoogleMap.MAP_TYPE_HYBRID,
                 thumbnailRes = R.drawable.img_map_hybrid
             ),
             MapType(
                 id = 3,
-                name = "Satellite",
+                name = getString(R.string.satellite),
                 type = GoogleMap.MAP_TYPE_SATELLITE,
                 thumbnailRes = R.drawable.img_map_satellite
             ),
             MapType(
                 id = 4,
-                name = "Terrain",
+                name = getString(R.string.terrain),
                 type = GoogleMap.MAP_TYPE_TERRAIN,
                 thumbnailRes = R.drawable.img_map_terrain
             )

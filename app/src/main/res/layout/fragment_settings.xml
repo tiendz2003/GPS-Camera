@@ -11,7 +11,7 @@
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Setting"
+        android:text="@string/setting"
         android:layout_margin="16sp"
         android:textSize="24sp"
         android:textColor="@android:color/black"
@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Map Setting"
+        android:text="@string/setting_map"
         android:textColor="@color/black"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_weight="1"
-                android:text="Location"
+                android:text="@string/location"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
@@ -98,7 +98,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_weight="1"
-                android:text="Map Type"
+                android:text="@string/map_type"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
@@ -131,7 +131,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_weight="1"
-                android:text="Date &amp; Time Type"
+                android:text="@string/date_amp_time_type"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
@@ -164,7 +164,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_weight="1"
-                android:text="Date &amp; Time Format"
+                android:text="@string/date_amp_time_format"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
@@ -196,7 +196,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_weight="1"
-                android:text="Temperature Unit"
+                android:text="@string/temperature_unit"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
@@ -254,7 +254,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_weight="1"
-                android:text="Language"
+                android:text="@string/language"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
@@ -287,7 +287,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_weight="1"
-                android:text="Rating"
+                android:text="@string/rating"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
@@ -320,7 +320,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_weight="1"
-                android:text="Privacy Policy"
+                android:text="@string/privacy_policy"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
@@ -353,7 +353,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_weight="1"
-                android:text="Share"
+                android:text="@string/share"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 

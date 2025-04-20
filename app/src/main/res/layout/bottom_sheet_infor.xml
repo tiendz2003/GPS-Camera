@@ -27,7 +27,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Sort by"
+            android:text="@string/sort_by"
             android:textSize="18sp"
             android:textColor="@color/black"
             android:textStyle="bold" />
@@ -60,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:text="Share"
+            android:text="@string/share"
             android:textColor="@color/black"
             android:textSize="16sp"/>
     </LinearLayout>
@@ -83,7 +83,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:text="Delete"
+            android:text="@string/delete"
             android:textColor="@color/black"
             android:textSize="16sp"/>
     </LinearLayout>
@@ -108,7 +108,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:textColor="@color/black"
-            android:text="Info"
+            android:text="@string/information"
             android:textSize="16sp"/>
     </LinearLayout>
 

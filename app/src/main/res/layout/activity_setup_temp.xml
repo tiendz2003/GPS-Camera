@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="Temperature Unit"
+            android:text="@string/temperature_unit"
             android:textColor="@android:color/black"
             android:textSize="25sp"
             android:textStyle="bold"
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:text="@string/celsius"
             android:textColor="#879096"
-            android:textSize="15dp"
+            android:textSize="15sp"
             app:layout_constraintEnd_toStartOf="@id/cbCelsius"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

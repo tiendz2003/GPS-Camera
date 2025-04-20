@@ -76,6 +76,7 @@ class PhotosViewModel(
                 val appAlbum = albums.find { it.name == "GPS_CAMERA" }
                 if (appAlbum != null) {
                     loadedPhotos = repository.getVideoFromAlbum(appAlbum.id)
+                    Log.d("EditAlbumLibraryActivity", "Error: $loadedPhotos")
                     sortAndShow(currentMethod)
                 } else {
                     _photos.value = Resource.Success(emptyList())

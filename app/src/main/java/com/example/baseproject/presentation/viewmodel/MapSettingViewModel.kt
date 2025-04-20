@@ -21,16 +21,16 @@ class MapSettingViewModel(
     private val mapLocationRepository: MapLocationRepository,
     private val cacheDataTemplate: CacheDataTemplate,
 ): ViewModel() {
-    private val _mapSettingState = MutableStateFlow<MapSettingState>(MapSettingState())
+    private val _mapSettingState = MutableStateFlow(MapSettingState())
     val mapSettingState = _mapSettingState.asStateFlow()
 
     init {
         getCurrentLocation()
     }
-    fun updateSettingState(newState: (MapSettingState) -> MapSettingState) {
+    private fun updateSettingState(newState: (MapSettingState) -> MapSettingState) {
         return _mapSettingState.update(newState)
     }
-    fun getCurrentLocation() {
+    private fun getCurrentLocation() {
         viewModelScope.launch {
             if (cacheDataTemplate.isCacheValid()) {
                 cacheDataTemplate.templateData.value?.let { cacheData ->
@@ -49,9 +49,11 @@ class MapSettingViewModel(
                                 it.copy(
                                     currentLocation = location,
                                     isLoading = false,
-                                    isError = null
+                                    isError = null,
+                                    currentAddress = cacheData.location,
                                 )
                             }
+                            updateLocation(location)
                             //
                         }
                     } catch (e: Exception) {
@@ -66,9 +68,7 @@ class MapSettingViewModel(
             }
 
             try {
-                val locationResult = mapLocationRepository.getCurrentLocation()
-
-                when (locationResult) {
+                when (val locationResult = mapLocationRepository.getCurrentLocation()) {
                     is LocationResult.Success -> {
                         val currentLocation = locationResult.location
                         updateSettingState {
@@ -78,6 +78,7 @@ class MapSettingViewModel(
                                 isError = null
                             )
                         }
+                        updateLocation(currentLocation)
                     }
                     is LocationResult.Error -> {
                         updateSettingState {
@@ -109,8 +110,41 @@ class MapSettingViewModel(
     fun updateLocation(location: Location){
         updateSettingState {
             it.copy(
-                currentLocation = location
+                currentLocation = location,
+                isLoading = true // Set loading while fetching address
             )
+        }
+        viewModelScope.launch {
+            try {
+                when (val addressResult = mapLocationRepository.getAddressFromLocation(location)) {
+                    is LocationResult.Address -> {
+                        updateSettingState {
+                            it.copy(
+                                currentAddress = addressResult.address,
+                                isLoading = false
+                            )
+                        }
+                    }
+                    is LocationResult.Error -> {
+                        updateSettingState {
+                            it.copy(
+                                isLoading = false,
+                                isError = addressResult.message
+                            )
+                        }
+                    }
+                    else -> {
+                        updateSettingState { it.copy(isLoading = false) }
+                    }
+                }
+            } catch (e: Exception) {
+                updateSettingState {
+                    it.copy(
+                        isLoading = false,
+                        isError = e.message
+                    )
+                }
+            }
         }
     }
 }

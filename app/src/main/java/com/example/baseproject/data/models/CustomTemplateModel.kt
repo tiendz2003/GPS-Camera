@@ -42,20 +42,7 @@ data class TemplateDataModel(
     val temperature: String? = null,
     val currentTime: String? = null,
     val currentDate: String? = null
-):Parcelable{
-    companion object{
-        fun getDefaultTemplateData(): TemplateDataModel {
-            return TemplateDataModel(
-                location = "Hanoi",
-                lat = "21.0285",
-                long = "105.8542",
-                temperature = "25°C",
-                currentTime = "12:00 PM",
-                currentDate = "01/01/2025"
-            )
-        }
-    }
-}
+):Parcelable
 data class TemplateState(
     val selectedTemplateId: Int? = null,
     val showLocation: Boolean = true,

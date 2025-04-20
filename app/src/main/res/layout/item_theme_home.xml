@@ -10,18 +10,33 @@
     android:shadowColor="@android:color/transparent"
     app:cardBackgroundColor="@android:color/transparent"
     app:cardCornerRadius="6dp">
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_item"
-        android:foreground="?attr/selectableItemBackgroundBorderless"
-        android:layout_width="130dp"
+
+    <FrameLayout
+        android:layout_width="140dp"
         android:layout_height="170dp">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/imv_theme"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_item"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_height="match_parent">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imv_theme"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ImageView
+            android:id="@+id/imv_check"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_menu_check"
+            android:layout_margin="8dp"
+            android:visibility="visible"
+            android:layout_gravity="end|top" />
+    </FrameLayout>
 </com.google.android.material.card.MaterialCardView>

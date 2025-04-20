@@ -10,16 +10,21 @@ import com.example.baseproject.presentation.hometab.activities.MediaSavedActivit
 import com.example.baseproject.presentation.hometab.activities.PreviewTemplateActivity
 import com.example.baseproject.presentation.hometab.activities.TemplatesActivity
 import com.example.baseproject.presentation.hometab.adapter.ThemeTemplateAdapter
+import com.example.baseproject.utils.Config
+import com.example.baseproject.utils.SharePrefManager
 import com.example.baseproject.utils.setupHorizontal
+import com.example.baseproject.utils.updateSelection
 
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::inflate) {
     private lateinit var adapter: ThemeTemplateAdapter
-    val listTheme = ThemeTemplateModel.getTemplate()
+    private val listTheme = ThemeTemplateModel.getTemplate()
     override fun initData() {
     }
 
     override fun initView() {
+
+
         Log.d("RecyclerView", "List size: ${listTheme.size}")
         adapter = ThemeTemplateAdapter {
             Log.d("RecyclerView", "Binding item: ${it.id}")
@@ -27,6 +32,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         }
         adapter.submitList(listTheme)
         binding.rcvTheme.setupHorizontal(adapter)
+        adapter.updateSelection(SharePrefManager.getDefaultTemplate()?:Config.TEMPLATE_1)
     }
 
     override fun initActionView() {
@@ -45,11 +51,17 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             startActivity(MediaSavedActivity.getIntent(requireContext(), true))
         }
     }
-    fun navToPreview(selectedTemplate: ThemeTemplateModel) {
+    private fun navToPreview(selectedTemplate: ThemeTemplateModel) {
         val themeType = selectedTemplate.type
         val filterList = ThemeTemplateModel.getTemplate().filter { it.type == themeType } as ArrayList<ThemeTemplateModel>
         val intent = PreviewTemplateActivity.getIntent(requireContext(), selectedTemplate, filterList,themeType)
         startActivity(intent)
     }
 
+
+    override fun onResume() {
+        super.onResume()
+        val defaultTemplateId = SharePrefManager.getDefaultTemplate()
+        adapter.updateSelection(defaultTemplateId)
+    }
 }

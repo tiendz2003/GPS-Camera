@@ -55,7 +55,7 @@ class CurrentLocationSheet(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         isCancelable = false
         _binding = BottomSheetAddressBinding.inflate(inflater, container, false)
         return binding.root

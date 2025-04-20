@@ -2,27 +2,43 @@ package com.example.baseproject.utils
 
 import com.example.baseproject.R
 import com.example.baseproject.data.models.LanguageModel
-import com.example.baseproject.utils.Constants.HAWK_LANGUAGE_POSITION
-import com.example.baseproject.utils.Constants.HAWK_RATE_STAR
+import com.example.baseproject.utils.Constants.LANGUAGE_POSITION
+import com.example.baseproject.utils.Constants.RATE_STAR
 import com.orhanobut.hawk.Hawk
 
 object Common {
 
-    fun setSelectedLanguage(language: LanguageModel) {
-        Hawk.put(HAWK_LANGUAGE_POSITION, language)
+    /*fun setSelectedLanguage(language: LanguageModel) {
+        Hawk.put(, language)
     }
 
     fun getSelectedLanguage(): LanguageModel {
         return Hawk.get(HAWK_LANGUAGE_POSITION, LanguageModel(R.drawable.ic_english, R.string.english, "en"))
-    }
-
-    fun setRateStar() {
+    }*/
+    var languageSelected: LanguageModel
+        get() {
+            return SharePrefManager.get(
+                LANGUAGE_POSITION,
+                LanguageModel(R.drawable.ic_english, R.string.english, "en")
+            )
+        }
+        set(value) {
+            SharePrefManager.put(LANGUAGE_POSITION, value)
+        }
+    var rateStar: Int
+        get() {
+            return SharePrefManager.get(RATE_STAR, 0)
+        }
+        set(value) {
+            SharePrefManager.put(RATE_STAR, value + 1)
+        }
+    /*fun setRateStar() {
         Hawk.put(HAWK_RATE_STAR, getRateStar() + 1)
     }
 
     fun getRateStar(): Int {
         return Hawk.get(HAWK_RATE_STAR, 0)
-    }
+    }*/
 
     fun getLanguageList(): MutableList<LanguageModel> {
         val languageList = mutableListOf<LanguageModel>()

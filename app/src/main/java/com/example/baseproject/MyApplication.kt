@@ -10,6 +10,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.baseproject.di.AppModule
+import com.example.baseproject.utils.SharePrefManager
 import com.example.baseproject.worker.LoadDataTemplateWorker
 import com.google.android.libraries.places.api.Places
 import com.snake.squad.adslib.AdsApplication
@@ -30,6 +31,7 @@ class MyApplication : AdsApplication("", isProduction = true) {
             androidContext(this@MyApplication)
             modules(AppModule.appModule)
         }
+        SharePrefManager.initialize(this)
         Places.initialize(applicationContext, appContext.getString(R.string.google_maps_key))
         val workerFactory: LoadDataTemplateWorker.Factory by inject()
         val config = Configuration.Builder()

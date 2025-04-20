@@ -17,7 +17,7 @@ data class ThemeTemplateModel(
                 ThemeTemplateModel(
                     id = Config.TEMPLATE_1,
                     image ="file:///android_asset/theme/daily_theme_1.webp",
-                    type = TemplateType.DAILY
+                    type = TemplateType.DAILY,
                 ),
                 ThemeTemplateModel(
                     id = Config.TEMPLATE_2,

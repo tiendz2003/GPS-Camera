@@ -43,7 +43,6 @@ class PermissionActivity : BaseActivity<ActivityPermissionBinding>(ActivityPermi
         setupSkipButton()
     }
     private fun setupPermissionSwitches() {
-        // Set initial state based on whether permissions are granted
         binding.switchCamera.isChecked = checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
         binding.switchMicrophone.isChecked = checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
         binding.switchLocation.isChecked = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED

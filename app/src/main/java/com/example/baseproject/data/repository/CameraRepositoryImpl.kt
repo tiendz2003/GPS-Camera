@@ -1,5 +1,6 @@
 package com.example.baseproject.data.repository
 
+import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
@@ -314,4 +315,35 @@ class CameraRepositoryImpl : CameraRepository {
                 return@withContext false
             }
         }
+    suspend fun getLatestImageFromAppAlbum(context: Context): Uri? = withContext(Dispatchers.IO) {
+        try {
+            val collection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            val projection = arrayOf(
+                MediaStore.Images.Media._ID,
+                MediaStore.Images.Media.DATE_TAKEN,
+                MediaStore.Images.Media.RELATIVE_PATH
+            )
+            val selection = "${MediaStore.Images.Media.RELATIVE_PATH} LIKE ?"
+            val selectionArgs = arrayOf("DCIM/GPS_CAMERA/%")
+            val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT 1"
+
+            context.contentResolver.query(
+                collection,
+                projection,
+                selection,
+                selectionArgs,
+                sortOrder
+            )?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+                    val imageId = cursor.getLong(idColumn)
+                    return@withContext ContentUris.withAppendedId(collection, imageId)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return@withContext null
+    }
+
 }

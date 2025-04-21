@@ -1,6 +1,8 @@
 package com.example.baseproject.presentation.hometab.activities
 
+import android.content.Intent
 import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
 import com.example.baseproject.bases.BaseActivity
 import com.example.baseproject.databinding.ActivityTemplatesBinding
 import com.example.baseproject.data.models.TemplateType
@@ -12,6 +14,21 @@ import com.example.baseproject.utils.updateSelection
 
 class TemplatesActivity :
     BaseActivity<ActivityTemplatesBinding>(ActivityTemplatesBinding::inflate) {
+    private val previewActivityLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            // Pass the template selection result back to CameraActivity
+            val selectedTemplateId = result.data?.getStringExtra("SELECTED_TEMPLATE_ID")
+            if (selectedTemplateId != null) {
+                val resultIntent = Intent().apply {
+                    putExtra("SELECTED_TEMPLATE_ID", selectedTemplateId)
+                }
+                setResult(RESULT_OK, resultIntent)
+                finish()
+            }
+        }
+    }
     private val dailyAdapter by lazy {
         ThemeTemplateAdapter {selectedTemplate ->
             Log.d("TemplatesActivity", "initData: ${selectedTemplate.id}")
@@ -83,7 +100,8 @@ class TemplatesActivity :
     private fun navToPreview(selectedTemplate: ThemeTemplateModel) {
         val themeType = selectedTemplate.type
         val filterList = ThemeTemplateModel.getTemplate().filter { it.type == themeType } as ArrayList<ThemeTemplateModel>
-        val intent = PreviewTemplateActivity.getIntent(this, selectedTemplate, filterList,themeType)
-        startActivity(intent)
+        val intent = PreviewTemplateActivity.getIntent(this, selectedTemplate, filterList, themeType)
+        // Use registerForActivityResult to handle the result
+        previewActivityLauncher.launch(intent)
     }
 }

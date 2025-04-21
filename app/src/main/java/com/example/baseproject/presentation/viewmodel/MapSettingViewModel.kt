@@ -58,7 +58,6 @@ class MapSettingViewModel(
                         }
                     } catch (e: Exception) {
                         Log.e("Mapsetting", "lỗi convert: ${e.message}")
-
                     }
                 }
             }

@@ -212,4 +212,56 @@ class MediaRepositoryImpl (private val context: Context): MediaRepository {
             Log.d("MediaRepository", "Tìm thấy tổng cộng ${videos.size} video")
             videos
         }
+    override suspend fun getLatestPhotoInAlbum(): Photo? =
+        withContext(Dispatchers.IO) {
+            val albumFolderName = "GPS_CAMERA"
+            val projection = arrayOf(
+                MediaStore.Images.Media._ID,
+                MediaStore.Images.Media.DATE_ADDED,
+                MediaStore.Images.Media.DISPLAY_NAME,
+                MediaStore.Images.Media.SIZE,
+                MediaStore.Images.Media.DATA // dùng để lọc theo đường dẫn
+            )
+
+            // Chỉ lấy ảnh có path chứa tên thư mục album của app
+            val selection = "${MediaStore.Images.Media.DATA} LIKE ?"
+            val selectionArgs = arrayOf("%/${albumFolderName}/%")
+
+            val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
+
+            val query = context.contentResolver.query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                sortOrder
+            )
+
+            var latestPhoto: Photo? = null
+
+            query?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID))
+                    val dateAdded = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED))
+                    val name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME))
+                    val size = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE))
+                    val contentUri = ContentUris.withAppendedId(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        id
+                    )
+
+                    latestPhoto = Photo(
+                        id = id,
+                        path = contentUri,
+                        dateAdded = dateAdded,
+                        albumId = albumFolderName,
+                        size = size,
+                        name = name
+                    )
+                }
+            }
+
+            latestPhoto
+        }
+
 }

@@ -114,6 +114,7 @@ class PreviewTemplateActivity : BaseActivity<ActivityPreviewTemplateBinding>(
                     putExtra("SELECTED_TEMPLATE_ID", it.id)
                 }
                 setResult(RESULT_OK, resultIntent)
+                // This will return to previous activity with the selected template ID
                 finish()
             }
         }

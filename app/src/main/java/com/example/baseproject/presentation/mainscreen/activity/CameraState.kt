@@ -3,6 +3,7 @@ package com.example.baseproject.presentation.mainscreen.activity
 import android.graphics.Bitmap
 import android.net.Uri
 import android.view.View
+import com.example.baseproject.data.models.Photo
 import com.example.baseproject.data.models.TemplateDataModel
 
 data class CameraState(
@@ -19,5 +20,8 @@ data class CameraState(
     val error : String? = null,
     val selectedTemplateId: String? = null,
     val templateData: TemplateDataModel? = null,
+    val lastCaptureImage:Photo? =null,
     val templateView: View? = null,
+    val showProcessingSnackbar: Boolean = false,
+    val showSuccessSnackbar: Boolean = false
 )

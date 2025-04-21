@@ -1,12 +1,15 @@
 package com.example.baseproject.presentation.viewmodel
 
 import android.annotation.SuppressLint
+import android.content.ContentUris
 import android.content.Context
+import android.graphics.Bitmap
 import android.hardware.display.VirtualDisplay
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
+import android.provider.MediaStore
 import android.util.Log
 import android.view.Surface
 import androidx.camera.core.Camera
@@ -27,9 +30,11 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.baseproject.data.models.Photo
 import com.example.baseproject.data.models.TemplateDataModel
 import com.example.baseproject.domain.CameraRepository
 import com.example.baseproject.domain.MapLocationRepository
+import com.example.baseproject.domain.MediaRepository
 import com.example.baseproject.domain.WeatherRepository
 import com.example.baseproject.presentation.mainscreen.activity.CameraState
 import com.example.baseproject.utils.LocationResult
@@ -38,6 +43,7 @@ import com.example.baseproject.utils.formatCaptureDuration
 import com.example.baseproject.utils.formatToDate
 import com.example.baseproject.utils.formatToTime
 import com.example.baseproject.worker.CacheDataTemplate
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -58,7 +64,8 @@ class CameraViewModel(
     private val weatherRepository: WeatherRepository,
     private val locationRepository: MapLocationRepository,
     private val cameraRepository: CameraRepository,
-    private val cacheDataTemplate: CacheDataTemplate
+    private val mediaRepository:MediaRepository,
+    private val cacheDataTemplate: CacheDataTemplate,
 ) : ViewModel() {
     private val _cameraState = MutableStateFlow(CameraState())
     val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
@@ -70,7 +77,7 @@ class CameraViewModel(
     private var recording: Recording? = null
     private var preview: Preview? = null
     private var cameraExecutor = Executors.newSingleThreadExecutor()
-
+    private var processingSnackbar: Snackbar? = null
 
     private var lensFacing = CameraSelector.LENS_FACING_BACK
     private var flashMode = ImageCapture.FLASH_MODE_OFF
@@ -121,7 +128,7 @@ class CameraViewModel(
     }
 
     private fun bindCameraUseCase(previewView: PreviewView, lifecycleOwner: LifecycleOwner) {
-        val cameraProvider = this.cameraProvider ?: throw IllegalStateException("Chuwa khoi tao")
+        val cameraProvider = this.cameraProvider ?: throw IllegalStateException("Chưa khởi tạo camera")
 
         //cameara selector
         val cameraSelector = CameraSelector.Builder()
@@ -230,15 +237,6 @@ class CameraViewModel(
 
     fun enableGrid() {
         isGridEnabled = !isGridEnabled
-    }
-
-    fun takePhoto() {
-        val timerSeconds = _cameraState.value.selectedTimerDuration
-        if (timerSeconds > 0) {
-            countToCapturePhoto(timerSeconds)
-        } else {
-            capturePhoto()
-        }
     }
 
     private fun countToCapturePhoto(seconds: Int) {
@@ -399,6 +397,9 @@ class CameraViewModel(
                                                 isLoading = true, error = null
                                             )
                                         }
+                                        updateCameraState {
+                                            it.copy(showProcessingSnackbar = true)
+                                        }
                                         // Lấy tham chiếu đến template view
                                         val templateView = _cameraState.value.templateView
                                         val savedUri = if (templateView != null) {
@@ -423,14 +424,21 @@ class CameraViewModel(
                                             it.copy(
                                                 previewUri = savedUri,
                                                 isLoading = false,
+                                                showProcessingSnackbar = false,
+                                                showSuccessSnackbar = true,
                                                 error = if (savedUri == null) "Lưu video không thành công" else null
                                             )
+                                        }
+                                        delay(3000)
+                                        updateCameraState {
+                                            it.copy(showSuccessSnackbar = false)
                                         }
                                     } catch (e: Exception) {
                                         updateCameraState {
                                             it.copy(
                                                 error = "Lưu video không thành công: ${e.message}",
-                                                isLoading = false
+                                                isLoading = false,
+                                                showProcessingSnackbar = false
                                             )
                                         }
                                     }
@@ -595,7 +603,24 @@ class CameraViewModel(
     fun currentLensFacing(): Int {
         return lensFacing
     }
-
+    fun getLastCaptureImage(){
+        viewModelScope.launch {
+            try {
+                val uri = mediaRepository.getLatestPhotoInAlbum()
+                updateCameraState {
+                    it.copy(
+                        lastCaptureImage = uri
+                    )
+                }
+            } catch (e: Exception) {
+                updateCameraState {
+                    it.copy(
+                        error = e.message
+                    )
+                }
+            }
+        }
+    }
     fun cleanupCamera() {
         try {
             cameraProvider?.unbindAll()

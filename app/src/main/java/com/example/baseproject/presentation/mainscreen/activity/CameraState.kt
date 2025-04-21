@@ -19,5 +19,5 @@ data class CameraState(
     val error : String? = null,
     val selectedTemplateId: String? = null,
     val templateData: TemplateDataModel? = null,
-    val templateView: View? = null
+    val templateView: View? = null,
 )

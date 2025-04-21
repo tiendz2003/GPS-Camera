@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -13,6 +12,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
+import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -21,6 +21,7 @@ import com.example.baseproject.bases.BaseActivity
 import com.example.baseproject.data.models.TemplateDataModel
 import com.example.baseproject.databinding.ActivityCameraBinding
 import com.example.baseproject.presentation.viewmodel.CameraViewModel
+import com.example.baseproject.service.MapManager
 import com.example.baseproject.utils.BitmapHolder
 import com.example.baseproject.utils.Config
 import com.example.baseproject.utils.PermissionManager
@@ -30,7 +31,11 @@ import com.example.baseproject.utils.gone
 import com.example.baseproject.utils.invisible
 import com.example.baseproject.utils.startCountdownAnimation
 import com.example.baseproject.utils.visible
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding::inflate) {
@@ -47,27 +52,33 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
             }
         }
     private var templateId: String? = null
-
+    private var mapSnapshotJob: Job? = null
+    private lateinit var mapManager: MapManager
+    var mapSnapshot: Bitmap? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        binding.mapView.onCreate(savedInstanceState)
+
+        mapManager = MapManager(this, lifecycle, binding.mapView)
+
+        mapManager.setOnMapReadyCallback { map ->
+            cameraViewModel.updateTemplateData()
+        }
     }
 
     override fun initData() {
-        cameraViewModel.updateTemplateData()
         templateId = SharePrefManager.getDefaultTemplate()
     }
 
     override fun initView() {
-
         if (PermissionManager.hasPermissions(this, cameraPermission)) {
             startCamera()
         } else {
             PermissionManager.requestPermissions(requestCameraPermissionLauncher, cameraPermission)
         }
-        /* initTemplate(
-             TemplateDataModel.getDefaultTemplateData()
-         )*/
+
         val savedTimer = SharePrefManager.getTimerPref()
         cameraViewModel.updateCameraState {
             it.copy(
@@ -93,22 +104,60 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
             imvSwitchCamera.setOnClickListener {
                 toggleCamera()
             }
+            binding.motionLayoutMode.setTransitionListener(object : MotionLayout.TransitionListener {
+                override fun onTransitionStarted(motionLayout: MotionLayout?, startId: Int, endId: Int) {}
+
+                override fun onTransitionChange(motionLayout: MotionLayout?, startId: Int, endId: Int, progress: Float) {}
+
+                override fun onTransitionCompleted(motionLayout: MotionLayout?, currentId: Int) {
+                    when (currentId) {
+                        R.id.photo_mode -> {
+                            binding.imvTakeCapture.setImageResource(R.drawable.ic_take_photo)
+
+                            binding.tvFunction.setBackgroundResource(R.drawable.bg_btn_photo)
+                            binding.tvFunction.setTextColor(Color.BLACK)
+
+                            binding.tvOption.setBackgroundColor(Color.TRANSPARENT)
+                            binding.tvOption.setTextColor(getResources().getColor(R.color.neutralGrey))
+
+                            binding.tvDurationVideo.visibility = View.GONE
+                        }
+
+                        R.id.video_mode -> {
+                            binding.imvTakeCapture.setImageResource(R.drawable.ic_take_photo)
+
+                            binding.tvOption.setBackgroundResource(R.drawable.bg_btn_photo)
+                            binding.tvOption.setTextColor(Color.BLACK)
+
+                            binding.tvFunction.setBackgroundColor(Color.TRANSPARENT)
+                            binding.tvFunction.setTextColor(getResources().getColor(R.color.neutralGrey))
+                        }
+                    }
+                }
+
+                override fun onTransitionTrigger(motionLayout: MotionLayout?, triggerId: Int, positive: Boolean, progress: Float) {}
+            })
+
             tvFunction.setOnClickListener {
+                Log.d("CameraActivity", "tvFunction clicked!")
                 if (cameraViewModel.isVideoMode()) {
-                    updateCameraMode(false)
+                    binding.motionLayoutMode.transitionToState(R.id.photo_mode)
                     cameraViewModel.toggleCameraMode()
                 }
             }
             tvOption.setOnClickListener {
+                Log.d("CameraActivity", "tvOption clicked!")
                 if (!cameraViewModel.isVideoMode()) {
-                    updateCameraMode(true)
+                    binding.motionLayoutMode.transitionToState(R.id.video_mode)
                     cameraViewModel.toggleCameraMode()
                 }
             }
             imvTakeCapture.setOnClickListener {
                 if (cameraViewModel.isVideoMode()) {
+                    Log.d("CameraActivity", "Video mode")
                     toggleVideoRecording()
                 } else {
+                    Log.d("CameraActivity", "camera mode")
                     takePicture()
                 }
             }
@@ -116,7 +165,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                 if (cameraViewModel.currentLensFacing() == CameraSelector.LENS_FACING_FRONT) {
                     Toast.makeText(
                         this@CameraActivity,
-                        "Camera trc ko hỗ trợ flash",
+                        getString(R.string.front_camera_does_not_support_flash),
                         Toast.LENGTH_SHORT
                     ).show()
                     return@setOnClickListener
@@ -157,11 +206,10 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                         Log.d("CameraActivity", "observeViewModel: $bitmap")
                         navigateToPreviewImage(bitmap)
                     }
-                    cameraState.previewUri?.let { uri ->
-                        //saveVideoToGallery(uri)
-                    }
+
                     cameraState.error?.let {
-                        Toast.makeText(this@CameraActivity, it, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@CameraActivity,
+                            getString(R.string.error_taking_photo_please_try_again), Toast.LENGTH_SHORT).show()
                     }
                     cameraState.recordingDuration?.let { duration ->
                         binding.tvDurationVideo.text = duration
@@ -186,10 +234,11 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
 
     private fun navigateToPreviewImage(imgBitmap: Bitmap) {
         val intent = Intent(this, PreviewImageActivity::class.java).apply {
-            BitmapHolder.bitmap = imgBitmap
+            BitmapHolder.imageBitmap = imgBitmap
             putExtra("TEMPLATE_DATA", cameraViewModel.cameraState.value.templateData)
             putExtra("TEMPLATE_ID", cameraViewModel.cameraState.value.selectedTemplateId)
             putExtra("FROM_ALBUM", false)
+            putExtra("IS_FRONT_CAMERA", checkCurrentLensFacing())
         }
         cameraViewModel.updateCameraState {
             it.copy(
@@ -198,7 +247,9 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
         }
         startActivity(intent)
     }
-
+    fun checkCurrentLensFacing(): Boolean {
+        return cameraViewModel.currentLensFacing() == CameraSelector.LENS_FACING_FRONT
+    }
     private fun startCamera() {
         cameraViewModel.initializeCamera(this, binding.previewView, this)
     }
@@ -206,7 +257,6 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
     private fun takePicture() {
         cameraViewModel.startCaptureCountDown()
     }
-
 
     private fun toggleCamera() {
         cameraViewModel.toggleCamera(binding.previewView, this)
@@ -242,7 +292,6 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
         SharePrefManager.setTimerPref(newTimerValue)
         cameraViewModel.setCaptureTime(newTimerValue)
         updateTimerIcon(newTimerValue)
-
     }
 
     private fun updateTimerIcon(timerValue: Int) {
@@ -257,24 +306,71 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
     }
 
     private fun initTemplate(template: TemplateDataModel) {
-
+        mapSnapshotJob?.cancel()
         cameraViewModel.selectedTemplate(templateId)
-
-        // Tạo template trên màn hình camera
-        binding.templateOverlayContainer.addTemplate(
-            this,
-            templateId?:Config.TEMPLATE_1,
-            template
-        )
-
-        // Lưu tham chiếu đến template view
-        cameraViewModel.updateCameraState {
-            it.copy(
-                templateView = binding.templateOverlayContainer
+        val isGpsTemplate = Config.isGPSTemplate(templateId)
+        if (isGpsTemplate) {
+            if(cameraViewModel.cameraState.value.isRecording && mapSnapshot != null ){
+                updateTemplateOverlay(template, mapSnapshot)
+                cameraViewModel.updateCameraState {
+                    it.copy(templateView = binding.templateOverlayContainer)
+                }
+                return
+            }
+            try {
+                val lat = template.lat?.replace(",", ".")?.toDouble()
+                val lon = template.long?.replace(",", ".")?.toDouble()
+                if (lat == null || lon == null) {
+                    Log.e("CameraActivity", "Toạ độ null")
+                    return
+                }
+                mapSnapshotJob = lifecycleScope.launch {
+                    delay(500)
+                    if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                        return@launch
+                    }
+                    withContext(Dispatchers.Main) {
+                        mapManager.captureMapImage(lat, lon) { bitmap ->
+                            if (isFinishing || isDestroyed) return@captureMapImage
+                            mapSnapshot = bitmap
+                            Log.d("CameraActivity", "Map snapshot captured: ${bitmap != null}")
+                            updateTemplateOverlay(template, bitmap)
+                            cameraViewModel.updateCameraState {
+                                it.copy(templateView = binding.templateOverlayContainer)
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("CameraActivity", "Error processing location data: ${e.message}")
+                updateTemplateOverlay(template,null)
+            }
+        } else {
+            updateTemplateOverlay(template,null)
+            cameraViewModel.updateCameraState {
+                it.copy(templateView = binding.templateOverlayContainer)
+            }
+        }
+    }
+    fun updateTemplateOverlay(template: TemplateDataModel,bitmap: Bitmap?) {
+        if(bitmap != null) {
+            binding.templateOverlayContainer.addTemplate(
+                this,
+                templateId ?: Config.TEMPLATE_1,
+                template,
+                null,
+                bitmap
+            )
+        } else {
+            binding.templateOverlayContainer.addTemplate(
+                this,
+                templateId ?: Config.TEMPLATE_1,
+                template,
+                null,
+                null
             )
         }
     }
-
     private fun updateCameraMode(isVideoMode: Boolean) {
         with(binding) {
             if (isVideoMode) {
@@ -316,10 +412,20 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
             }
         }
     }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        binding.mapView.onSaveInstanceState(outState)
+    }
 
+    override fun onLowMemory() {
+        super.onLowMemory()
+        binding.mapView.onLowMemory()
+    }
     override fun onDestroy() {
         super.onDestroy()
         cameraViewModel.cancelCountDown()
         cameraViewModel.cleanupCamera()
+        mapSnapshotJob?.cancel()
+        mapSnapshot = null
     }
 }

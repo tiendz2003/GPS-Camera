@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.os.Build
@@ -22,8 +24,11 @@ import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.example.baseproject.MyApplication
 import com.example.baseproject.R
 import com.example.baseproject.bases.BaseCustomView
+import com.example.baseproject.data.models.FormatItem
 import com.example.baseproject.data.models.TemplateDataModel
 import com.example.baseproject.data.models.TemplateState
 import com.example.baseproject.map_template.DailyTemplateV1
@@ -51,6 +56,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToInt
+import kotlin.text.format
 
 fun View.gone() {
     visibility = View.GONE
@@ -186,6 +192,7 @@ fun ImageView.loadImageIcon(url: Any) {
         .diskCacheStrategy(DiskCacheStrategy.ALL)
         .into(this)
 }
+
 @SuppressLint("DefaultLocale")
 fun Int.formatDuration(): String {
     val minutes = this / 1000 / 60
@@ -202,12 +209,18 @@ fun TextView.underline() {
     paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
 }
 
+fun Bitmap.flipHorizontally(): Bitmap {
+    val matrix = Matrix().apply {
+        preScale(-1.0f, 1.0f)
+    }
+    return Bitmap.createBitmap(this, 0, 0, this.width, this.height, matrix, true)
+}
 fun FrameLayout.addTemplate(
     context: Context,
     type: String,
     data: TemplateDataModel,
     templateState: TemplateState? = null,
-    imageMap: Any? = null
+    imageMap: Bitmap? = null
 ){
     this.removeAllViews()
     val layoutParams = FrameLayout.LayoutParams(
@@ -246,6 +259,9 @@ fun FrameLayout.addTemplate(
         templateView.layoutParams = layoutParams
         templateView.setData(data,templateState)
         this.addView(templateView)
+        if (Config.isGPSTemplate(type) && imageMap != null) {
+            templateView.setMapImage(imageMap)
+        }
     }
 }
 inline fun <reified T:Parcelable> Intent.parcelable(key: String): T? {
@@ -274,17 +290,28 @@ inline fun <reified T:Parcelable> Intent.parcelable(key: String): T? {
 }
 
 fun Date.formatToDate(): String {
-    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    val savedFormat = SharePrefManager.getString(
+        FormatItem.DATE_FORMAT_KEY,
+        FormatItem.DATE_FORMATS[0].id
+    ) ?: FormatItem.DATE_FORMATS[0].id
+
+    val dateFormat = SimpleDateFormat(savedFormat, Locale.getDefault())
     return dateFormat.format(this)
 }
 
 fun Date.formatToTime(): String {
-    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+    val timeFormatOption = SharePrefManager.getString(
+        FormatItem.TIME_FORMAT_KEY,
+        FormatItem.TIME_FORMATS[0].id
+    ) ?: FormatItem.TIME_FORMATS[0].id
+
+    val pattern = if (timeFormatOption == MyApplication.appContext.getString(R.string._12_hours)) "hh:mm a" else "HH:mm"
+    val timeFormat = SimpleDateFormat(pattern, Locale.getDefault())
     return timeFormat.format(this)
 }
+
 fun Date.formatToDateTime(): String {
-    val timeFormat = SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault())
-    return timeFormat.format(this)
+    return "${formatToDate()} ${formatToTime()}"
 }
 inline fun <reified T> Gson.fromJsonWithTypeToken(value: String): T {
     return this.fromJson(value, object : TypeToken<T>() {}.type)

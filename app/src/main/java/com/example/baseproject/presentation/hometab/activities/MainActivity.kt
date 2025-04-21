@@ -116,7 +116,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         ) {
             startActivity(Intent(this, CameraActivity::class.java))
         } else {
-            Toast.makeText(this, "Quyền camera là cần thiết để chụp ảnh", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.warning_camera_permission), Toast.LENGTH_SHORT).show()
         }
     }
 

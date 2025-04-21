@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Photo mode -->
+    <ConstraintSet android:id="@+id/photo_mode">
+        <Constraint
+            android:id="@+id/tv_function"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="140dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_option"
+            app:layout_constraintTop_toTopOf="parent">
+            <CustomAttribute app:attributeName="textColor" app:customColorValue="@color/black" />
+            <CustomAttribute app:attributeName="text" app:customStringValue="@string/photo" />
+        </Constraint>
+
+        <Constraint
+            android:id="@+id/tv_option"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            app:layout_constraintStart_toEndOf="@id/tv_function"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+            <CustomAttribute app:attributeName="textColor" app:customColorValue="@color/white" />
+            <CustomAttribute app:attributeName="text" app:customStringValue="@string/video" />
+        </Constraint>
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/video_mode">
+        <Constraint
+            android:id="@+id/tv_function"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_option"
+            app:layout_constraintTop_toTopOf="parent">
+            <CustomAttribute app:attributeName="textColor" app:customColorValue="@color/white" />
+            <CustomAttribute app:attributeName="text" app:customStringValue="@string/photo" />
+        </Constraint>
+
+        <Constraint
+            android:id="@+id/tv_option"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="140dp"
+            app:layout_constraintStart_toEndOf="@id/tv_function"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+            <CustomAttribute app:attributeName="textColor" app:customColorValue="@color/black" />
+            <CustomAttribute app:attributeName="text" app:customStringValue="@string/video" />
+        </Constraint>
+    </ConstraintSet>
+
+    <!-- Transitions -->
+    <Transition
+        app:constraintSetStart="@id/photo_mode"
+        app:constraintSetEnd="@id/video_mode"
+        app:duration="300" />
+
+    <Transition
+        app:constraintSetStart="@id/video_mode"
+        app:constraintSetEnd="@id/photo_mode"
+        app:duration="300" />
+</MotionScene>

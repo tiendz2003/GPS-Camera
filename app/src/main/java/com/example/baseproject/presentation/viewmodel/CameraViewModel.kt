@@ -2,13 +2,13 @@ package com.example.baseproject.presentation.viewmodel
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
+import android.hardware.display.VirtualDisplay
+import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
 import android.util.Log
-import android.view.View
+import android.view.Surface
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -35,11 +35,9 @@ import com.example.baseproject.presentation.mainscreen.activity.CameraState
 import com.example.baseproject.utils.LocationResult
 import com.example.baseproject.utils.Resource
 import com.example.baseproject.utils.formatCaptureDuration
-import com.example.baseproject.utils.formatDuration
 import com.example.baseproject.utils.formatToDate
 import com.example.baseproject.utils.formatToTime
 import com.example.baseproject.worker.CacheDataTemplate
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -49,9 +47,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -74,6 +70,7 @@ class CameraViewModel(
     private var recording: Recording? = null
     private var preview: Preview? = null
     private var cameraExecutor = Executors.newSingleThreadExecutor()
+
 
     private var lensFacing = CameraSelector.LENS_FACING_BACK
     private var flashMode = ImageCapture.FLASH_MODE_OFF
@@ -465,7 +462,6 @@ class CameraViewModel(
         }
     }
 
-
     private fun stopVideoRecording() {
         recording?.stop()
         recording = null
@@ -615,7 +611,7 @@ class CameraViewModel(
         } catch (e: Exception) {
             updateCameraState {
                 it.copy(
-                    error = "Giari phóng không thành công:${e.message}"
+                    error = "Giải phóng không thành công:${e.message}"
                 )
             }
         }

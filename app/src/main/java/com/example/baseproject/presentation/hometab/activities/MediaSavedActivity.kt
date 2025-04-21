@@ -34,7 +34,6 @@ class MediaSavedActivity :
             }
         }
     }
-
     private var photoAdapter: PhotoAdapter? = null
     private val photosViewModel: PhotosViewModel by viewModel()
     private lateinit var bottomSheet: SortBottomSheet

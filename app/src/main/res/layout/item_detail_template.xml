@@ -10,11 +10,9 @@
     android:shadowColor="@android:color/transparent"
     app:cardBackgroundColor="@android:color/transparent"
     app:cardCornerRadius="6dp">
-
     <FrameLayout
-        android:layout_width="160dp"
-        android:layout_height="190dp">
-
+        android:layout_width="150dp"
+        android:layout_height="180dp">
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cl_item"
             android:foreground="?attr/selectableItemBackgroundBorderless"

@@ -16,4 +16,14 @@ object Config {
     const val TEMPLATE_13 = "TEMPLATE_13"
     const val TEMPLATE_14 = "TEMPLATE_14"
     const val TEMPLATE_15 = "TEMPLATE_15"
+
+    fun isGPSTemplate(templateId: String?): Boolean {
+        return templateId in listOf(
+            TEMPLATE_11,
+            TEMPLATE_12,
+            TEMPLATE_13,
+            TEMPLATE_14,
+            TEMPLATE_15
+        )
+    }
 }

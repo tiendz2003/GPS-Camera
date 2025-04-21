@@ -52,7 +52,7 @@ class LoadDataTemplateWorker(
                 }
                 cacheDataTemplate.updateData(
                     TemplateDataModel(
-                        location = location,
+                        location = location?:"Loading...",
                         lat = lat,
                         long = lon,
                         temperature = temperature,

@@ -4,12 +4,15 @@ import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.media.MediaCodecInfo
+import android.media.MediaRecorder
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import android.view.Surface
 import android.view.View
 import com.example.baseproject.domain.CameraRepository
 import kotlinx.coroutines.Dispatchers

@@ -2,7 +2,7 @@
     <item
         android:id="@+id/nav_home"
         android:icon="@drawable/home_icon_selector"
-        android:title="Home"/>
+        android:title="@string/home"/>
     <item
     android:id="@+id/placeholder"
     android:title=""
@@ -10,5 +10,5 @@
     <item
         android:id="@+id/nav_setting"
         android:icon="@drawable/setting_icon_selector"
-        android:title="Settings"/>
+        android:title="@string/settings"/>
 </menu>

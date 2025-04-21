@@ -2,6 +2,7 @@ package com.example.baseproject.bases
 
 import android.content.Context
 import android.content.res.TypedArray
+import android.graphics.Bitmap
 import android.util.AttributeSet
 import android.widget.RelativeLayout
 import com.example.baseproject.data.models.TemplateDataModel
@@ -57,6 +58,8 @@ abstract class BaseCustomView : RelativeLayout {
 
     abstract fun setData(data: TemplateDataModel,state: TemplateState?=null)
     abstract fun updateVisibility(state: TemplateState)
+    open fun setMapImage(imageUrl: Bitmap?) {
 
+    }
     open val templateId: Int = -1
 }

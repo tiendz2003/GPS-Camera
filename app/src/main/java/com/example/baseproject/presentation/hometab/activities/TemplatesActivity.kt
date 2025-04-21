@@ -1,8 +1,6 @@
 package com.example.baseproject.presentation.hometab.activities
 
-import android.os.Bundle
 import android.util.Log
-import androidx.activity.enableEdgeToEdge
 import com.example.baseproject.bases.BaseActivity
 import com.example.baseproject.databinding.ActivityTemplatesBinding
 import com.example.baseproject.data.models.TemplateType

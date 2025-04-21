@@ -37,7 +37,6 @@ class DailyTemplateV2(context: Context?, attrs: AttributeSet?) : BaseCustomView(
         with(binding){
             tvCity.underline()
             tvCountry.underline()
-
             tvCity.text = city
             tvCountry.text = country
             tvTime.text = "${data.currentDate} ${data.currentTime}"

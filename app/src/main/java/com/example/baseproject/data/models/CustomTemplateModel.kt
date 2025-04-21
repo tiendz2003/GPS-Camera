@@ -6,7 +6,13 @@ import com.example.baseproject.R
 import com.example.baseproject.utils.CustomTemplateConfig
 import kotlinx.parcelize.Parcelize
 
-data class CustomTemplateModel(val id: String, val name: String, val icon: Int, var isSelected: Boolean = false, var isActive: Boolean = true) {
+data class CustomTemplateModel(
+    val id: String,
+    val name: String,
+    val icon: Int,
+    var isSelected: Boolean = false,
+    var isActive: Boolean = true
+) {
     companion object {
         fun getCustomTemplates(context: Context) =
             arrayListOf(
@@ -31,9 +37,10 @@ data class CustomTemplateModel(val id: String, val name: String, val icon: Int, 
                     R.drawable.ic_date
                 ),
 
-            )
+                )
     }
 }
+
 @Parcelize
 data class TemplateDataModel(
     val location: String? = null,
@@ -42,7 +49,8 @@ data class TemplateDataModel(
     val temperature: String? = null,
     val currentTime: String? = null,
     val currentDate: String? = null
-):Parcelable
+) : Parcelable
+
 data class TemplateState(
     val selectedTemplateId: Int? = null,
     val showLocation: Boolean = true,

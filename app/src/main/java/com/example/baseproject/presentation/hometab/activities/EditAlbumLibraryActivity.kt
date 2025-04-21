@@ -23,7 +23,6 @@ class EditAlbumLibraryActivity : BaseActivity<ActivityAlbumLibraryBinding>(
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         if(PermissionManager.checkAndRequestPermissions(this)){
             albumsViewModel.loadAlbums()
         }

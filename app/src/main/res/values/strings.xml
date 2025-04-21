@@ -113,5 +113,14 @@
     <string name="camera_access">Camera Access</string>
     <string name="permission_description">We need to grant access to the device camera, Photo Library and Location to take photos or record video.</string>
     <string name="current_location">Vị trí hiện tại</string>
+    <string name="front_camera_does_not_support_flash">Front camera does not support flash</string>
+    <string name="error_taking_photo_please_try_again">Error taking photo.Please try again</string>
+    <string name="preview">Preview</string>
+    <string name="custom">Custom</string>
+    <string name="warning_camera_permission">Please grant permission to use the photo capture feature</string>
+    <string name="home">Home</string>
+    <string name="settings">Settings</string>
+    <string name="_12_hours">12 hours</string>
+    <string name="_24_hours">24 hours</string>
 
 </resources>

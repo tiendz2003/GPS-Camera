@@ -122,19 +122,28 @@
         android:gravity="center"
         app:layout_constraintBottom_toTopOf="@id/cl_bottom"
         app:layout_constraintTop_toBottomOf="@id/cl_header">
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/map_view"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center"
+            android:visibility="visible"
+            android:clickable="false"
+            android:focusable="false" />
         <androidx.camera.view.PreviewView
             android:id="@+id/previewView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:keepScreenOn="true">
+
+            <com.example.baseproject.presentation.custom.GridOverlayView
+                android:id="@+id/gridOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible" />
         </androidx.camera.view.PreviewView>
-        <com.example.baseproject.presentation.custom.GridOverlayView
-            android:id="@+id/gridOverlay"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="visible"
-            />
+
         <FrameLayout
             android:id="@+id/templateOverlayContainer"
             android:layout_width="match_parent"
@@ -144,7 +153,7 @@
         <TextView
             android:id="@+id/tv_count_down"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:textSize="80sp"
             android:textColor="@color/white"
             android:textStyle="bold"
@@ -165,42 +174,52 @@
             android:layout_height="1dp"
             android:layout_marginEnd="16dp"
             android:visibility="visible"
-            app:layout_constraintEnd_toStartOf="@id/tv_function"
+            app:layout_constraintEnd_toStartOf="@id/motionLayout_mode"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_function" />
+            app:layout_constraintTop_toTopOf="@id/motionLayout_mode" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_function"
-            style="@style/medium_500"
+        <androidx.constraintlayout.motion.widget.MotionLayout
+            android:id="@+id/motionLayout_mode"
             android:layout_width="0dp"
-            android:layout_height="32dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/bg_btn_photo"
-            android:gravity="center"
-            android:singleLine="true"
-            android:text="@string/photo"
-            android:textAllCaps="true"
-            android:textSize="13sp"
-            app:layout_constraintEnd_toStartOf="@id/tv_option"
-            app:layout_constraintStart_toEndOf="@id/view_1"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_option"
-            style="@style/medium_500_v2"
-            android:layout_width="0dp"
-            android:layout_height="32dp"
-            android:gravity="center"
-            android:layout_marginTop="24dp"
-            android:paddingHorizontal="12dp"
-            android:singleLine="true"
-            android:text="@string/video"
-            android:textAllCaps="true"
-            android:textSize="13sp"
+            android:layout_height="wrap_content"
+            app:layoutDescription="@xml/scene_mode_switch"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/tv_function"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_function"
+                style="@style/medium_500"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text="@string/photo"
+                android:textAllCaps="true"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toStartOf="@id/tv_option"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_option"
+                style="@style/medium_500_v2"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="16dp"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text="@string/video"
+                android:textAllCaps="true"
+                android:elevation="2dp"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/tv_function"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.motion.widget.MotionLayout>
+
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_duration_video"
@@ -228,7 +247,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_function" />
+            app:layout_constraintTop_toBottomOf="@id/motionLayout_mode" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imv_effect"
@@ -244,7 +263,7 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_function" />
+            app:layout_constraintTop_toBottomOf="@id/motionLayout_mode" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imv_select_image"

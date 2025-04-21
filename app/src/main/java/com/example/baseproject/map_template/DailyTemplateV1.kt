@@ -45,4 +45,5 @@ class DailyTemplateV1(context: Context?, attrs: AttributeSet?) : BaseCustomView(
            tvTime.visibility = if (state.showTime) VISIBLE else GONE
        }
     }
+
 }

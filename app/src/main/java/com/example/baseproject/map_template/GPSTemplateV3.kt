@@ -3,12 +3,15 @@ package com.example.baseproject.map_template
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.TypedArray
+import android.graphics.Bitmap
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import com.example.baseproject.bases.BaseCustomView
 import com.example.baseproject.data.models.TemplateDataModel
 import com.example.baseproject.data.models.TemplateState
 import com.example.baseproject.databinding.TemplateGps3Binding
+import com.example.baseproject.utils.loadImageIcon
 
 class GPSTemplateV3(context: Context?, attrs: AttributeSet?) : BaseCustomView(context, attrs) {
 
@@ -46,9 +49,16 @@ class GPSTemplateV3(context: Context?, attrs: AttributeSet?) : BaseCustomView(co
         with(binding){
             tvCity.visibility = if (state.showLocation) VISIBLE else GONE
             tvLocation.visibility = if (state.showLocation) VISIBLE else GONE
+            imvMap.visibility = if (state.showLocation) VISIBLE else GONE
             tvLatitude.visibility = if (state.showLatLong) VISIBLE else GONE
             tvLongitude.visibility = if (state.showLatLong) VISIBLE else GONE
             tvTemp.visibility = if (state.showTemperature) VISIBLE else GONE
+        }
+    }
+    override fun setMapImage(imageUrl: Bitmap?) {
+        Log.d("GPSTemplateV1", "setMapImage: $imageUrl")
+        imageUrl?.let {
+            binding.imvMap.loadImageIcon(it)
         }
     }
 }

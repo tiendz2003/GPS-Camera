@@ -63,7 +63,6 @@ class SelectImageActivity : BaseActivity<ActivitySelectedImageBinding>(ActivityS
             startActivity(
                 Intent(this, PreviewImageActivity::class.java).apply {
                     putExtra("TEMPLATE_DATA", photoViewModel.cacheData.value)
-                    putExtra("TEMPLATE_ID", Config.TEMPLATE_10)
                     putExtra("IMAGE_PATH", (photo.path).toString())
                     putExtra("FROM_ALBUM", true)
                 }

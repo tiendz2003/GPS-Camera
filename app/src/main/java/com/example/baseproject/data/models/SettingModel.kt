@@ -1,5 +1,8 @@
 package com.example.baseproject.data.models
 
+import com.example.baseproject.MyApplication
+import com.example.baseproject.R
+
 data class MapType(
     val id: Int,
     val name: String,
@@ -21,8 +24,8 @@ data class FormatItem(
         )
 
         val TIME_FORMATS = listOf(
-            FormatItem("12 hours"),
-            FormatItem("24 hours")
+            FormatItem(MyApplication.appContext.getString(R.string._12_hours)),
+            FormatItem(MyApplication.appContext.getString(R.string._24_hours))
         )
     }
 }

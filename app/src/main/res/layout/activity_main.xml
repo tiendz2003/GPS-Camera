@@ -34,7 +34,6 @@
             app:itemIconTint="@color/colorPrimary"
             app:itemTextColor="@color/colorPrimary"
             app:itemTextAppearance="@style/BottomNavigationTextStyle"
-            android:background="@android:color/transparent"
             app:labelVisibilityMode="labeled"
             app:menu="@menu/bottom_navigation" />
     </com.google.android.material.bottomappbar.BottomAppBar>

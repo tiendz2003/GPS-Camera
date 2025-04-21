@@ -1,5 +1,6 @@
 package com.example.baseproject.presentation.hometab.activities
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
@@ -134,6 +135,7 @@ class DetailTemplateActivity : BaseActivity<ActivityDetailTemplateBinding>(
             })
         }
     }
+    @SuppressLint("SuspiciousIndentation")
     override fun onResume() {
         super.onResume()
         val defaultTemplateId = SharePrefManager.getDefaultTemplate()

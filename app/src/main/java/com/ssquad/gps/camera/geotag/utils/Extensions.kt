@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.os.Build
+import android.os.Bundle
 import android.os.Parcelable
 import android.util.DisplayMetrics
 import android.view.Gravity
@@ -77,7 +78,11 @@ fun Int.dpToPx(context: Context): Int {
     val displayMetrics: DisplayMetrics = context.resources!!.displayMetrics
     return (this * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)).roundToInt()
 }
-
+fun navToActivity(context: Context, activity: Class<*>, bundle: Bundle? = null) {
+    val intent = Intent(context, activity)
+    intent.putExtras(bundle ?: Bundle())
+    context.startActivity(intent)
+}
 fun MaterialShapeDrawable.updateCornerSize(context: Context) {
     val shapeAppearanceModel = this.shapeAppearanceModel.toBuilder()
         .setTopLeftCornerSize(16f.dpToPx(context))

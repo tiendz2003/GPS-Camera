@@ -19,7 +19,9 @@ import com.ssquad.gps.camera.geotag.presentation.hometab.activities.PreviewTempl
 import com.ssquad.gps.camera.geotag.databinding.FragmentHomeBinding
 import com.ssquad.gps.camera.geotag.presentation.hometab.activities.TemplatesActivity
 import com.ssquad.gps.camera.geotag.presentation.hometab.adapter.ThemeTemplateAdapter
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.activity.RequestPermissionActivity
 import com.ssquad.gps.camera.geotag.utils.Config
+import com.ssquad.gps.camera.geotag.utils.Constants
 import com.ssquad.gps.camera.geotag.utils.PermissionManager
 import com.ssquad.gps.camera.geotag.utils.SharePrefManager
 import com.ssquad.gps.camera.geotag.utils.setupHorizontal
@@ -30,7 +32,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private lateinit var adapter: ThemeTemplateAdapter
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
     private val listTheme = ThemeTemplateModel.getTemplate()
+    private var reqNavigate = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
 
+    }
     override fun initData() {
     }
 
@@ -62,20 +66,35 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             startActivity(intent)
         }
         binding.editPhotoCard.setOnClickListener {
-            requestMediaPermission {
-                val intent = Intent(requireContext(), EditAlbumLibraryActivity::class.java)
-                startActivity(intent)
+            if (PermissionManager.checkLibraryGranted(requireContext())) {
+                reqNavigate.launch(Intent(requireContext(), EditAlbumLibraryActivity::class.java))
+            } else {
+                Intent(requireContext(), RequestPermissionActivity::class.java).apply {
+                    putExtra(Constants.INTENT_REQUEST_SINGLE_PERMISSION, RequestPermissionActivity.TYPE_GALLERY)
+                    putExtra(Constants.INTENT_LIBRARY_PERMISSION, true)
+                    reqNavigate.launch(this)
+                }
             }
         }
         binding.savedImageCard.setOnClickListener {
-           requestMediaPermission {
-               startActivity(MediaSavedActivity.getIntent(requireContext(),false))
-           }
+            if (PermissionManager.checkLibraryGranted(requireContext())) {
+                reqNavigate.launch(MediaSavedActivity.getIntent(requireContext(), false))
+            } else {
+                Intent(requireContext(), RequestPermissionActivity::class.java).apply {
+                    putExtra(Constants.INTENT_REQUEST_SINGLE_PERMISSION, RequestPermissionActivity.TYPE_GALLERY)
+                    reqNavigate.launch(this)
+                }
+            }
         }
         binding.savedVideoCard.setOnClickListener {
-           requestMediaPermission {
-               startActivity(MediaSavedActivity.getIntent(requireContext(), true))
-           }
+            if (PermissionManager.checkLibraryGranted(requireContext())) {
+                reqNavigate.launch(MediaSavedActivity.getIntent(requireContext(), true))
+            } else {
+                Intent(requireContext(), RequestPermissionActivity::class.java).apply {
+                    putExtra(Constants.INTENT_REQUEST_SINGLE_PERMISSION, RequestPermissionActivity.TYPE_GALLERY)
+                    reqNavigate.launch(this)
+                }
+            }
         }
     }
 
@@ -85,39 +104,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         val intent = PreviewTemplateActivity.getIntent(requireContext(), selectedTemplate, filterList,themeType)
         startActivity(intent)
     }
-    private fun requestMediaPermission(onGranted: () -> Unit) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val permissions = arrayOf(
-                Manifest.permission.READ_MEDIA_IMAGES,
-                Manifest.permission.READ_MEDIA_VIDEO
-            )
 
-            if (PermissionManager.hasPermissions(requireContext(), permissions)) {
-                onGranted() // Quyền đã được cấp, gọi hành động ngay
-                return
-            }
-
-            val shouldShowRationale = permissions.any {
-                ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), it)
-            }
-
-            if (shouldShowRationale) {
-                PermissionManager.showPermissionExplanationDialog(requireContext()) {
-                    permissionLauncher.launch(permissions)
-                }
-            } else {
-                // Chỉ hiển thị dialog yêu cầu vào Settings nếu quyền chưa được cấp
-                PermissionManager.showOpenSettingsDialog(requireContext()) {
-                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                        data = Uri.fromParts("package", requireContext().packageName, null)
-                    }
-                    startActivity(intent)
-                }
-            }
-        } else {
-            onGranted()
-        }
-    }
 
     override fun onResume() {
         super.onResume()

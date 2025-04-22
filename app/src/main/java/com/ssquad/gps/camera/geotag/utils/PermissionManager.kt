@@ -16,75 +16,45 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 
 object PermissionManager {
-        private const val REQUEST_STORAGE_PERMISSION = 100
+    fun checkPermissionGranted(context: Context, permission: String): Boolean {
+        return ContextCompat.checkSelfPermission(
+            context,
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
+    }
 
-        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-        fun checkAndRequestPermissions(activity: AppCompatActivity): Boolean {
-            val permissionsToRequest = mutableListOf<String>()
-
-            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
-                permissionsToRequest.add(Manifest.permission.READ_MEDIA_IMAGES)
-            }
-
-            return if (permissionsToRequest.isNotEmpty()) {
-                ActivityCompat.requestPermissions(activity, permissionsToRequest.toTypedArray(), REQUEST_STORAGE_PERMISSION)
-                false
-            } else {
-                true
-            }
+    fun checkPermissionsGranted(context: Context, permissions: List<String>): Boolean {
+        permissions.forEach { permission ->
+            if (!checkPermissionGranted(context, permission)) return false
         }
 
-        fun onRequestPermissionsResult(
-            requestCode: Int,
-            permissions: Array<out String>,
-            grantResults: IntArray,
-            onPermissionGranted: () -> Unit,
-            onPermissionDenied: () -> Unit
-        ) {
-            if (requestCode == REQUEST_STORAGE_PERMISSION) {
-                if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-                    onPermissionGranted()
-                } else {
-                    onPermissionDenied()
-                }
-            }
-        }
-        fun hasPermissions(context: Context, permissions: Array<String>): Boolean {
-            return permissions.all {
-                ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
-            }
-        }
+        return true
+    }
 
-    fun requestPermissions(
-        context: Context,
-        launcher: ActivityResultLauncher<Array<String>>,
-        permissions: Array<String>,
-        onPermissionGranted: () -> Unit,
-        onPermissionDenied: (shouldShowRationale: Boolean) -> Unit
-    ) {
-        // Kiểm tra nếu đã có tất cả quyền
-        if (hasPermissions(context, permissions)) {
-            onPermissionGranted()
-            return
-        }
-
-        // Kiểm tra nếu nên hiển thị giải thích
-        val activity = context as? AppCompatActivity
-        if (activity != null) {
-            val shouldShowRationale = permissions.any {
-                ActivityCompat.shouldShowRequestPermissionRationale(activity, it)
-            }
-
-            if (shouldShowRationale) {
-                showPermissionExplanationDialog(context) {
-                    launcher.launch(permissions)
-                }
-            } else {
-                launcher.launch(permissions)
-            }
+    fun checkLibraryGranted(context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            checkPermissionGranted(
+                context,
+                Manifest.permission.READ_MEDIA_IMAGES
+            )
         } else {
-            launcher.launch(permissions)
+            checkPermissionsGranted(
+                context,
+                listOf(
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                )
+            )
         }
+    }
+
+    fun checkCamAndMicroPermissions(context: Context): Boolean {
+        return checkPermissionsGranted(
+            context,
+            listOf(
+                Manifest.permission.CAMERA,
+                Manifest.permission.RECORD_AUDIO
+            )
+        )
     }
      fun showPermissionExplanationDialog(context: Context, onRetry: () -> Unit) {
         AlertDialog.Builder(context)

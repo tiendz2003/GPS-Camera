@@ -25,6 +25,9 @@
         android:theme="@style/Theme.BaseProject"
         tools:targetApi="31">
         <activity
+            android:name="com.ssquad.gps.camera.geotag.presentation.mainscreen.activity.RequestPermissionActivity"
+            android:exported="false" />
+        <activity
             android:name=".presentation.mainscreen.activity.PermissionActivity"
             android:exported="false" />
         <activity
@@ -60,36 +63,36 @@
 
         <activity
             android:name=".presentation.mainscreen.activity.PreviewSavedActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.mainscreen.activity.PreviewImageActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.mainscreen.activity.CameraActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.hometab.activities.PreviewTemplateActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.hometab.activities.TemplatesActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.hometab.activities.SelectImageActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.hometab.activities.MediaSavedActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.hometab.activities.DetailTemplateActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.hometab.activities.EditAlbumLibraryActivity"
             android:exported="false"
@@ -98,7 +101,7 @@
         <activity
             android:name=".presentation.hometab.activities.MainActivity"
             android:exported="false"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.hometab.activities.IntroActivity"
             android:enableOnBackInvokedCallback="true"

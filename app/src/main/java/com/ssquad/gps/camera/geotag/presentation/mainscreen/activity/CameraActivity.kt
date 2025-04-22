@@ -95,11 +95,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
     }
 
     override fun initView() {
-        if (PermissionManager.hasPermissions(this, cameraPermission)) {
-            startCamera()
-        } else {
-            //PermissionManager.requestPermissions(requestCameraPermissionLauncher, cameraPermission)
-        }
+
         val savedTimer = SharePrefManager.getTimerPref()
         cameraViewModel.updateCameraState {
             it.copy(

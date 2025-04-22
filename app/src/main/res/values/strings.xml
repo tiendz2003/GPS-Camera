@@ -129,5 +129,12 @@
     <string name="save_image_failed">Save image failed!</string>
     <string name="Continue">Continue</string>
     <string name="share_to">Share to</string>
+    <string name="hint_per_camera">To start using the camera, please turn on access\\nyour camera and microphone</string>
+    <string name="grant_access">Grant access</string>
+    <string name="til_per_camera"><![CDATA[Needs access to camera & microphone]]></string>
+    <string name="til_per_gallery">Allow access to your photo library to select images</string>
+    <string name="hint_per_gallery">To continue, please allow access to your photo library so you can choose images from your device.</string>
+    <string name="til_per_location">Allow access to your location to provide location-based features.</string>
+    <string name="hint_per_location">To continue, please allow access to your location. This helps us provide relevant content based on where you are.</string>
 
 </resources>

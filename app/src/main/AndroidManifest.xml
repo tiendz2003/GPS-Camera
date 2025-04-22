@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.baseproject">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -19,9 +18,9 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/img_logo"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/img_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.BaseProject"
         tools:targetApi="31">
@@ -61,40 +60,40 @@
 
         <activity
             android:name=".presentation.mainscreen.activity.PreviewSavedActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".presentation.mainscreen.activity.PreviewImageActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".presentation.mainscreen.activity.CameraActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".presentation.hometab.activities.PreviewTemplateActivity"
-            android:exported="false" />
-        <activity
-            android:name=".presentation.hometab.activities.VideoLibraryActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".presentation.hometab.activities.TemplatesActivity"
-            android:exported="false" />
-        <activity
-            android:name=".presentation.hometab.activities.ShowMediaActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".presentation.hometab.activities.SelectImageActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".presentation.hometab.activities.MediaSavedActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".presentation.hometab.activities.DetailTemplateActivity"
-            android:exported="false" />
-        <activity
-            android:name=".presentation.hometab.activities.CustomPhotoActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".presentation.hometab.activities.EditAlbumLibraryActivity"
             android:exported="false"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.BaseProject" />
         <activity
             android:name=".presentation.hometab.activities.MainActivity"

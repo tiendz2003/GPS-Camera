@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/nunito_sans_bold"
-        android:text="@string/app_name"
+        android:text="@string/splash_title"
         android:textColor="@color/colorPrimary"
         android:textSize="24sp"
         android:textStyle="bold"

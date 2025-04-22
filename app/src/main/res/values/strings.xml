@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GPS Camera</string>
+    <string name="app_name">GPS Camera: Geotag Photos</string>
 
     <string name="admob_app_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
     <string name="fb_app_id" translatable="false"></string>
@@ -21,11 +21,10 @@
     <string name="korean">Korean</string>
     <string name="please_select_language">Please select language first.</string>
     <string name="next">Next</string>
-
     <string name="title_intro_1">Take photo with location</string>
     <string name="title_intro_2">Multi template</string>
     <string name="title_intro_3">Geotag on photo</string>
-
+    <string name="splash_title" translatable="false">GPS Camera</string>
     <string name="message_intro_1">Capture memories with location data - Preserve \nthe where in every snapshot effortlessly</string>
     <string name="message_intro_2">Effortless photo categorization with multi \ntemplate - Simplify your visual journey</string>
     <string name="message_intro_3">Capture the moment and add location \nexisting photos</string>
@@ -60,14 +59,14 @@
     <string name="find_location">Find location</string>
     <string name="date_format">Date Format</string>
     <string name="time_format">Time Format</string>
-    <string name="current_date_amp_time"><![CDATA[Current Date & Time]]></string>
-    <string name="custom_date_amp_time"><![CDATA[Custom Date & Time]]></string>
-    <string name="select_date_amp_time"><![CDATA[Select Date & Time]]></string>
+    <string name="current_date_amp_time">Current Date &amp; Time</string>
+    <string name="custom_date_amp_time">Custom Date &amp; Time</string>
+    <string name="select_date_amp_time">Select Date &amp; Time</string>
     <string name="save">Save</string>
     <string name="tap_to_set">Tap to set</string>
     <string name="select_time">Please select time</string>
     <string name="select_date">Please select date</string>
-    <string name="celsius">Celcius</string>
+    <string name="celsius">Celsius</string>
     <string name="fahrenheit">Fahrenheit</string>
     <string name="languages">Languages</string>
     <string name="edit_photo">Edit Photo</string>
@@ -112,7 +111,7 @@
     <string name="micro_access">Microphone Access</string>
     <string name="camera_access">Camera Access</string>
     <string name="permission_description">We need to grant access to the device camera, Photo Library and Location to take photos or record video.</string>
-    <string name="current_location">Vị trí hiện tại</string>
+    <string name="current_location">Current Location</string>
     <string name="front_camera_does_not_support_flash">Front camera does not support flash</string>
     <string name="error_taking_photo_please_try_again">Error taking photo.Please try again</string>
     <string name="preview">Preview</string>
@@ -122,7 +121,13 @@
     <string name="settings">Settings</string>
     <string name="_12_hours">12 hours</string>
     <string name="_24_hours">24 hours</string>
-    <string name="processing">Saving video...</string>
+    <string name="processing">Saving video…</string>
     <string name="success">Video saved successfully</string>
+    <string name="warning_camera_location_permission">Please grant all necessary permissions to use this feature.</string>
+    <string name="saving_image">Saving image</string>
+    <string name="image_saved_successfully">Image saved successfully!</string>
+    <string name="save_image_failed">Save image failed!</string>
+    <string name="Continue">Continue</string>
+    <string name="share_to">Share to</string>
 
 </resources>

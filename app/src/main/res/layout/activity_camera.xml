@@ -149,7 +149,7 @@
 
             </androidx.camera.view.PreviewView>
 
-            <com.example.baseproject.presentation.custom.GridOverlayView
+            <com.ssquad.gps.camera.geotag.presentation.custom.GridOverlayView
                 android:id="@+id/gridOverlay"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

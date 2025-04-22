@@ -19,30 +19,23 @@
             android:textSize="24sp"
             android:textStyle="bold"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="30dp"
             android:layout_marginBottom="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-        <View
-            android:id="@+id/spacerView"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/titleHeader"
-            android:layout_marginStart="16dp"/>
+
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/editPhotoCard"
             android:layout_width="0dp"
             android:layout_height="160dp"
             app:cardCornerRadius="16dp"
-            app:strokeColor="@color/neutralWhite"
-            app:strokeWidth="1dp"
+            android:elevation="0dp"
             android:layout_marginVertical="24dp"
             android:layout_marginHorizontal="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spacerView">
+            app:layout_constraintTop_toBottomOf="@+id/titleHeader">
 
             <ImageView
                 android:layout_width="match_parent"

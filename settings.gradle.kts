@@ -27,6 +27,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "BaseProject"
+rootProject.name = "GPS Camera - SSQUAD"
 include(":app")
  

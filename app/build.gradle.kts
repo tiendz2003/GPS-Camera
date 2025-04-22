@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.baseproject"
+    namespace = "com.ssquad.gps.camera.geotag"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.baseproject"
+        applicationId = "com.ssquad.gps.camera.geotag"
         minSdk = 29
         targetSdk = 35
 //        versionCode = 100
@@ -74,7 +74,6 @@ dependencies {
     implementation ("androidx.work:work-runtime-ktx:2.10.0")
     implementation (libs.androidx.camera.core)
     implementation ("androidx.camera:camera-camera2:1.4.2")
-    implementation ("com.google.android.libraries.places:places:4.2.0")
     // CameraX Lifecycle để tự động quản lý camera theo lifecycle
     implementation (libs.androidx.camera.lifecycle)
     // CameraX View để hiển thị preview
@@ -105,5 +104,5 @@ dependencies {
     implementation(libs.dotsindicator)
     implementation(libs.glide)
     implementation(libs.user.messaging.platform)
-
+    implementation(libs.gson)
 }

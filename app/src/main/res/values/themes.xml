@@ -5,17 +5,22 @@
         <item name="fontWeight">400</item>
     </style>
 
-    <style name="Theme.BaseProject" parent="Base.Theme.BaseProject" />
     <style name="BottomNavigationTextStyle" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="android:textSize">10sp</item>
-        <item name="android:paddingTop">8dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/nunito_sans_regular</item>
+        <item name="android:textStyle">normal</item>
     </style>
     <style name="CustomBottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
         <item name="android:minHeight">48dp</item> <!-- Đặt chiều cao tối thiểu -->
-        <item name="itemIconSize">22dp</item> <!-- Kích thước icon nhỏ hơn -->
+        <item name="itemIconSize">24dp</item> <!-- Kích thước icon nhỏ hơn -->
         <item name="itemPaddingTop">4dp</item> <!-- Padding trên nhỏ hơn -->
         <item name="itemPaddingBottom">4dp</item> <!-- Padding dưới nhỏ hơn -->
     </style>
+    <style name="CustomBottomAppBar" parent="Widget.MaterialComponents.BottomAppBar">
+        <item name="backgroundTint">@color/white</item>
+        <item name="elevation">8dp</item>
+    </style>
+
     <style name="BottomSheetDialogTheme" parent="ThemeOverlay.Material3.DayNight.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/CustomBottomSheet</item>
     </style>

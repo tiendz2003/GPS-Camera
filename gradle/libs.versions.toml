@@ -20,6 +20,7 @@ userMessagingPlatform = "3.1.0"
 navigationFragmentKtx = "2.8.9"
 navigationUiKtx = "2.8.9"
 playServicesMaps = "19.2.0"
+gson = "2.13.0"
 
 [libraries]
 androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "cameraX" }
@@ -45,7 +46,7 @@ user-messaging-platform = { module = "com.google.android.ump:user-messaging-plat
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
-
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

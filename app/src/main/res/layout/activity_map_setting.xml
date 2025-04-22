@@ -56,4 +56,18 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/topBar" />
 
+    <ImageButton
+        android:id="@+id/btnMyLocation"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/rounded_blue_button"
+        android:layout_margin="16dp"
+        android:elevation="6dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_my_location"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topBar"
+        app:tint="@android:color/white" />
 </androidx.constraintlayout.widget.ConstraintLayout>

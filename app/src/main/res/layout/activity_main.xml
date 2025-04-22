@@ -29,11 +29,13 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_marginTop="8dp"
+            android:padding="8dp"
             style="@style/CustomBottomNavigationView"
             android:textAlignment="gravity"
             app:itemIconTint="@color/colorPrimary"
             app:itemTextColor="@color/colorPrimary"
-            app:itemTextAppearance="@style/BottomNavigationTextStyle"
+            app:itemTextAppearanceActive="@style/BottomNavigationTextStyle"
+            app:itemTextAppearanceInactive="@style/BottomNavigationTextStyle"
             app:labelVisibilityMode="labeled"
             app:menu="@menu/bottom_navigation" />
     </com.google.android.material.bottomappbar.BottomAppBar>
@@ -46,6 +48,7 @@
         android:src="@drawable/ic_camera"
         app:tint="@color/white"
         app:backgroundTint="@color/colorPrimary"
+        app:maxImageSize="35dp"
         app:layout_anchor="@id/bottomAppBar" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

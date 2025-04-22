@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        app:dotsColor="@color/neutralGrey"
+        app:dotsColor="#E5E7E9"
         app:dotsSize="6dp"
         app:dotsSpacing="4dp"
         app:dotsWidthFactor="3"
@@ -62,6 +62,7 @@
         android:padding="12dp"
         android:textStyle="bold"
         android:text="@string/next"
+        android:textSize="16sp"
         android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@id/frNative"
         app:layout_goneMarginBottom="24dp" />

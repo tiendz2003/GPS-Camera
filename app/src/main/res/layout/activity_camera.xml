@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraintlayout.motion.widget.MotionLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/cl_root"
@@ -146,29 +147,32 @@
                 android:layout_gravity="center"
                 android:keepScreenOn="true">
 
-                <com.example.baseproject.presentation.custom.GridOverlayView
-                    android:id="@+id/gridOverlay"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="visible" />
             </androidx.camera.view.PreviewView>
 
-            <FrameLayout
-                android:id="@+id/templateOverlayContainer"
+            <com.example.baseproject.presentation.custom.GridOverlayView
+                android:id="@+id/gridOverlay"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom" />
+                android:layout_height="match_parent"
+                android:elevation="5dp"
+                android:visibility="visible" />
+
 
             <TextView
                 android:id="@+id/tv_count_down"
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:textColor="@color/white"
                 android:textSize="80sp"
+                android:elevation="10dp"
                 android:textStyle="bold"
                 android:visibility="visible" />
         </FrameLayout>
+        <FrameLayout
+            android:id="@+id/templateOverlayContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/fl_camera"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cl_bottom"

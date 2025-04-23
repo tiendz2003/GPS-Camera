@@ -67,6 +67,6 @@
         android:scaleType="centerInside"
         android:src="@drawable/ic_my_location"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topBar"
+        app:layout_constraintTop_toTopOf="@+id/mapView"
         app:tint="@android:color/white" />
 </androidx.constraintlayout.widget.ConstraintLayout>

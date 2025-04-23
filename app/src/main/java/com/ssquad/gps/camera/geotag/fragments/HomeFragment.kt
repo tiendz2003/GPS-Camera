@@ -24,6 +24,7 @@ import com.ssquad.gps.camera.geotag.utils.Config
 import com.ssquad.gps.camera.geotag.utils.Constants
 import com.ssquad.gps.camera.geotag.utils.PermissionManager
 import com.ssquad.gps.camera.geotag.utils.SharePrefManager
+import com.ssquad.gps.camera.geotag.utils.scrollToCenter
 import com.ssquad.gps.camera.geotag.utils.setupHorizontal
 import com.ssquad.gps.camera.geotag.utils.updateSelection
 
@@ -31,6 +32,7 @@ import com.ssquad.gps.camera.geotag.utils.updateSelection
 class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::inflate) {
     private lateinit var adapter: ThemeTemplateAdapter
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
+    private var lastDefaultTemplateId: String? = null // Biến lưu giá trị trước đó
     private val listTheme = ThemeTemplateModel.getTemplate()
     private var reqNavigate = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
 
@@ -40,15 +42,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     override fun initView() {
 
-
+        setupRecycleView()
         Log.d("RecyclerView", "List size: ${listTheme.size}")
-        adapter = ThemeTemplateAdapter {
-            Log.d("RecyclerView", "Binding item: ${it.id}")
-            navToPreview(it)
-        }
-        adapter.submitList(listTheme)
-        binding.rcvTheme.setupHorizontal(adapter)
-        adapter.updateSelection(SharePrefManager.getDefaultTemplate())
         permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val allGranted = permissions.all { it.value }
             if (allGranted) {
@@ -97,7 +92,18 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             }
         }
     }
+    private fun setupRecycleView(){
+        adapter = ThemeTemplateAdapter {
+            Log.d("RecyclerView", "Binding item: ${it.id}")
+            navToPreview(it)
+        }
 
+        binding.rcvTheme.setupHorizontal(adapter)
+        binding.rcvTheme.setHasFixedSize(true)
+        adapter.submitList(listTheme){
+
+        }
+    }
     private fun navToPreview(selectedTemplate: ThemeTemplateModel) {
         val themeType = selectedTemplate.type
         val filterList = ThemeTemplateModel.getTemplate().filter { it.type == themeType } as ArrayList<ThemeTemplateModel>
@@ -109,7 +115,20 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     override fun onResume() {
         super.onResume()
         val defaultTemplateId = SharePrefManager.getDefaultTemplate()
-        adapter.updateSelection(defaultTemplateId)
+
+        // Kiểm tra nếu defaultTemplateId thay đổi
+        if (defaultTemplateId != lastDefaultTemplateId) {
+            lastDefaultTemplateId = defaultTemplateId // Cập nhật giá trị mới
+            adapter.updateSelection(defaultTemplateId)
+
+            // Tìm vị trí của template đã chọn
+            val selectedPosition = listTheme.indexOfFirst { it.id == defaultTemplateId }
+            if (selectedPosition != -1) {
+                binding.rcvTheme.post {
+                    binding.rcvTheme.scrollToCenter(selectedPosition)
+                }
+            }
+        }
         initActionView()
     }
 }

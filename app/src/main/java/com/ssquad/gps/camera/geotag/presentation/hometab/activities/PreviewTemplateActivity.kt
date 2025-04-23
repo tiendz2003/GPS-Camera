@@ -92,6 +92,7 @@ class PreviewTemplateActivity : BaseActivity<ActivityPreviewTemplateBinding>(
                 selectedPosition = themeList.indexOf(it)
                 detailTemplateAdapter.updateSelection(selectedPosition)
                 binding.rvThemeOptions.post {
+                    if (isFinishing || isDestroyed) return@post
                     binding.rvThemeOptions.scrollToCenter(selectedPosition)
                     updatePreview(it)
                 }

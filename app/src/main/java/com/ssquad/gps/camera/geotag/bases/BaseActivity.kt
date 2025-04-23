@@ -22,6 +22,16 @@ abstract class BaseActivity<viewBinding : ViewBinding>(val inflater :(LayoutInfl
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(
+                view.paddingLeft,
+                systemBarsInsets.top, // Thêm padding top
+                view.paddingRight,
+                view.paddingBottom
+            )
+            insets
+        }
         initData()
         initView()
         initActionView()

@@ -38,7 +38,7 @@ class EditAlbumLibraryActivity : BaseActivity<ActivityAlbumLibraryBinding>(
     }
     private fun setupRecycleView(){
         adapter = EditAlbumAdapter {album->
-            startActivity(SelectImageActivity.Companion.getIntent(this,album.id,album.name))
+            startActivity(SelectImageActivity.getIntent(this,album.id,album.name))
         }
         binding.rcvAlbum.adapter = adapter
     }

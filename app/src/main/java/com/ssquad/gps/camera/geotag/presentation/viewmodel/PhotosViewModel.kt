@@ -37,6 +37,7 @@ class PhotosViewModel(
                 Log.d("EditAlbumLibraryActivity", "observeViewModel: $result")
                 _photos.value = Resource.Success(result)
             } catch (e: Exception) {
+                Log.e("EditAlbumLibraryActivity", "Error: ${e.message}")
                 _photos.value = Resource.Error("Không tải được: " + e.message.toString())
             }
         }
@@ -57,7 +58,7 @@ class PhotosViewModel(
                     _photos.value = Resource.Success(emptyList())
                 }
             } catch (e: Exception) {
-                Log.e("EditAlbumLibraryActivity", "Error: $e")
+                Log.e("EditAlbumLibraryActivity", "Error: ${e.message}")
                 _photos.value = Resource.Error("Không tải được: " + e.message.toString())
             }
         }

@@ -23,10 +23,18 @@ import com.ssquad.gps.camera.geotag.utils.SharePrefManager
 class DetailTemplateActivity : BaseActivity<ActivityDetailTemplateBinding>(
     ActivityDetailTemplateBinding::inflate
 ) {
-    private val previewTemplateContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private val previewActivityLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
         if (result.resultCode == RESULT_OK) {
-            val selectedTemplateId = result.data?.getStringExtra("SELECTED_TEMPLATE_ID") ?: return@registerForActivityResult
-            updateSelectedTemplate(selectedTemplateId)
+            val selectedTemplateId = result.data?.getStringExtra("SELECTED_TEMPLATE_ID")
+            if (selectedTemplateId != null) {
+                val resultIntent = Intent().apply {
+                    putExtra("SELECTED_TEMPLATE_ID", selectedTemplateId)
+                }
+                setResult(RESULT_OK, resultIntent)
+                finish()
+            }
         }
     }
 
@@ -35,7 +43,7 @@ class DetailTemplateActivity : BaseActivity<ActivityDetailTemplateBinding>(
             val themeType = selectedTemplate.type
             val filterList = ThemeTemplateModel.getTemplate().filter { it.type == themeType } as ArrayList<ThemeTemplateModel>
             val intent = PreviewTemplateActivity.Companion.getIntent(this, selectedTemplate, filterList, themeType)
-            previewTemplateContract.launch(intent)
+            previewActivityLauncher.launch(intent)
         }
     }
 

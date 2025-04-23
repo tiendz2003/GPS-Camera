@@ -37,6 +37,7 @@ import com.ssquad.gps.camera.geotag.utils.formatToDate
 import com.ssquad.gps.camera.geotag.utils.formatToTime
 import com.ssquad.gps.camera.geotag.worker.CacheDataTemplate
 import com.google.android.material.snackbar.Snackbar
+import com.ssquad.gps.camera.geotag.utils.rotate
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -307,10 +308,12 @@ class CameraViewModel(
                 override fun onCaptureSuccess(image: ImageProxy) {
                     viewModelScope.launch {
                         try {
+
                             val bitmap = image.toBitmap()
+                            val rotatedBitmap = bitmap.rotate(image.imageInfo.rotationDegrees)
                             updateCameraState {
                                 it.copy(
-                                    captureImageBitmap = bitmap
+                                    captureImageBitmap = rotatedBitmap
                                 )
                             }
                         } catch (e: Exception) {

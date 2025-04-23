@@ -142,5 +142,6 @@
     <string name="content_take_photo">Capture those wonderful moment now</string>
     <string name="version">Version</string>
     <string name="template">Template</string>
+    <string name="unknown_album">Unknown Album</string>
 
 </resources>

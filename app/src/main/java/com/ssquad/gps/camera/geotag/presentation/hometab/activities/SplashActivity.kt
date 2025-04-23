@@ -44,7 +44,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(ActivitySplashBinding
             }, 3000)
         }
         val animator = ValueAnimator.ofFloat(0f, 1f)
-        animator.duration = 5000
+        animator.duration = 3000
         animator.addUpdateListener { animation ->
             val progress = animation.animatedValue as Float
             binding.progressBar.progress = progress

@@ -4,6 +4,7 @@ import android.content.ContentUris
 import android.content.Context
 import android.provider.MediaStore
 import android.util.Log
+import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.data.models.Album
 import com.ssquad.gps.camera.geotag.data.models.Photo
 import com.ssquad.gps.camera.geotag.domain.MediaRepository
@@ -11,66 +12,95 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class MediaRepositoryImpl (private val context: Context): MediaRepository {
-
+/**
+    chú ý:Luôn kiểm tra null trước mỗi quẻy (các cursor từ ContentResolver)
+    nếu có xảy ra null hãy dugf giá trị mặc định thay thế cho null
+ */
     override suspend fun getAlbums(): List<Album> =
         withContext(Dispatchers.IO) {
-                val albums = mutableListOf<Album>()
-                val projection = arrayOf(
-                    MediaStore.Images.Media.BUCKET_ID,
-                    MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
-                    MediaStore.Images.Media._ID,
-                )
-                val selection = null
-                val selectionArgs = null
-                val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} ASC"
+            val albums = mutableListOf<Album>()
+            val projection = arrayOf(
+                MediaStore.Images.Media.BUCKET_ID,
+                MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
+                MediaStore.Images.Media._ID,
+            )
 
+            try {
                 val query = context.contentResolver.query(
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                     projection,
-                    selection,
-                    selectionArgs,
-                    sortOrder
-                )
+                    null,
+                    null,
+                    "${MediaStore.Images.Media.DATE_TAKEN} ASC"
+                ) ?: return@withContext emptyList()
                 val bucketIds = mutableSetOf<String>()
 
-                query?.use { cursor ->
-                    val bucketIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_ID)
-                    val bucketNameColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
-                    val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+                query.use { cursor ->
+                    val bucketIdColumn = try {
+                        cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_ID)
+                    } catch (e: Exception) {
+                        Log.e("MediaRepository", "BUCKET_ID ko tìm thấy", e)
+                        return@use
+                    }
+                    val bucketNameColumn = try {
+                        cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+                    } catch (e: Exception) {
+                        Log.e("MediaRepository", "BUCKET_DISPLAY_NAME ko tìm thấy", e)
+                        return@use
+                    }
+                    val idColumn = try {
+                        cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+                    } catch (e: Exception) {
+                        Log.e("MediaRepository", "ID column ko tìm thấy", e)
+                        return@use
+                    }
 
-                    while (cursor.moveToNext()){
-                        val bucketId = cursor.getString(bucketIdColumn)
-                        val bucketName = cursor.getString(bucketNameColumn)
-                        if(bucketIds.contains(bucketId)){
+                    while (cursor.moveToNext()) {
+                        val bucketId = cursor.getString(bucketIdColumn)?:continue
+                        val bucketName = cursor.getString(bucketNameColumn)?: context.getString(R.string.unknown_album)
+                        if (bucketIds.contains(bucketId)) {
                             continue
                         }
                         bucketIds.add(bucketId)
-                        val countQuery = context.contentResolver.query(
-                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                            arrayOf(MediaStore.Images.Media._ID),
-                            "${MediaStore.Images.Media.BUCKET_ID} = ?",
-                            arrayOf(bucketId),
+                        val countQuery = try {
+                            context.contentResolver.query(
+                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                                arrayOf(MediaStore.Images.Media._ID),
+                                "${MediaStore.Images.Media.BUCKET_ID} = ?",
+                                arrayOf(bucketId),
+                                null
+                            )
+                        } catch (e: Exception) {
+                            Log.e("MediaRepository", "Lỗi khi đêms query: ${e.message}", e)
                             null
-                        )
+                        }
                         val count = countQuery?.count ?: 0
                         countQuery?.close()
 
-                        val id = cursor.getLong(idColumn)
-                        val contentUri  = ContentUris.withAppendedId(
-                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                            id
-                        )
-                        albums.add(
-                            Album(
-                                photoCount = count,
-                                id = bucketId,
-                                name = bucketName,
-                                coverPath = contentUri
+                        try {
+                            val id = cursor.getLong(idColumn)
+                            val contentUri = ContentUris.withAppendedId(
+                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                                id
                             )
-                        )
+                            albums.add(
+                                Album(
+                                    photoCount = count,
+                                    id = bucketId,
+                                    name = bucketName,
+                                    coverPath = contentUri
+                                )
+                            )
+                        } catch (e: Exception) {
+                            Log.e("MediaRepository", "Lỗi khi lấy album: ${e.message}", e)
+                            // Continue processing other albums
+                        }
                     }
                 }
-                albums
+            } catch (e: Exception) {
+                Log.e("MediaRepository", "Error fetching albums: ${e.message}", e)
+            }
+            albums
         }
 
     override suspend fun getPhotosFromAlbum(albumId: String): List<Photo> =

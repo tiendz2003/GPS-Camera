@@ -92,7 +92,12 @@ fun String.formatCoordinate(decimalPlaces: Int = 4): String {
     } ?: this
 }
 
-
+fun Bitmap.rotate(degrees: Int): Bitmap {
+    val matrix = Matrix().apply {
+        postRotate(degrees.toFloat())
+    }
+    return Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
+}
 fun MaterialShapeDrawable.updateCornerSize(context: Context) {
     val shapeAppearanceModel = this.shapeAppearanceModel.toBuilder()
         .setTopLeftCornerSize(16f.dpToPx(context))
@@ -171,6 +176,9 @@ fun Int.formatCaptureDuration(): String {
  fun RecyclerView.scrollToCenter(position: Int) {
     val layoutManager = this.layoutManager as? LinearLayoutManager ?: return
     val itemCount = adapter?.itemCount?:0
+     if(position<0 || position>=itemCount){
+         return
+     }
     if(position == 0 || position == itemCount - 1) {
         this.smoothScrollToPosition(position)
         return

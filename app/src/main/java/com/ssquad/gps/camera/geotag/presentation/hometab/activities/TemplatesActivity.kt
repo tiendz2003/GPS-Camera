@@ -18,7 +18,6 @@ class TemplatesActivity :
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
-            // Pass the template selection result back to CameraActivity
             val selectedTemplateId = result.data?.getStringExtra("SELECTED_TEMPLATE_ID")
             if (selectedTemplateId != null) {
                 val resultIntent = Intent().apply {

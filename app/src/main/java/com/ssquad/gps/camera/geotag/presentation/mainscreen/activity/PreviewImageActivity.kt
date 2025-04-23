@@ -294,7 +294,7 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
         }
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = when (position) {
-                0 -> getString(R.string.preview)
+                0 -> getString(R.string.template)
                 else -> getString(R.string.custom)
             }
         }.attach()

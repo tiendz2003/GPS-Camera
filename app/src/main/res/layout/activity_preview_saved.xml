@@ -33,7 +33,7 @@
             android:maxLines="1"
             android:text="VID_452fmn.mp4"
             android:textColor="@android:color/black"
-            android:textSize="16sp"
+            android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btnMore"
             app:layout_constraintStart_toEndOf="@+id/btnBack"

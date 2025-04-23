@@ -1,13 +1,13 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.BaseProject" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="fontFamily">@font/nunito_sans_regular</item>
+        <item name="fontFamily">@font/plusjakartasans</item>
         <item name="fontWeight">400</item>
     </style>
 
     <style name="BottomNavigationTextStyle" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textSize">14sp</item>
-        <item name="android:fontFamily">@font/nunito_sans_regular</item>
+        <item name="android:fontFamily">@font/plusjakartasans</item>
         <item name="android:textStyle">normal</item>
     </style>
     <style name="CustomBottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">

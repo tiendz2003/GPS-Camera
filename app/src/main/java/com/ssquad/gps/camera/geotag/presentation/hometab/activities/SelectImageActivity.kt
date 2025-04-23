@@ -106,4 +106,7 @@ class SelectImageActivity : BaseActivity<ActivitySelectedImageBinding>(ActivityS
             }
         }
     }
+    override fun onResume() {
+        super.onResume()
+    }
 }

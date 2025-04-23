@@ -1,6 +1,10 @@
 package com.ssquad.gps.camera.geotag.fragments
 
+import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import com.ssquad.gps.camera.geotag.BuildConfig
 import com.ssquad.gps.camera.geotag.R
@@ -11,10 +15,11 @@ import com.ssquad.gps.camera.geotag.presentation.settingtab.activity.CustomDateT
 import com.ssquad.gps.camera.geotag.presentation.settingtab.activity.DateTimeFormatActivity
 import com.ssquad.gps.camera.geotag.presentation.settingtab.activity.MapSettingActivity
 import com.ssquad.gps.camera.geotag.presentation.settingtab.activity.MapTypeActivity
+import com.ssquad.gps.camera.geotag.presentation.settingtab.activity.PolicyActivity
 import com.ssquad.gps.camera.geotag.presentation.settingtab.activity.SetupTempActivity
 import com.ssquad.gps.camera.geotag.utils.Constants
+import androidx.core.net.toUri
 
-private const val URL = "param1"
 class SettingsFragment : BaseFragment<FragmentSettingsBinding>(FragmentSettingsBinding::inflate) {
     private val reqNavigate = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
 
@@ -50,11 +55,14 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(FragmentSettingsB
                 }
                 startActivity(intent)
             }
+            llPrivacy.setOnClickListener {
+                reqNavigate.launch(Intent(requireContext(), PolicyActivity::class.java))
+            }
             llShare.setOnClickListener {
                 shareApp()
             }
             llRating.setOnClickListener {
-
+                openAppRating(requireContext())
             }
         }
     }
@@ -67,5 +75,19 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(FragmentSettingsB
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage)
         reqNavigate.launch(Intent.createChooser(shareIntent, getString(R.string.share_to)))
     }
-
+    fun openAppRating(context: Context) {
+        val packageName = context.packageName
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri())
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_NO_HISTORY or
+                    Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+            context.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Log.e("", e.toString())
+            val intent = Intent(Intent.ACTION_VIEW,
+                "https://play.google.com/store/apps/details?id=$packageName".toUri())
+            context.startActivity(intent)
+        }
+    }
 }

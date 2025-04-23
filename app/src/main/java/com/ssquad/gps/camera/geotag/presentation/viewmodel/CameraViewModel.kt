@@ -70,7 +70,6 @@ class CameraViewModel(
     private var recording: Recording? = null
     private var preview: Preview? = null
     private var cameraExecutor = Executors.newSingleThreadExecutor()
-    private var processingSnackbar: Snackbar? = null
 
     private var lensFacing = CameraSelector.LENS_FACING_BACK
     private var flashMode = ImageCapture.FLASH_MODE_OFF

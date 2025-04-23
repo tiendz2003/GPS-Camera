@@ -11,6 +11,7 @@ import com.ssquad.gps.camera.geotag.bases.BaseCustomView
 import com.ssquad.gps.camera.geotag.data.models.TemplateDataModel
 import com.ssquad.gps.camera.geotag.data.models.TemplateState
 import com.ssquad.gps.camera.geotag.databinding.TemplateGps2Binding
+import com.ssquad.gps.camera.geotag.utils.formatCoordinate
 import com.ssquad.gps.camera.geotag.utils.loadImageIcon
 
 class GPSTemplateV2(context: Context?, attrs: AttributeSet?) : BaseCustomView(context, attrs) {
@@ -36,8 +37,8 @@ class GPSTemplateV2(context: Context?, attrs: AttributeSet?) : BaseCustomView(co
             tvDate.text = data.currentDate
             tvTime.text = data.currentTime
             tvAddress.text = data.location
-            tvLatValue.text = data.lat
-            tvLongValue.text = data.long
+            tvLatValue.text = "${data.lat?.formatCoordinate()}°N"
+            tvLongValue.text = "${data.long?.formatCoordinate()}°E"
             state?.let {
                 updateVisibility(it)
             }
@@ -50,8 +51,8 @@ class GPSTemplateV2(context: Context?, attrs: AttributeSet?) : BaseCustomView(co
             imvMap.visibility = if (state.showLocation) VISIBLE else GONE
             tvDate.visibility = if (state.showDate) VISIBLE else GONE
             tvTime.visibility = if (state.showTime) VISIBLE else GONE
-            tvLatValue.visibility = if (state.showLatLong) VISIBLE else GONE
-            tvLongValue.visibility = if (state.showLatLong) VISIBLE else GONE
+            llLat.visibility = if (state.showLatLong) VISIBLE else GONE
+            llLong.visibility = if (state.showLatLong) VISIBLE else GONE
         }
     }
     override fun setMapImage(imageUrl: Bitmap?) {

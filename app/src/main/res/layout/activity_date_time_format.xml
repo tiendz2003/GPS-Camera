@@ -5,7 +5,9 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.settingtab.activity.DateTimeFormatActivity">
+    tools:context=".presentation.settingtab.activity.DateTimeFormatActivity"
+    android:paddingTop="12dp"
+    >
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
@@ -30,18 +32,18 @@
             android:layout_height="wrap_content"
             android:text="@string/date_amp_time_format"
             android:textColor="@android:color/black"
-            android:textSize="25sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/btnBack"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginStart="16dp" />
+            android:layout_marginStart="8dp" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/btnCheck"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_check_set"
+            android:src="@drawable/ic_menu_check"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -61,10 +63,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="12dp"
                 android:text="@string/date_format"
                 android:textColor="@color/neutralGrey"
-                android:textSize="15sp"
+                android:textSize="18sp"
                 style="@style/medium_500"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -86,7 +88,7 @@
                 android:layout_marginStart="16dp"
                 android:text="@string/time_format"
                 android:textColor="@color/neutralGrey"
-                android:textSize="15sp"
+                android:textSize="18sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/rcvDateFormat" />
 

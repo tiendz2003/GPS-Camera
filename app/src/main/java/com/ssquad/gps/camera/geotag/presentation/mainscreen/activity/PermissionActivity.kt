@@ -61,7 +61,6 @@ class PermissionActivity : BaseActivity<ActivityPermissionBinding>(ActivityPermi
                 requestMicrophonePermission()
             }
         }
-
         binding.switchLocation.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 requestLocationPermission()

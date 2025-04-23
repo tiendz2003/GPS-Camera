@@ -4,12 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp">
+    android:padding="8dp"
+    android:layout_margin="16dp"
+    >
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/ivMapThumbnail"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="95dp"
+        android:layout_height="95dp"
         android:scaleType="centerCrop"
         android:src="@drawable/img_default_map"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,11 +25,12 @@
         android:id="@+id/llLocationContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginStart="12dp"
-        app:layout_constraintStart_toEndOf="@id/ivMapThumbnail"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintStart_toEndOf="@id/ivMapThumbnail"
+        app:layout_constraintTop_toTopOf="@+id/ivMapThumbnail">
 
         <FrameLayout
             android:layout_width="wrap_content"
@@ -38,57 +41,57 @@
                 android:id="@+id/tvLocationTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="NEW YORK"
                 android:background="@android:color/transparent"
                 android:layerType="software"
-                android:textSize="24sp"
-                android:textStyle="bold"
                 android:paddingHorizontal="8dp"
-                android:paddingVertical="2dp" />
+                android:paddingVertical="2dp"
+                android:text="NEW YORK"
+                android:textSize="26sp"
+                android:textStyle="bold" />
 
         </FrameLayout>
 
         <TextView
             android:id="@+id/tvLocationAddress"
+            style="@style/afacad_style"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Brooklyn, 103386 New York, United States"
-            style="@style/afacad_style"
             android:layout_marginTop="4dp"
+            android:ellipsize="end"
             android:singleLine="true"
-            android:ellipsize="end" />
+            android:text="Brooklyn, 103386 New York, United States" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginTop="8dp"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/tvDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="FRIDAY, 05 JAN 2024"
+                android:layout_marginEnd="12dp"
                 android:textColor="@android:color/white"
-                android:textSize="12sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/ivWeatherIcon"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/ic_cloud_travel"
-                android:layout_marginStart="8dp" />
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_cloud_travel" />
 
             <TextView
                 android:id="@+id/tvTemperature"
+                style="@style/jakarta_style"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
                 android:text="22°C"
-                style="@style/jakarta_style"
-                android:textSize="12sp"
-                android:layout_marginStart="4dp" />
+                android:textSize="16sp" />
         </LinearLayout>
     </LinearLayout>
 

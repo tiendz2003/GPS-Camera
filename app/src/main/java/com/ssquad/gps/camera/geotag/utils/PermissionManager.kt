@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
+import com.ssquad.gps.camera.geotag.R
 
 object PermissionManager {
     fun checkPermissionGranted(context: Context, permission: String): Boolean {
@@ -47,32 +48,38 @@ object PermissionManager {
         }
     }
 
-    fun checkCamAndMicroPermissions(context: Context): Boolean {
+    fun checkCamPermissions(context: Context): Boolean {
         return checkPermissionsGranted(
             context,
             listOf(
-                Manifest.permission.CAMERA,
+                Manifest.permission.CAMERA
+            )
+        )
+    }
+    fun checkMicroPermissions(context: Context): Boolean {
+        return checkPermissionsGranted(
+            context,
+            listOf(
                 Manifest.permission.RECORD_AUDIO
             )
         )
     }
-     fun showPermissionExplanationDialog(context: Context, onRetry: () -> Unit) {
-        AlertDialog.Builder(context)
-            .setTitle("Yêu cầu quyền")
-            .setMessage("Ứng dụng cần quyền để truy cập ảnh và video. Vui lòng cấp quyền để sử dụng tính năng này.")
-            .setPositiveButton("Cho phép") { _, _ -> onRetry() }
-            .setNegativeButton("Hủy", null)
-            .show()
-    }
 
      fun showOpenSettingsDialog(context: Context,gotoSettings: () -> Unit) {
-        AlertDialog.Builder(context)
-            .setTitle("Yêu cầu quyền")
-            .setMessage("Bạn đã tắt quyền truy cập ảnh/video. Vui lòng mở cài đặt để cấp quyền.")
-            .setPositiveButton("Mở cài đặt") { _, _ ->
-                gotoSettings()
-            }
-            .setNegativeButton("Hủy", null)
-            .show()
+         val builder = AlertDialog.Builder(context)
+         builder.setTitle(R.string.go_to_setting)
+         builder.setMessage(R.string.warning_camera_location_permission)
+         builder.setCancelable(false)
+         builder.setPositiveButton(
+             R.string.go_to_setting
+         ) { _, _ ->
+             gotoSettings.invoke()
+             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+             val uri = Uri.fromParts("package", context.packageName, null)
+             intent.data = uri
+             context.startActivity(intent)
+         }
+         val alert: AlertDialog = builder.create()
+         alert.show()
     }
 }

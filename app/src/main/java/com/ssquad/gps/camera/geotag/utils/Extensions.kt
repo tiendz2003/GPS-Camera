@@ -17,6 +17,8 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
@@ -69,7 +71,6 @@ fun View.invisible() {
 fun View.setVisible(visible: Boolean) {
     visibility = if (visible) View.VISIBLE else View.GONE
 }
-
 fun Float.dpToPx(context: Context): Float {
     return this * context.resources.displayMetrics.density
 }
@@ -83,6 +84,15 @@ fun navToActivity(context: Context, activity: Class<*>, bundle: Bundle? = null) 
     intent.putExtras(bundle ?: Bundle())
     context.startActivity(intent)
 }
+fun String.formatCoordinate(decimalPlaces: Int = 4): String {
+    val normalized = this.replace(",", ".")
+
+    return normalized.toDoubleOrNull()?.let {
+        String.format("%.${decimalPlaces}f", it)
+    } ?: this
+}
+
+
 fun MaterialShapeDrawable.updateCornerSize(context: Context) {
     val shapeAppearanceModel = this.shapeAppearanceModel.toBuilder()
         .setTopLeftCornerSize(16f.dpToPx(context))

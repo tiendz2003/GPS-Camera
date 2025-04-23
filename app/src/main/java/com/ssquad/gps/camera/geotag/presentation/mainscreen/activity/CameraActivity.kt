@@ -1,6 +1,5 @@
 package com.ssquad.gps.camera.geotag.presentation.mainscreen.activity
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
@@ -26,7 +25,6 @@ import com.ssquad.gps.camera.geotag.service.MapManager
 import com.ssquad.gps.camera.geotag.utils.BitmapHolder
 import com.ssquad.gps.camera.geotag.utils.Config
 import com.ssquad.gps.camera.geotag.utils.CustomSnackbar
-import com.ssquad.gps.camera.geotag.utils.PermissionManager
 import com.ssquad.gps.camera.geotag.utils.SharePrefManager
 import com.ssquad.gps.camera.geotag.utils.addTemplate
 import com.ssquad.gps.camera.geotag.utils.gone
@@ -59,17 +57,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
             }
         }
     private val cameraViewModel: CameraViewModel by viewModel()
-    private val cameraPermission =
-        arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
-    private val requestCameraPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            val allGranted = permissions.entries.all { it.value }
-            if (allGranted) {
-                startCamera()
-            } else {
-                Toast.makeText(this, "", Toast.LENGTH_SHORT).show()
-            }
-        }
+
     private var templateId: String? = null
     private var mapSnapshotJob: Job? = null
     private lateinit var mapManager: MapManager
@@ -79,11 +67,9 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
+        startCamera()
         binding.mapView.onCreate(savedInstanceState)
-
         mapManager = MapManager(this, lifecycle, binding.mapView)
-
         mapManager.setOnMapReadyCallback {
             cameraViewModel.updateTemplateData()
         }
@@ -186,6 +172,16 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                     binding.motionLayoutMode.transitionToState(R.id.video_mode)
                     cameraViewModel.toggleCameraMode()
                 }
+                if(cameraViewModel.getCurrentFlashMode() == ImageCapture.FLASH_MODE_ON){
+                    Toast.makeText(
+                        this@CameraActivity,
+                        getString(R.string.flash_not_available_in_video_mode),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    toggleFlashMode()
+                    updateFlashIcon(cameraViewModel.getCurrentFlashMode())
+                    return@setOnClickListener
+                }
             }
             imvTakeCapture.setOnClickListener {
                 if (cameraViewModel.isVideoMode()) {
@@ -197,6 +193,14 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                 }
             }
             imvFlash.setOnClickListener {
+                if(cameraViewModel.isVideoMode()){
+                    Toast.makeText(
+                        this@CameraActivity,
+                        getString(R.string.flash_not_available_in_video_mode),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
+                }
                 if (cameraViewModel.currentLensFacing() == CameraSelector.LENS_FACING_FRONT) {
                     Toast.makeText(
                         this@CameraActivity,

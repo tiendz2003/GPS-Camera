@@ -11,6 +11,7 @@ import com.ssquad.gps.camera.geotag.bases.BaseCustomView
 import com.ssquad.gps.camera.geotag.data.models.TemplateDataModel
 import com.ssquad.gps.camera.geotag.data.models.TemplateState
 import com.ssquad.gps.camera.geotag.databinding.TemplateGps5Binding
+import com.ssquad.gps.camera.geotag.utils.formatCoordinate
 import com.ssquad.gps.camera.geotag.utils.loadImageIcon
 
 class GPSTemplateV5(context: Context?, attrs: AttributeSet?) : BaseCustomView(context, attrs) {
@@ -34,8 +35,8 @@ class GPSTemplateV5(context: Context?, attrs: AttributeSet?) : BaseCustomView(co
     override fun setData(data: TemplateDataModel,templateState: TemplateState?) {
         with(binding) {
             tvLocationName.text = data.location
-            tvLatLabel.text = "Lat: ${data.lat}"
-            tvLongLabel.text = "Long: ${data.long}"
+            tvLatLabel.text = "Lat: ${data.lat?.formatCoordinate()}"
+            tvLongLabel.text = "Long: ${data.long?.formatCoordinate()}"
             tvTemperature.text= data.temperature
             tvDateTime.text = data.currentDate
             templateState?.let {
@@ -46,9 +47,8 @@ class GPSTemplateV5(context: Context?, attrs: AttributeSet?) : BaseCustomView(co
     override fun updateVisibility(state: TemplateState) {
         with(binding){
             tvLocationName.visibility = if (state.showLocation) VISIBLE else GONE
-            ivMapThumbnail.visibility = if (state.showLocation) VISIBLE else GONE
-            tvLatLabel.visibility = if (state.showLatLong) VISIBLE else GONE
-            tvLongLabel.visibility = if (state.showLatLong) VISIBLE else GONE
+            cardMapThumbnail.visibility = if (state.showLocation) VISIBLE else GONE
+            llLatLong.visibility = if (state.showLatLong) VISIBLE else GONE
             tvTemperature.visibility = if (state.showTemperature) VISIBLE else GONE
             tvDateTime.visibility = if (state.showDate) VISIBLE else GONE
         }
@@ -56,7 +56,7 @@ class GPSTemplateV5(context: Context?, attrs: AttributeSet?) : BaseCustomView(co
     override fun setMapImage(imageUrl: Bitmap?) {
         Log.d("GPSTemplateV1", "setMapImage: $imageUrl")
         imageUrl?.let {
-            binding.ivMapThumbnail.loadImageIcon(it)
+            binding.cardMapThumbnail.loadImageIcon(it)
         }
     }
 }

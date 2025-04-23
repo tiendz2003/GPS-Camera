@@ -1,5 +1,6 @@
 package com.ssquad.gps.camera.geotag.presentation.hometab.activities
 
+import android.Manifest
 import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
@@ -15,10 +16,15 @@ import com.ssquad.gps.camera.geotag.presentation.hometab.dialog.SortBottomSheet
 import com.ssquad.gps.camera.geotag.presentation.mainscreen.activity.PreviewSavedActivity
 import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.databinding.ActivityImagesSavedBinding
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.activity.CameraActivity
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.activity.RequestPermissionActivity
 import com.ssquad.gps.camera.geotag.presentation.viewmodel.PhotosViewModel
+import com.ssquad.gps.camera.geotag.utils.Constants
 import com.ssquad.gps.camera.geotag.utils.GridSpacingItemDecoration
 import com.ssquad.gps.camera.geotag.utils.PermissionManager
 import com.ssquad.gps.camera.geotag.utils.Resource
+import com.ssquad.gps.camera.geotag.utils.gone
+import com.ssquad.gps.camera.geotag.utils.visible
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -45,9 +51,7 @@ class MediaSavedActivity :
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if(PermissionManager.checkAndRequestPermissions(this)){
-            loadMediaData()
-        }
+
     }
 
     override fun initData() {
@@ -72,6 +76,30 @@ class MediaSavedActivity :
             }
             btnBack.setOnClickListener {
                 onBackPressedDispatcher.onBackPressed()
+            }
+            btnTakePhoto.setOnClickListener {
+                if (PermissionManager.checkPermissionsGranted(
+                        this@MediaSavedActivity,
+                        listOf(
+                            Manifest.permission.CAMERA,
+                            Manifest.permission.RECORD_AUDIO,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        )
+                    )
+                ) {
+                    Intent(this@MediaSavedActivity, CameraActivity::class.java).let {
+                        it.putExtra(Constants.CAMERA, true)
+                        startActivity(it)
+                    }
+                } else {
+                    Intent(this@MediaSavedActivity, RequestPermissionActivity::class.java).let {
+                        it.putExtra(
+                            Constants.INTENT_REQUEST_SINGLE_PERMISSION,
+                            RequestPermissionActivity.TYPE_CAMERA
+                        )
+                        startActivityForResult(it, RequestPermissionActivity.REQUEST_CODE)
+                    }
+                }
             }
         }
     }
@@ -138,11 +166,21 @@ class MediaSavedActivity :
                         }
                         Log.d("MediaSavedActivity", "observeViewModel: ${photoByDates.size}")
                         photoAdapter?.submitList(photoByDates)
+                        if(photoByDates.isEmpty()){
+                            Log.d("MediaSavedActivity", "observeViewModel: empty")
+                            binding.llTakePhoto.visible()
+                            binding.rcvImage.gone()
+                        }else{
+                            binding.llTakePhoto.gone()
+                            binding.rcvImage.visible()
+                        }
                     }
                 }
 
                 is Resource.Error -> {
                     Toast.makeText(this, resource.message, Toast.LENGTH_LONG).show()
+                    binding.llTakePhoto.visible()
+                    binding.rcvImage.gone()
                 }
             }
 
@@ -154,12 +192,6 @@ class MediaSavedActivity :
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        PermissionManager.onRequestPermissionsResult(
-            requestCode,
-            permissions,
-            grantResults,
-            { loadMediaData() },
-            {finish()}
-        )
+
     }
 }

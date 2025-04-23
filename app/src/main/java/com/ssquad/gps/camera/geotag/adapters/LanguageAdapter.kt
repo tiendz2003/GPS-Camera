@@ -25,12 +25,10 @@ class LanguageAdapter(
             binding.languageName.isSelected = true
             if (position == selectedPosition) {
                 binding.layoutRoot.setBackgroundResource(R.drawable.bg_language_selected)
-                binding.languageName.typeface =
-                    ResourcesCompat.getFont(context, R.font.nunito_sans_semi_bold)
+
             } else {
                 binding.layoutRoot.setBackgroundResource(R.drawable.bg_language_unselected)
-                binding.languageName.typeface =
-                    ResourcesCompat.getFont(context, R.font.nunito_sans_regular)
+
             }
             binding.root.setOnClickListener {
                 val previousSelected = selectedPosition

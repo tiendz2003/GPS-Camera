@@ -22,10 +22,11 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imv_banner"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="16dp"
+        android:scaleType="fitCenter"
         android:src="@drawable/ic_per_camera"
         app:layout_constraintBottom_toTopOf="@id/tv_title"
         app:layout_constraintEnd_toEndOf="parent"

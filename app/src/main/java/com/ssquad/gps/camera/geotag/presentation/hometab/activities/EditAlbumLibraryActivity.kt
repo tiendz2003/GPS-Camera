@@ -9,7 +9,6 @@ import com.ssquad.gps.camera.geotag.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.presentation.hometab.adapter.EditAlbumAdapter
 import com.ssquad.gps.camera.geotag.databinding.ActivityAlbumLibraryBinding
 import com.ssquad.gps.camera.geotag.presentation.viewmodel.AlbumViewModel
-import com.ssquad.gps.camera.geotag.utils.PermissionManager
 import com.ssquad.gps.camera.geotag.utils.Resource
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -21,9 +20,7 @@ class EditAlbumLibraryActivity : BaseActivity<ActivityAlbumLibraryBinding>(
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if(PermissionManager.checkAndRequestPermissions(this)){
-            albumsViewModel.loadAlbums()
-        }
+
     }
 
     override fun initData() {
@@ -35,7 +32,7 @@ class EditAlbumLibraryActivity : BaseActivity<ActivityAlbumLibraryBinding>(
     }
 
     override fun initActionView() {
-        binding.ivBack.setOnClickListener {
+        binding.btnBack.setOnClickListener {
             finish()
         }
     }
@@ -71,12 +68,5 @@ class EditAlbumLibraryActivity : BaseActivity<ActivityAlbumLibraryBinding>(
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        PermissionManager.onRequestPermissionsResult(
-            requestCode,
-            permissions,
-            grantResults,
-            { albumsViewModel.loadAlbums() },
-            { finish()}
-        )
     }
 }

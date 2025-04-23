@@ -127,6 +127,7 @@
     <string name="saving_image">Saving image</string>
     <string name="image_saved_successfully">Image saved successfully!</string>
     <string name="save_image_failed">Save image failed!</string>
+    <string name="flash_not_available_in_video_mode">Flash is not available in video mode</string>
     <string name="Continue">Continue</string>
     <string name="share_to">Share to</string>
     <string name="hint_per_camera">To start using the camera, please turn on access\\nyour camera and microphone</string>
@@ -136,5 +137,10 @@
     <string name="hint_per_gallery">To continue, please allow access to your photo library so you can choose images from your device.</string>
     <string name="til_per_location">Allow access to your location to provide location-based features.</string>
     <string name="hint_per_location">To continue, please allow access to your location. This helps us provide relevant content based on where you are.</string>
+    <string name="go_to_setting">Go to setting</string>
+    <string name="take_photo">Take a photo</string>
+    <string name="content_take_photo">Capture those wonderful moment now</string>
+    <string name="version">Version</string>
+    <string name="template">Template</string>
 
 </resources>

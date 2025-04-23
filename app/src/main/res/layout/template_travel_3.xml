@@ -8,46 +8,60 @@
     android:layout_margin="16dp"
     android:padding="8dp">
 
-    <ImageView
-        android:id="@+id/ivLocationIcon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:src="@drawable/ic_location"
+    <LinearLayout
+        android:id="@+id/llLocation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/tvLocation" />
+        android:orientation="horizontal"
+        android:gravity="center"
+        >
 
-    <TextView
-        android:id="@+id/tvLocation"
-        android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/ivLocationIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_location" />
+
+        <TextView
+            android:id="@+id/tvLocation"
+            style="@style/purple_purse_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="United Stated"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="United Stated"
-        android:textStyle="bold"
-        style="@style/purple_purse_style"
-        android:layout_marginStart="8dp"
-        app:layout_constraintStart_toEndOf="@id/ivLocationIcon"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/ivHolidayIcon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:src="@drawable/ic_island_travel"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/tvHolidays"
-        app:layout_constraintBottom_toBottomOf="@id/tvHolidays" />
-
-    <TextView
-        android:id="@+id/tvHolidays"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="HOLIDAYS"
-        style="@style/poller_one_style"
-        android:textStyle="bold"
-        android:layout_marginStart="8dp"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintStart_toEndOf="@id/ivHolidayIcon"
-        app:layout_constraintTop_toBottomOf="@id/tvLocation" />
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@+id/llLocation"
+        app:layout_constraintStart_toStartOf="parent"
+        >
+
+        <ImageView
+            android:id="@+id/ivHolidayIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_island_travel" />
+
+        <TextView
+            android:id="@+id/tvHolidays"
+            style="@style/poller_one_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="HOLIDAYS"
+            android:textStyle="bold" />
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/ivWeatherIcon"
@@ -67,7 +81,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toEndOf="@id/ivWeatherIcon"
-        app:layout_constraintTop_toBottomOf="@id/tvHolidays" />
+        app:layout_constraintTop_toBottomOf="@id/linearLayout2" />
 
     <TextView
         android:id="@+id/tvDate"

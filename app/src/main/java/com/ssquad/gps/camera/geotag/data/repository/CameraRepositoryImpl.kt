@@ -75,8 +75,7 @@ class CameraRepositoryImpl : CameraRepository {
                     SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
                 }.mp4"
 
-                // 1. Thử phương pháp lưu trực tiếp vào thư mục cụ thể nếu đang chạy Android 10+
-                    Log.d("VideoProcessor", "Saving video using MediaStore API (Android 10+)")
+                    Log.d("VideoProcessor", "Saving video)")
                     var outputStream: OutputStream? = null
                     var videoUri: Uri? = null
 

@@ -23,8 +23,6 @@ class MapSettingActivity : BaseActivity<ActivityMapSettingBinding>(ActivityMapSe
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-
         mapManager = MapManager(this, lifecycle, binding.mapView)
 
         setupMapCallbacks()

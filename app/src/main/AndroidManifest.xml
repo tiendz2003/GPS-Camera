@@ -25,7 +25,10 @@
         android:theme="@style/Theme.BaseProject"
         tools:targetApi="31">
         <activity
-            android:name="com.ssquad.gps.camera.geotag.presentation.mainscreen.activity.RequestPermissionActivity"
+            android:name=".presentation.settingtab.activity.PolicyActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.mainscreen.activity.RequestPermissionActivity"
             android:exported="false" />
         <activity
             android:name=".presentation.mainscreen.activity.PermissionActivity"

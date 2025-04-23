@@ -87,7 +87,6 @@ class DetailTemplateActivity : BaseActivity<ActivityDetailTemplateBinding>(
         setupRecyclerView()
     }
 
-    // Phương thức cập nhật UI dựa trên template đã chọn
     private fun updateSelectedTemplate(selectedTemplateId: String) {
         SharePrefManager.setDefaultTemplate(selectedTemplateId)
 
@@ -100,12 +99,12 @@ class DetailTemplateActivity : BaseActivity<ActivityDetailTemplateBinding>(
             Log.d("DetailTemplateActivity", "Selected template: ${it.id}")
         }
 
-        allItemsAdapter.submitList(null) // Force refresh
+        allItemsAdapter.submitList(null)
         allItemsAdapter.submitList(currentList)
     }
 
     override fun initActionView() {
-        binding.ivBack.setOnClickListener {
+        binding.btnBack.setOnClickListener {
             finish()
         }
     }

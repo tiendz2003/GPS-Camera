@@ -6,6 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/bg_rounded_background"
     android:padding="16dp"
+    android:layout_margin="16dp"
     >
     <LinearLayout
         android:id="@+id/ll_lat_long"
@@ -24,8 +25,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:gravity="center"
-        android:text="Lat: 16.0544"
+        android:gravity="end"
+        android:text="Lat:16.0544"
         style="@style/afacad_style" />
 
     <View
@@ -39,7 +40,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:gravity="center"
         android:text="Long: 16.0544"
         style="@style/afacad_style" />
 </LinearLayout>

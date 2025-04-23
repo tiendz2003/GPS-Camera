@@ -17,19 +17,13 @@ class DateTimeFormatActivity : BaseActivity<ActivityDateTimeFormatBinding>(
 ) {
     private lateinit var timeAdapter: FormatAdapter
     private lateinit var dateAdapter: FormatAdapter
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-    }
 
     override fun initData() {
     }
-
     override fun initView() {
         setupDateRecycleView()
         setupTimeRecycleView()
     }
-
     override fun initActionView() {
         with(binding) {
             btnBack.setOnClickListener {
@@ -38,10 +32,10 @@ class DateTimeFormatActivity : BaseActivity<ActivityDateTimeFormatBinding>(
         }
         setupSaveButton()
     }
-
     @SuppressLint("NotifyDataSetChanged")
     private fun setupDateRecycleView() {
         val listDateExample = DATE_FORMATS
+        listDateExample.forEach { it.isSelected = false }
         val currentDateFormat =
             SharePrefManager.getString(DATE_FORMAT_KEY, listDateExample[0].id)
         dateAdapter = FormatAdapter(listDateExample) { selectedFormat ->
@@ -58,6 +52,7 @@ class DateTimeFormatActivity : BaseActivity<ActivityDateTimeFormatBinding>(
     @SuppressLint("NotifyDataSetChanged")
     private fun setupTimeRecycleView() {
         val listTimeExample = TIME_FORMATS
+        listTimeExample.forEach { it.isSelected = false }
         val currentTimeFormat =
             SharePrefManager.getString(TIME_FORMAT_KEY, listTimeExample[0].id)
         timeAdapter = FormatAdapter(listTimeExample) { selectedFormat ->
@@ -70,7 +65,6 @@ class DateTimeFormatActivity : BaseActivity<ActivityDateTimeFormatBinding>(
         initSelect?.isSelected = true
         binding.rcvTimeFormat.adapter = timeAdapter
     }
-
     private fun setupSaveButton() {
         binding.btnCheck.setOnClickListener {
 

@@ -41,7 +41,7 @@ class TravelTemplateV5(context: Context?, attrs: AttributeSet?) : BaseCustomView
     }
     override fun updateVisibility(state: TemplateState) {
         with(binding) {
-            tvLocation.visibility = if (state.showLocation) VISIBLE else GONE
+            llLocation.visibility = if (state.showLocation) VISIBLE else GONE
             tvDate.visibility = if (state.showDate) VISIBLE else GONE
             tvTime.visibility = if (state.showTime) VISIBLE else GONE
             tvTemperature.visibility = if (state.showTemperature) VISIBLE else GONE

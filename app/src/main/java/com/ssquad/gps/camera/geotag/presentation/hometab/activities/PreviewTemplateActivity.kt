@@ -104,10 +104,10 @@ class PreviewTemplateActivity : BaseActivity<ActivityPreviewTemplateBinding>(
     }
 
     override fun initActionView() {
-        binding.ivBack.setOnClickListener {
+        binding.btnBack.setOnClickListener {
             finish()
         }
-        binding.ivDone.setOnClickListener {
+        binding.btnCheck.setOnClickListener {
             val selectedTemplate = detailTemplateAdapter.currentList.find { it.isSelected }
             selectedTemplate?.let {
                 SharePrefManager.setDefaultTemplate(it.id)
@@ -115,7 +115,6 @@ class PreviewTemplateActivity : BaseActivity<ActivityPreviewTemplateBinding>(
                     putExtra("SELECTED_TEMPLATE_ID", it.id)
                 }
                 setResult(RESULT_OK, resultIntent)
-                // This will return to previous activity with the selected template ID
                 finish()
             }
         }

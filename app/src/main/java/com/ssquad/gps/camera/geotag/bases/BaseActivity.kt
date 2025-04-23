@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.viewbinding.ViewBinding
 
 abstract class BaseActivity<viewBinding : ViewBinding>(val inflater :(LayoutInflater) -> viewBinding) : AppCompatActivity() {

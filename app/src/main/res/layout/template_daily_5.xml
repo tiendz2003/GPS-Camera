@@ -7,7 +7,19 @@
     android:layout_height="wrap_content"
     android:background="@drawable/bg_border_daily_5"
     android:layout_margin="16dp">
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineTop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="0dp" />
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineBottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="50dp" />
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imv_center"
         android:layout_width="0dp"
@@ -25,91 +37,77 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="8dp"
-        android:layout_marginTop="16dp"
-        android:textSize="18sp"
+        android:layout_marginTop="8dp"
         android:textColor="@color/white"
-        app:layout_constraintEnd_toStartOf="@id/imv_center"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@id/guidelineBottom"
+        app:layout_constraintEnd_toStartOf="@+id/imv_center"
+        app:layout_constraintTop_toTopOf="@+id/guidelineTop"
         tools:text="UNITED STATES" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_address"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginStart="4dp"
         android:ellipsize="end"
         android:maxLines="2"
         android:textSize="12sp"
         android:textColor="@color/white"
         app:layout_constraintEnd_toStartOf="@id/imv_center"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_city"
+        app:layout_constraintTop_toBottomOf="@id/guidelineBottom"
         tools:text="sd kjsfadb kjfasj hjksdfb jksd ksd jks" />
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/ll_lat_long"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_date"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
-        android:layout_marginTop="16dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/imv_center"
-        app:layout_constraintTop_toTopOf="parent">
-
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_date"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_weight="1"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            tools:text="Friday, 05 Jan 2024" />
-    </androidx.appcompat.widget.LinearLayoutCompat>
+        android:layout_marginTop="8dp"
+        android:layout_weight="1"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/guidelineBottom"
+        app:layout_constraintStart_toEndOf="@+id/imv_center"
+        app:layout_constraintTop_toTopOf="@id/guidelineTop"
+        tools:text="Friday, 05 Jan 2024" />
 
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/ll_temp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
-        android:layout_marginTop="8dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.6"
         app:layout_constraintStart_toEndOf="@id/imv_center"
-        app:layout_constraintTop_toBottomOf="@id/ll_lat_long">
+        app:layout_constraintTop_toBottomOf="@id/guidelineBottom">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
             android:maxLines="1"
-            android:textSize="18sp"
             android:textColor="@color/white"
+            android:textSize="14sp"
             app:autoSizeTextType="uniform"
             tools:text="@string/time" />
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="14dp"
-            android:layout_height="14dp"
-            android:layout_marginStart="4dp"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="1dp"
             android:src="@drawable/ic_snow_daily" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="1dp"
             android:maxLines="1"
-            android:textSize="18sp"
             android:textColor="@color/white"
+            android:textSize="14sp"
             app:autoSizeTextType="uniform"
             tools:text="@string/temperature" />
     </androidx.appcompat.widget.LinearLayoutCompat>

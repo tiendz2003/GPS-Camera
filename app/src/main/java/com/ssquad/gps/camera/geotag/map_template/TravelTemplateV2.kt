@@ -40,7 +40,7 @@ class TravelTemplateV2(context: Context?, attrs: AttributeSet?) : BaseCustomView
     }
     override fun updateVisibility(state: TemplateState) {
         with(binding){
-            tvLocation.visibility = if (state.showLocation) VISIBLE else GONE
+            llLoveLocation.visibility = if (state.showLocation) VISIBLE else GONE
             tvDate.visibility = if (state.showDate) VISIBLE else GONE
             tvTime.visibility = if (state.showTime) VISIBLE else GONE
         }

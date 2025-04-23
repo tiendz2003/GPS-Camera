@@ -34,7 +34,7 @@
             android:singleLine="true"
             android:text="@string/saved_img"
             android:textColor="@color/black"
-            android:textSize="25sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/btn_arrange"
@@ -45,6 +45,44 @@
             android:background="@color/white"
             />
     </RelativeLayout>
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/llTakePhoto"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutToolbar">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnTakePhoto"
+            style="@style/medium_500"
+            android:layout_width="106dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/rounded_blue_button"
+            android:gravity="center"
+            android:text="@string/take_photo"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/btnCancel" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="@string/content_take_photo"
+            android:textSize="12sp"
+            app:layout_constraintTop_toBottomOf="@+id/banner" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcvImage"
         android:layout_width="match_parent"

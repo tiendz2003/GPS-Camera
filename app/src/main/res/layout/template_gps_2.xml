@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:padding="8dp">
 
-        <com.google.android.material.imageview.ShapeableImageView
+        <ImageView
             android:id="@+id/imv_map"
             android:layout_width="0dp"
             android:layout_height="100dp"
@@ -39,8 +39,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/circleImageView" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cl_content"
@@ -56,7 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.35" />
+                app:layout_constraintGuide_percent="0.4" />
 
             <LinearLayout
                 android:id="@+id/ll_lat"
@@ -64,6 +63,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:orientation="vertical"
+                android:layout_marginBottom="8dp"
                 app:layout_constraintEnd_toEndOf="@id/line2"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -82,7 +82,7 @@
                     android:layout_height="wrap_content"
                     android:text="15.154N"
                     style="@style/aboreto_style"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     />
             </LinearLayout>
 
@@ -90,7 +90,7 @@
                 android:id="@+id/ll_long"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="12dp"
                 android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@id/line2"
@@ -98,18 +98,18 @@
 
                 <TextView
                     android:id="@+id/tv_long_label"
+                    style="@style/jakarta_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/longitude"
-                    style="@style/jakarta_style" />
+                    android:text="@string/longitude" />
 
                 <TextView
                     android:id="@+id/tv_long_value"
+                    style="@style/aboreto_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="107.123E"
-                    style="@style/aboreto_style"
-                    android:textSize="18sp" />
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -117,7 +117,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
                 style="@style/jakarta_style"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/ll_lat"

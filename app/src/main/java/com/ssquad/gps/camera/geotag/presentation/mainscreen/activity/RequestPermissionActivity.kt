@@ -127,7 +127,6 @@ class RequestPermissionActivity :
     }
 
     override fun initActionView() {
-        TODO("Not yet implemented")
     }
     override fun onResume() {
         super.onResume()

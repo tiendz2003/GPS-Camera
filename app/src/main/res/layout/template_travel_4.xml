@@ -5,8 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_rounded_background"
-    android:layout_margin="8dp"
-    android:padding="16dp">
+    android:layout_marginHorizontal="48dp"
+    android:layout_marginBottom="24dp"
+    android:padding="8dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerGroup"
@@ -86,13 +87,14 @@
         android:layout_marginTop="8dp"
         android:text="12:00 PM"
         style="@style/abhaya_style"
-        android:textSize="32sp"
+        android:textSize="36sp"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/divider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <LinearLayout
+        android:id="@+id/llLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -115,6 +117,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:text="New York, United States"
+            android:textSize="22sp"
             style="@style/rasa_style" />
     </LinearLayout>
 

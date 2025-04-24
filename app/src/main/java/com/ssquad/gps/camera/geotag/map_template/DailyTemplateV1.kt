@@ -8,6 +8,7 @@ import com.ssquad.gps.camera.geotag.bases.BaseCustomView
 import com.ssquad.gps.camera.geotag.data.models.TemplateDataModel
 import com.ssquad.gps.camera.geotag.data.models.TemplateState
 import com.ssquad.gps.camera.geotag.databinding.TemplateDaily1Binding
+import com.ssquad.gps.camera.geotag.utils.getFormattedTemperature
 import com.ssquad.gps.camera.geotag.utils.underline
 
 class DailyTemplateV1(context: Context?, attrs: AttributeSet?) : BaseCustomView(context, attrs) {
@@ -36,7 +37,7 @@ class DailyTemplateV1(context: Context?, attrs: AttributeSet?) : BaseCustomView(
             tvLocation.underline()
             tvDate.text = data.currentDate
             tvTime.text = data.currentTime
-            tvTemperature.text = data.temperature
+            tvTemperature.text = data.getFormattedTemperature()
         }
     }
 

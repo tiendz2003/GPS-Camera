@@ -7,6 +7,7 @@ import androidx.core.content.edit
 import com.google.android.gms.maps.GoogleMap
 import com.google.gson.Gson
 import com.ssquad.gps.camera.geotag.BuildConfig
+import com.ssquad.gps.camera.geotag.utils.Constants.CACHED_LOCATION
 import com.ssquad.gps.camera.geotag.utils.Constants.CACHED_LOCATION_LAT
 import com.ssquad.gps.camera.geotag.utils.Constants.CACHED_LOCATION_LNG
 
@@ -23,7 +24,7 @@ object SharePrefManager {
         sharePreferences = application.getSharedPreferences(SHARE_PREFERENCES_NAME, Context.MODE_PRIVATE)
     }
 
-    private fun getPreferences(): SharedPreferences {
+    fun getPreferences(): SharedPreferences {
         return sharePreferences
             ?: throw IllegalStateException("Chưa khởi tạo SharePrefManager")
     }
@@ -60,22 +61,24 @@ object SharePrefManager {
     }
 
 
-    fun saveCachedCoordinates(latitude: Double, longitude: Double) {
+    fun saveCachedCoordinates(latitude: Double, longitude: Double,location:String) {
         getPreferences().edit {
             putFloat(CACHED_LOCATION_LAT, latitude.toFloat())
             putFloat(CACHED_LOCATION_LNG, longitude.toFloat())
+            SharePrefManager.putString(CACHED_LOCATION,location)
         }
     }
 
-    fun getCachedCoordinates(): Pair<Double, Double>? {
+    fun getCachedCoordinates(): Triple<Double, Double,String>? {
         val prefs = getPreferences()
-        if (!prefs.contains(CACHED_LOCATION_LAT) || !prefs.contains(CACHED_LOCATION_LNG)) {
+        if (!prefs.contains(CACHED_LOCATION_LAT) || !prefs.contains(CACHED_LOCATION_LNG) || !prefs.contains(CACHED_LOCATION)) {
             return null
         }
 
         val lat = prefs.getFloat(CACHED_LOCATION_LAT, 0f).toDouble()
         val lng = prefs.getFloat(CACHED_LOCATION_LNG, 0f).toDouble()
-        return Pair(lat, lng)
+        val location = prefs.getString(CACHED_LOCATION, null) ?: return null
+        return Triple(lat, lng,location)
     }
     fun getString(key: String, defaultValue: Any? = null): String? {
         return when (defaultValue) {

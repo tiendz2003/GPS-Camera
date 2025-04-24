@@ -96,9 +96,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         }
     }
     private fun navToPreview(selectedTemplate: ThemeTemplateModel) {
+        // Cập nhật trạng thái isSelected trong danh sách gốc
+        listTheme.forEach { it.isSelected = it.id == selectedTemplate.id }
+
         val themeType = selectedTemplate.type
-        val filterList = ThemeTemplateModel.getTemplate().filter { it.type == themeType } as ArrayList<ThemeTemplateModel>
-        val intent = PreviewTemplateActivity.getIntent(requireContext(), selectedTemplate, filterList,themeType)
+        val filterList = listTheme.filter { it.type == themeType } as ArrayList<ThemeTemplateModel>
+        val intent = PreviewTemplateActivity.getIntent(requireContext(), selectedTemplate, filterList, themeType)
         startActivity(intent)
     }
 

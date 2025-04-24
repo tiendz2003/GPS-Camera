@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 class PreviewShareViewModel(
     private val cameraRepository: CameraRepository,
 ) : ViewModel() {
-    private val _previewUiState = MutableStateFlow<PreviewState>(PreviewState())
+    private val _previewUiState = MutableStateFlow(PreviewState())
     val previewUiState = _previewUiState.asStateFlow()
 
     private val _toastEvents = Channel<String>(Channel.BUFFERED)
@@ -85,5 +85,6 @@ class PreviewShareViewModel(
             }
         }
     }
+
 
 }

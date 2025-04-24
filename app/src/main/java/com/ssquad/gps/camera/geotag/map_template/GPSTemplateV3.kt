@@ -12,6 +12,7 @@ import com.ssquad.gps.camera.geotag.data.models.TemplateDataModel
 import com.ssquad.gps.camera.geotag.data.models.TemplateState
 import com.ssquad.gps.camera.geotag.databinding.TemplateGps3Binding
 import com.ssquad.gps.camera.geotag.utils.formatCoordinate
+import com.ssquad.gps.camera.geotag.utils.getFormattedTemperature
 import com.ssquad.gps.camera.geotag.utils.loadImageIcon
 
 class GPSTemplateV3(context: Context?, attrs: AttributeSet?) : BaseCustomView(context, attrs) {
@@ -40,7 +41,7 @@ class GPSTemplateV3(context: Context?, attrs: AttributeSet?) : BaseCustomView(co
             tvLocation.text = data.location
             tvLatitude.text = "Latitude:${data.lat?.formatCoordinate()}"
             tvLongitude.text = "Longitude:${data.long?.formatCoordinate()}"
-            tvTemp.text= data.temperature
+            tvTemp.text= data.getFormattedTemperature()
             tvDate.text = data.currentDate
             state?.let {
                 updateVisibility(it)

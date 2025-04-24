@@ -9,6 +9,7 @@ import com.ssquad.gps.camera.geotag.bases.BaseCustomView
 import com.ssquad.gps.camera.geotag.data.models.TemplateDataModel
 import com.ssquad.gps.camera.geotag.data.models.TemplateState
 import com.ssquad.gps.camera.geotag.databinding.TemplateTravel1Binding
+import com.ssquad.gps.camera.geotag.utils.getFormattedTemperature
 
 class TravelTemplateV1(context: Context?, attrs: AttributeSet?) : BaseCustomView(context, attrs) {
 
@@ -32,7 +33,7 @@ class TravelTemplateV1(context: Context?, attrs: AttributeSet?) : BaseCustomView
         with(binding){
             tvDate.text = data.currentDate
             tvLocation.text = data.location
-            tvTemperature.text = data.temperature
+            tvTemperature.text = data.getFormattedTemperature()
             templateState?.let {
                 updateVisibility(it)
             }

@@ -91,6 +91,7 @@ class CameraViewModel(
 
     override fun onCleared() {
         super.onCleared()
+        cacheDataTemplate.cleanup()
         cleanupCamera()
         cameraExecutor.shutdown()
     }
@@ -493,7 +494,8 @@ class CameraViewModel(
                             location = cacheData.location,
                             lat = cacheData.lat,
                             long = cacheData.long,
-                            temperature = cacheData.temperature,
+                            temperatureC = cacheData.temperatureC,
+                            temperatureF = cacheData.temperatureF,
                             currentTime = now.formatToTime(),
                             currentDate = now.formatToDate()
                         )
@@ -507,7 +509,8 @@ class CameraViewModel(
                     var location: String? = null
                     var lat: String? = null
                     var lon: String? = null
-                    var temperature: String? = null
+                    var temperatureC: Float? = null
+                    var temperatureF: Float? = null
 
                     val locationResult = locationRepository.getCurrentLocation()
 
@@ -526,24 +529,19 @@ class CameraViewModel(
                             val addressDeferred = async {
                                 locationRepository.getAddressFromLocation(currentLocation)
                             }
-                            val tempDeferred = async {
-                                weatherRepository.getCurrentTemp(currentLocation)
-                            }
-
+                            val fakeTempResult = weatherRepository.getFakeTemp()
+                            val tempResult = weatherRepository.getCurrentTemp(currentLocation)
                             val addressResult = addressDeferred.await()
                             if (addressResult is LocationResult.Address) {
                                 location = addressResult.address
                             }
 
-                            val tempResult = tempDeferred.await()
-                            if (tempResult is Resource.Success) {
-                                temperature = tempResult.data
-                            } else {
-                                val fakeTemp = weatherRepository.getFakeTemp()
-                                if (fakeTemp is Resource.Success) {
-                                    temperature = fakeTemp.data
-                                }
-                            }
+                            val tempPair = (if(tempResult is Resource.Success) tempResult.data else null)
+                                ?: (if(fakeTempResult is Resource.Success) fakeTempResult.data else null)
+                                ?: Pair(null, null)
+
+                            temperatureC = tempPair.first
+                            temperatureF = tempPair.second
                         }
 
                         else -> {
@@ -558,7 +556,8 @@ class CameraViewModel(
                                 location = location,
                                 lat = lat,
                                 long = lon,
-                                temperature = temperature,
+                                temperatureC = temperatureC,
+                                temperatureF = temperatureF,
                                 currentTime = now.formatToTime(),
                                 currentDate = now.formatToDate()
                             )

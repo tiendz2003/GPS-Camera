@@ -11,6 +11,7 @@ import com.ssquad.gps.camera.geotag.bases.BaseCustomView
 import com.ssquad.gps.camera.geotag.data.models.TemplateDataModel
 import com.ssquad.gps.camera.geotag.data.models.TemplateState
 import com.ssquad.gps.camera.geotag.databinding.TemplateGps1Binding
+import com.ssquad.gps.camera.geotag.utils.getFormattedTemperature
 import com.ssquad.gps.camera.geotag.utils.loadImageIcon
 
 class GPSTemplateV1(context: Context?, attrs: AttributeSet?) : BaseCustomView(context, attrs) {
@@ -37,7 +38,7 @@ class GPSTemplateV1(context: Context?, attrs: AttributeSet?) : BaseCustomView(co
         val city = part?.get(0)
         with(binding) {
             tvDate.text = data.currentDate
-            tvTemp.text = data.temperature
+            tvTemp.text = data.getFormattedTemperature()
             tvCity.text = city
             tvAddress.text = data.location
             templateState?.let {

@@ -10,6 +10,8 @@ import com.ssquad.gps.camera.geotag.data.models.SortOption
 import com.ssquad.gps.camera.geotag.data.models.TemplateDataModel
 import com.ssquad.gps.camera.geotag.domain.MediaRepository
 import com.ssquad.gps.camera.geotag.utils.Resource
+import com.ssquad.gps.camera.geotag.utils.SharePrefManager
+import com.ssquad.gps.camera.geotag.utils.formatCoordinate
 import com.ssquad.gps.camera.geotag.utils.formatToDate
 import com.ssquad.gps.camera.geotag.utils.formatToTime
 import com.ssquad.gps.camera.geotag.worker.CacheDataTemplate
@@ -59,7 +61,7 @@ class PhotosViewModel(
                 }
             } catch (e: Exception) {
                 Log.e("EditAlbumLibraryActivity", "Error: ${e.message}")
-                _photos.value = Resource.Error("Không tải được: " + e.message.toString())
+                _photos.value = Resource.Error("Unable to load photos from album")
             }
         }
     }
@@ -103,20 +105,31 @@ class PhotosViewModel(
         val now = Date()
         if (cacheDataTemplate.isCacheValid()) {
             cacheDataTemplate.templateData.value?.let {
-                Log.d("PhotosViewModel", "getCacheDataTemplate: $it")
+                val (lat, long, location) = SharePrefManager.getCachedCoordinates()
+                    ?: Triple(it.lat?.toDouble(), it.long?.toDouble(), it.location)
+
                 _cacheData.value = TemplateDataModel(
-                    location = it.location,
-                    lat = it.lat,
-                    long = it.long,
-                    temperature = it.temperature,
+                    location = location,
+                    lat = lat.toString(),
+                    long = long.toString(),
+                    temperatureC = it.temperatureC,
+                    temperatureF = it.temperatureF,
                     currentTime = now.formatToTime(),
                     currentDate = now.formatToDate()
                 )
+
+                Log.d("PhotosViewModel", "getCacheDataTemplate: $it")
             }
         }
     }
 
+
     fun selectedPhoto(photo: Photo) {
         _selectedPhoto.value = photo
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        cacheDataTemplate.cleanup()
     }
 }

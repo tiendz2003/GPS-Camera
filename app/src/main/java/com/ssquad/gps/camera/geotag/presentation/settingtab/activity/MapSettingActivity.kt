@@ -2,6 +2,7 @@ package com.ssquad.gps.camera.geotag.presentation.settingtab.activity
 
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.fragment.app.DialogFragment
@@ -53,12 +54,21 @@ class MapSettingActivity :
                 }
             }
             btnCheck.setOnClickListener {
-                val currentLocation = mapSettingViewModel.mapSettingState.value.currentLocation
-                currentLocation?.let { location ->
-                    SharePrefManager.saveCachedCoordinates(location.latitude, location.longitude)
+                val currentCoordinate = mapSettingViewModel.mapSettingState.value.currentLocation
+                val currentLocation = mapSettingViewModel.mapSettingState.value.currentAddress
+                if (currentCoordinate != null && currentLocation != null) {
+                    Log.d(
+                        "MapSettingActivity",
+                        "Selected location: ${currentCoordinate.latitude}, ${currentCoordinate.longitude}"
+                    )
+                    SharePrefManager.saveCachedCoordinates(
+                        currentCoordinate.latitude,
+                        currentCoordinate.longitude,
+                        currentLocation
+                    )
                     showToast(getString(R.string.location_saved_successfully))
                     finish()
-                } ?: run {
+                } else {
                     showToast(getString(R.string.no_location_selected))
                 }
             }
@@ -100,7 +110,8 @@ class MapSettingActivity :
         val currentAddress = if (isLoading) {
             getString(R.string.loading_address)
         } else {
-            mapSettingViewModel.mapSettingState.value.currentAddress ?: getString(R.string.loading_address)
+            mapSettingViewModel.mapSettingState.value.currentAddress
+                ?: getString(R.string.loading_address)
         }
 
         // Đóng tất cả các bottom sheet cũ
@@ -115,7 +126,8 @@ class MapSettingActivity :
             currentLocationSheet?.updateLocationInfo(location, currentAddress, isLoading)
         } else {
             // Tạo bottom sheet mới nếu chưa có
-            currentLocationSheet = CurrentLocationSheet.newInstance(location, currentAddress, isLoading)
+            currentLocationSheet =
+                CurrentLocationSheet.newInstance(location, currentAddress, isLoading)
             currentLocationSheet?.show(supportFragmentManager, "location_sheet")
         }
     }

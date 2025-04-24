@@ -20,11 +20,6 @@ class EditAlbumLibraryActivity : BaseActivity<ActivityAlbumLibraryBinding>(
     private val albumsViewModel: AlbumViewModel by viewModel()
     private lateinit var adapter: EditAlbumAdapter
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
-
     override fun initData() {
     }
 

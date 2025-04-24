@@ -10,4 +10,5 @@ object Constants {
     const val IS_VIDEO = "IS_VIDEO"
     const val CACHED_LOCATION_LAT = "cached_location_latitude"
     const val CACHED_LOCATION_LNG = "cached_location_longitude"
+    const val CACHED_LOCATION = "cached_location"
 }

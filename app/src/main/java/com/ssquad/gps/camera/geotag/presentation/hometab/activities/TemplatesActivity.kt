@@ -100,8 +100,9 @@ class TemplatesActivity :
         }
     }
     private fun navToPreview(selectedTemplate: ThemeTemplateModel) {
+        listTheme.forEach { it.isSelected = it.id == selectedTemplate.id }
         val themeType = selectedTemplate.type
-        val filterList = ThemeTemplateModel.getTemplate().filter { it.type == themeType } as ArrayList<ThemeTemplateModel>
+        val filterList = listTheme.filter { it.type == themeType } as ArrayList<ThemeTemplateModel>
         val intent = PreviewTemplateActivity.Companion.getIntent(this, selectedTemplate, filterList, themeType)
         // Use registerForActivityResult to handle the result
         previewActivityLauncher.launch(intent)

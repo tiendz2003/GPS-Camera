@@ -85,7 +85,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(FragmentSettingsB
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage)
         reqNavigate.launch(Intent.createChooser(shareIntent, getString(R.string.share_to)))
     }
-    fun openAppRating(context: Context) {
+    private fun openAppRating(context: Context) {
         val packageName = context.packageName
         try {
             val intent = Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri())

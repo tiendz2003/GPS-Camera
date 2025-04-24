@@ -14,16 +14,14 @@ import java.util.Locale
 
 class LoadDataTemplateWorker(
     context: Context,
-    params:WorkerParameters,
-    private val weatherRepository:WeatherRepository,
-    private val locationRepository:MapLocationRepository,
+    params: WorkerParameters,
+    private val weatherRepository: WeatherRepository,
+    private val locationRepository: MapLocationRepository,
     private val cacheDataTemplate: CacheDataTemplate
-) :CoroutineWorker(context,params) {
+) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         try {
-
             val locationResult = locationRepository.getCurrentLocation()
-
 
             if(locationResult is LocationResult.Success){
                 val currentLocation = locationResult.location
@@ -31,30 +29,30 @@ class LoadDataTemplateWorker(
                 val lon = String.format(Locale.getDefault(), "%.6f", currentLocation.longitude)
                 val addressResult = locationRepository.getAddressFromLocation(currentLocation)
                 val tempResult = weatherRepository.getCurrentTemp(currentLocation)
+                val fakeTempResult = weatherRepository.getFakeTemp()
+
                 val location = if(addressResult is LocationResult.Address){
                     addressResult.address
                 }else{
                     null
                 }
-                val temperature = if(tempResult is Resource.Success){
-                    tempResult.data
-                }else{
-                    val fakeTempResult = weatherRepository.getFakeTemp()
-                    if(fakeTempResult is Resource.Success) {
-                        fakeTempResult.data
-                    }else{
-                        null
-                    }
-                }
+
+                val tempPair = (if(tempResult is Resource.Success) tempResult.data else null)
+                    ?: (if(fakeTempResult is Resource.Success) fakeTempResult.data else null)
+                    ?: Pair(null, null)
+
+                val tempC = tempPair.first
+                val tempF = tempPair.second
+
                 cacheDataTemplate.updateData(
                     TemplateDataModel(
                         location = location?:"Loading...",
                         lat = lat,
                         long = lon,
-                        temperature = temperature,
+                        temperatureC = tempC,
+                        temperatureF = tempF,
                     )
                 )
-
             }
             return Result.success()
         } catch (e: Exception) {
@@ -66,7 +64,7 @@ class LoadDataTemplateWorker(
         private val weatherRepository: WeatherRepository,
         private val locationRepository: MapLocationRepository,
         private val cacheDataTemplate: CacheDataTemplate
-    ) :WorkerFactory() {
+    ) : WorkerFactory() {
         override fun createWorker(
             appContext: Context,
             workerClassName: String,
@@ -80,7 +78,7 @@ class LoadDataTemplateWorker(
                     locationRepository,
                     cacheDataTemplate
                 )
-            }else{
+            } else {
                 null
             }
         }

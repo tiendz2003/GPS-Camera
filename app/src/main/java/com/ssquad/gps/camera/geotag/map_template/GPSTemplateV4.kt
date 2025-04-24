@@ -11,6 +11,7 @@ import com.ssquad.gps.camera.geotag.bases.BaseCustomView
 import com.ssquad.gps.camera.geotag.data.models.TemplateDataModel
 import com.ssquad.gps.camera.geotag.data.models.TemplateState
 import com.ssquad.gps.camera.geotag.databinding.TemplateGps4Binding
+import com.ssquad.gps.camera.geotag.utils.getFormattedTemperature
 import com.ssquad.gps.camera.geotag.utils.loadImageIcon
 
 class GPSTemplateV4(context: Context?, attrs: AttributeSet?) : BaseCustomView(context, attrs) {
@@ -38,7 +39,7 @@ class GPSTemplateV4(context: Context?, attrs: AttributeSet?) : BaseCustomView(co
             tvLocationTitle.text = city
             tvLocationAddress.text = data.location
             tvDate.text = data.currentDate
-            tvTemperature.text = data.temperature
+            tvTemperature.text = data.getFormattedTemperature()
             templateState?.let {
                 updateVisibility(it)
             }

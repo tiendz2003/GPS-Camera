@@ -36,13 +36,14 @@
         android:id="@+id/tvTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="1:23 PM"
         android:fontFamily="@font/plusjakartasans"
-        android:textSize="26sp"
+        android:text="1:23 PM"
         android:textColor="@android:color/white"
+        android:textSize="28sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="@id/guidelineTop"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/guidelineBottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guidelineTop" />
 
     <TextView
         android:id="@+id/tvTemperature"
@@ -53,25 +54,20 @@
         style="@style/jakarta_style"
         app:layout_constraintTop_toTopOf="@id/guidelineBottom"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="8dp" />
 
-    <ImageView
-        android:id="@+id/ivWeatherIcon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginStart="8dp"
-        android:src="@drawable/ic_cloud_daily"
-        app:layout_constraintTop_toTopOf="@id/tvTemperature"
-        app:layout_constraintStart_toEndOf="@id/tvTemperature" />
+
 
     <TextView
         android:id="@+id/tvWeatherCondition"
+        style="@style/jakarta_style"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Clouds"
-        style="@style/jakarta_style"
-        app:layout_constraintTop_toTopOf="@id/ivWeatherIcon"
-        app:layout_constraintStart_toEndOf="@id/ivWeatherIcon"  />
+        android:layout_marginStart="4dp"
+        app:drawableStartCompat="@drawable/ic_cloud_daily"
+        app:layout_constraintStart_toEndOf="@+id/tvTemperature"
+        app:layout_constraintTop_toTopOf="@+id/tvTemperature" />
 
     <TextView
         android:id="@+id/tvDate"
@@ -81,6 +77,6 @@
         style="@style/jakarta_style"
         app:layout_constraintTop_toTopOf="@id/guidelineBottom"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="8dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,8 +9,8 @@
 
     <ImageView
         android:id="@+id/tvTimeToTravel"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:layout_marginStart="24dp"
         android:layout_marginBottom="12dp"
         android:src="@drawable/ic_time_to_travel"
@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
             android:text="02:50 PM"
-            android:textSize="28sp"
+            android:textSize="32sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/layoutWeather"
             app:layout_constraintHorizontal_chainStyle="packed"
@@ -71,8 +71,8 @@
 
         <ImageView
             android:id="@+id/ivSun"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:layout_gravity="center_horizontal"
             android:contentDescription="Sun"
             android:src="@drawable/ic_sun" />
@@ -112,7 +112,7 @@
             style="@style/red_rose_style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="25sp"
+            android:textSize="26sp"
             android:text="New York, United States" />
     </LinearLayout>
 

@@ -47,11 +47,12 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
     private var mapSnapshotJob: Job? = null
     private var mapBitmap : Bitmap? = null
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding.mapView.onCreate(savedInstanceState)
         mapManager = MapManager(this, lifecycle, binding.mapView)
-        mapManager.setOnMapReadyCallback { map ->
+        mapManager.setOnMapReadyCallback {
             templateData?.let { data ->
                 if (isGPSTemplate()) {
                     loadMapImage(data)
@@ -79,7 +80,7 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
             if (bitmap != null) {
                 displayImageWithTemplate(bitmap, templateData, templateId)
             } else {
-                Toast.makeText(this, "Error receiving photo", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.error_receiving_photo), Toast.LENGTH_SHORT).show()
                 finish()
             }
         }
@@ -328,6 +329,5 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
         override fun getItemCount(): Int {
             return 2
         }
-
     }
 }

@@ -38,13 +38,10 @@
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:textAllCaps="true"
-            android:textSize="24sp"
-            app:autoSizeMaxTextSize="24dp"
-            app:autoSizeMinTextSize="16dp"
+            android:textSize="28sp"
             android:fontFamily="@font/nunito_sans_semi_bold"
             app:autoSizeTextType="uniform"
             android:textColor="@color/white"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="HA NOI" />
@@ -68,7 +65,7 @@
             android:layout_marginTop="6dp"
             android:textColor="@color/white"
             android:fontFamily="@font/nunito_sans_semi_bold"
-            android:textSize="12sp"
+            android:textSize="16sp"
             app:layout_constraintTop_toBottomOf="@id/tv_address"
             tools:text="Friday, 05 JAN 2024" />
 
@@ -100,8 +97,6 @@
                 android:maxLines="1"
                 android:textAllCaps="true"
                 style="@style/jakarta_style"
-                app:autoSizeMaxTextSize="14sp"
-                app:autoSizeMinTextSize="10sp"
                 app:autoSizeTextType="uniform"
                 tools:text="@string/temperature" />
         </androidx.appcompat.widget.LinearLayoutCompat>

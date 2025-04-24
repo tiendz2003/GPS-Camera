@@ -46,7 +46,8 @@ data class TemplateDataModel(
     val location: String? = null,
     val lat: String? = null,
     val long: String? = null,
-    val temperature: String? = null,
+    val temperatureC: Float? = null,
+    val temperatureF: Float? = null,
     val currentTime: String? = null,
     val currentDate: String? = null
 ) : Parcelable

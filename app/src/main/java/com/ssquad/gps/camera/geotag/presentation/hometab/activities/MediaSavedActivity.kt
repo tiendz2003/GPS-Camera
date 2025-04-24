@@ -172,7 +172,8 @@ class MediaSavedActivity :
                 }
 
                 is Resource.Error -> {
-                    Toast.makeText(this, resource.message, Toast.LENGTH_LONG).show()
+                    Toast.makeText(this,
+                        getString(R.string.unable_to_load_photos_from_album), Toast.LENGTH_LONG).show()
                     binding.llTakePhoto.visible()
                     binding.rcvImage.gone()
                 }

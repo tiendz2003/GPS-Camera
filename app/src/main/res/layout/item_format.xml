@@ -13,22 +13,21 @@
         android:text="MM/dd/yyyy"
         android:textColor="@android:color/black"
         android:textSize="18sp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/radioButton"
+        app:layout_constraintEnd_toStartOf="@+id/imgRadio"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.AppCompatRadioButton
-        android:id="@+id/radioButton"
+    <ImageView
+        android:id="@+id/imgRadio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:scaleX="1.3"
-        android:scaleY="1.3"
-        android:clickable="false"
-        style="@style/CustomRadioButton"
+        android:src="@drawable/ic_unchecked_language"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />
+
 
     <View
         android:layout_width="match_parent"

@@ -74,7 +74,6 @@ class CameraRepositoryImpl : CameraRepository {
                 val fileName = "GPS_CAMERA_${
                     SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
                 }.mp4"
-
                     Log.d("VideoProcessor", "Saving video)")
                     var outputStream: OutputStream? = null
                     var videoUri: Uri? = null

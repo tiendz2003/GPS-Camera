@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GPS Camera: Geotag Photos</string>
+    <string name="app_name">GPS Camera: \nGeotag Photos</string>
 
     <string name="admob_app_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
     <string name="fb_app_id" translatable="false"></string>
@@ -143,5 +143,7 @@
     <string name="version">Version</string>
     <string name="template">Template</string>
     <string name="unknown_album">Unknown Album</string>
-
+    <string name="loading_address">Loading address...</string>
+    <string name="location_saved_successfully">Location saved successfully</string>
+    <string name="no_location_selected">No location selected</string>
 </resources>

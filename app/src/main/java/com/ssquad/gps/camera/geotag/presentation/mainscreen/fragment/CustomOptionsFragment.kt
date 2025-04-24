@@ -39,7 +39,6 @@ class CustomOptionsFragment :
 
     private fun setupRecyclerView() {
         customOptionsAdapter = CustomOptionsAdapter { customTemplate, position ->
-
             customTemplate.isSelected = !customTemplate.isSelected
             customOptionsAdapter?.notifyItemChanged(position)
             val currentState = previewViewModel.previewUiState.value.templateState
@@ -75,15 +74,19 @@ class CustomOptionsFragment :
         }
     }
     private fun updateCustomState(state: TemplateState) {
-        customTemplateList.forEach { item ->
-            when (item.id) {
-                CustomTemplateConfig.LOCATION -> item.isSelected = state.showLocation
-                CustomTemplateConfig.LAT_LONG -> item.isSelected = state.showLatLong
-                CustomTemplateConfig.TIME -> item.isSelected = state.showTime
-                CustomTemplateConfig.DATE -> item.isSelected = state.showDate
+        val updatedList = customTemplateList.map { item ->
+            val isSelected = when (item.id) {
+                CustomTemplateConfig.LOCATION -> state.showLocation
+                CustomTemplateConfig.LAT_LONG -> state.showLatLong
+                CustomTemplateConfig.TIME -> state.showTime
+                CustomTemplateConfig.DATE -> state.showDate
+                else -> item.isSelected
             }
+            item.copy(isSelected = isSelected)
         }
-        customOptionsAdapter?.submitList(customTemplateList.toList())
 
+        customTemplateList = updatedList
+
+        customOptionsAdapter?.submitList(updatedList)
     }
 }

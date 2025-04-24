@@ -8,4 +8,6 @@ object Constants {
     const val LANGUAGE_POSITION = "LANGUAGE"
     const val RATE_STAR = "RATE_STAR"
     const val IS_VIDEO = "IS_VIDEO"
+    const val CACHED_LOCATION_LAT = "cached_location_latitude"
+    const val CACHED_LOCATION_LNG = "cached_location_longitude"
 }

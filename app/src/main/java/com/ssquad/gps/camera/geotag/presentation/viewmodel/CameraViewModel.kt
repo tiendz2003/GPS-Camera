@@ -11,6 +11,7 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
+import androidx.camera.core.TorchState
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.FileOutputOptions
 import androidx.camera.video.Quality
@@ -65,7 +66,7 @@ class CameraViewModel(
     val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
 
     private var cameraProvider: ProcessCameraProvider? = null
-    private var camera: Camera? = null
+    var camera: Camera? = null
     private var imageCapture: ImageCapture? = null
     private var videoCapture: VideoCapture<Recorder>? = null
     private var recording: Recording? = null
@@ -178,14 +179,16 @@ class CameraViewModel(
             else -> ImageCapture.FLASH_MODE_OFF
         }
         imageCapture?.flashMode = flashMode
-
         bindCameraUseCase(previewView, lifecycleOwner)
     }
 
     fun toggleFullScreen() {
         isFullScreen = !isFullScreen
     }
-
+    fun toggleFlashDuringRecording(){
+        val isTorchOn = camera?.cameraInfo?.torchState?.value == TorchState.ON
+        camera?.cameraControl?.enableTorch(!isTorchOn)
+    }
     fun toggleCameraMode() {
         isVideoMode = !isVideoMode
         updateCameraState {

@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".presentation.settingtab.activity.DateTimeFormatActivity"
-    android:paddingTop="12dp"
     >
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
@@ -41,8 +40,8 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/btnCheck"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:src="@drawable/ic_menu_check"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

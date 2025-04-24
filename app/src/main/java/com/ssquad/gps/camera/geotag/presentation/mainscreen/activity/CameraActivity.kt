@@ -12,6 +12,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
+import androidx.camera.core.TorchState
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -35,6 +36,9 @@ import com.ssquad.gps.camera.geotag.utils.visible
 import com.google.android.material.snackbar.Snackbar
 import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.databinding.ActivityCameraBinding
+import com.ssquad.gps.camera.geotag.presentation.hometab.activities.EditAlbumLibraryActivity
+import com.ssquad.gps.camera.geotag.utils.Constants
+import com.ssquad.gps.camera.geotag.utils.PermissionManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -56,6 +60,10 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                 }
             }
         }
+    private var reqNavigate =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+
+        }
     private val cameraViewModel: CameraViewModel by viewModel()
 
     private var templateId: String? = null
@@ -66,8 +74,8 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
     private var successSnackbar: Snackbar? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         startCamera()
+        observeTorchState()
         binding.mapView.onCreate(savedInstanceState)
         mapManager = MapManager(this, lifecycle, binding.mapView)
         mapManager.setOnMapReadyCallback {
@@ -164,6 +172,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                 if (cameraViewModel.isVideoMode()) {
                     binding.motionLayoutMode.transitionToState(R.id.photo_mode)
                     cameraViewModel.toggleCameraMode()
+                    cameraViewModel.toggleFlashDuringRecording()
                 }
             }
             tvOption.setOnClickListener {
@@ -172,15 +181,8 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                     binding.motionLayoutMode.transitionToState(R.id.video_mode)
                     cameraViewModel.toggleCameraMode()
                 }
-                if(cameraViewModel.getCurrentFlashMode() == ImageCapture.FLASH_MODE_ON){
-                    Toast.makeText(
-                        this@CameraActivity,
-                        getString(R.string.flash_not_available_in_video_mode),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    toggleFlashMode()
-                    updateFlashIcon(cameraViewModel.getCurrentFlashMode())
-                    return@setOnClickListener
+                if (cameraViewModel.getCurrentFlashMode() == ImageCapture.FLASH_MODE_ON || cameraViewModel.isVideoMode()) {
+                    cameraViewModel.toggleFlashDuringRecording()
                 }
             }
             imvTakeCapture.setOnClickListener {
@@ -192,26 +194,15 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                     takePicture()
                 }
             }
-            imvFlash.setOnClickListener {
-                if(cameraViewModel.isVideoMode()){
-                    Toast.makeText(
-                        this@CameraActivity,
-                        getString(R.string.flash_not_available_in_video_mode),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return@setOnClickListener
+            binding.imvFlash.setOnClickListener {
+                if (cameraViewModel.isVideoMode()) {
+                    cameraViewModel.toggleFlashDuringRecording()
+                } else {
+                    toggleFlashMode()
+                    updateFlashIcon(cameraViewModel.getCurrentFlashMode())
                 }
-                if (cameraViewModel.currentLensFacing() == CameraSelector.LENS_FACING_FRONT) {
-                    Toast.makeText(
-                        this@CameraActivity,
-                        getString(R.string.front_camera_does_not_support_flash),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return@setOnClickListener
-                }
-                toggleFlashMode()
-                updateFlashIcon(cameraViewModel.getCurrentFlashMode())
             }
+
             imvTimer.setOnClickListener {
                 setCountDownTimer()
             }
@@ -239,8 +230,23 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                 templateLauncher.launch(intent)
             }
             imvSelectImage.setOnClickListener {
-                val intent = MediaSavedActivity.getIntent(this@CameraActivity, false)
-                startActivity(intent)
+                if (PermissionManager.checkLibraryGranted(context = this@CameraActivity)) {
+                    reqNavigate.launch(
+                        Intent(
+                            this@CameraActivity,
+                            EditAlbumLibraryActivity::class.java
+                        )
+                    )
+                } else {
+                    Intent(this@CameraActivity, RequestPermissionActivity::class.java).apply {
+                        putExtra(
+                            Constants.INTENT_REQUEST_SINGLE_PERMISSION,
+                            RequestPermissionActivity.TYPE_GALLERY
+                        )
+                        putExtra(Constants.INTENT_LIBRARY_PERMISSION, true)
+                        reqNavigate.launch(this)
+                    }
+                }
             }
         }
     }
@@ -283,22 +289,43 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                     }
                     if (cameraState.showProcessingSnackbar) {
                         showProcessingSnackbar()
+                        disableCaptureButtons()
                     } else {
                         dismissProcessingSnackbar()
                     }
 
-                    // Handle success snackbar
                     if (cameraState.showSuccessSnackbar) {
                         showSuccessSnackbar()
+                        enableCaptureButtons()
                     }
                 }
             }
         }
     }
 
+    private fun observeTorchState() {
+        val torchState = cameraViewModel.camera?.cameraInfo?.torchState
+        if (torchState == null) {
+            Log.e("CameraActivity", "NULL ")
+            return
+        }
+
+        torchState.observe(this) { state ->
+            Log.d("CameraActivity", "observeTorchState: $state")
+            updateFlashIconDuringRecording(state == TorchState.ON)
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         cameraViewModel.getLastCaptureImage()
+        updateFlashIcon(cameraViewModel.getCurrentFlashMode()) // Cập nhật icon flash
+
+    }
+
+    private fun updateFlashIconDuringRecording(isTorchOn: Boolean) {
+        val flashIcon = if (isTorchOn) R.drawable.ic_flash_on else R.drawable.ic_flash_off
+        binding.imvFlash.setImageResource(flashIcon)
     }
 
     private fun navigateToPreviewImage(imgBitmap: Bitmap) {
@@ -511,6 +538,24 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                 message = getString(R.string.success),
             )
         successSnackbar?.show()
+    }
+
+    private fun disableCaptureButtons() {
+        binding.imvTakeCapture.isEnabled = false
+        binding.imvSwitchCamera.isEnabled = false
+        binding.imvFlash.isEnabled = false
+        binding.imvTimer.isEnabled = false
+        binding.imvSelectImage.isEnabled = false
+        binding.imvOpenTemplate.isEnabled = false
+    }
+
+    private fun enableCaptureButtons() {
+        binding.imvTakeCapture.isEnabled = true
+        binding.imvSwitchCamera.isEnabled = true
+        binding.imvFlash.isEnabled = true
+        binding.imvTimer.isEnabled = true
+        binding.imvSelectImage.isEnabled = true
+        binding.imvOpenTemplate.isEnabled = true
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

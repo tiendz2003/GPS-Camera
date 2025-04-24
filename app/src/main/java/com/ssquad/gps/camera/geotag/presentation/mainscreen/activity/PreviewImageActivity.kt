@@ -70,6 +70,7 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
         }
         if (isFromAlbum) {
             val uri = imgPath?.toUri()
+            Log.d("PreviewImageActivity", "uri: $uri")
             uri?.let {
                 displayEditImageWithTemplate(it, templateData, templateId)
             }

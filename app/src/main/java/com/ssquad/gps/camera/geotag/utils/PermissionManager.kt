@@ -17,6 +17,8 @@ import androidx.core.content.ContextCompat.startActivity
 import com.ssquad.gps.camera.geotag.R
 
 object PermissionManager {
+    private const val PREF_NAME = "permission_prefs"
+    private const val PREF_FIRST_TIME = "first_time"
     fun checkPermissionGranted(context: Context, permission: String): Boolean {
         return ContextCompat.checkSelfPermission(
             context,
@@ -64,7 +66,38 @@ object PermissionManager {
             )
         )
     }
+    fun checkLocationPermissions(context: Context): Boolean {
+        return checkPermissionsGranted(
+            context,
+            listOf(
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        )
+    }
 
+
+    /**
+     * Kiểm tra xem có nên hiển thị màn hình xin quyền hay không
+     * @return true nếu cần hiển thị màn hình xin quyền, false nếu không
+     */
+    fun shouldShowPermissionScreen(context: Context): Boolean {
+        val sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        val allPermissionsGranted = sharedPreferences.getBoolean(PREF_FIRST_TIME, false)
+
+        // Nếu đã cấp tất cả quyền thì không hiển thị màn hình xin quyền nữa
+        if (allPermissionsGranted) {
+            return false
+        }
+
+        // Kiểm tra xem có quyền nào chưa được cấp không
+        val cameraGranted = PermissionManager.checkCamPermissions(context)
+        val microphoneGranted = PermissionManager.checkMicroPermissions(context)
+        val locationGranted = PermissionManager.checkLocationPermissions(context)
+        val storageGranted = PermissionManager.checkLibraryGranted(context)
+
+        // Nếu còn quyền chưa được cấp, hiển thị màn hình xin quyền
+        return !(cameraGranted && microphoneGranted && locationGranted && storageGranted)
+    }
      fun showOpenSettingsDialog(context: Context,gotoSettings: () -> Unit) {
          val builder = AlertDialog.Builder(context)
          builder.setTitle(R.string.go_to_setting)

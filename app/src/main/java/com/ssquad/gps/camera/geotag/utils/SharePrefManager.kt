@@ -7,11 +7,14 @@ import androidx.core.content.edit
 import com.google.android.gms.maps.GoogleMap
 import com.google.gson.Gson
 import com.ssquad.gps.camera.geotag.BuildConfig
+import com.ssquad.gps.camera.geotag.utils.Constants.CACHED_LOCATION_LAT
+import com.ssquad.gps.camera.geotag.utils.Constants.CACHED_LOCATION_LNG
 
 object SharePrefManager {
     private const val SHARE_PREFERENCES_NAME = "${BuildConfig.APPLICATION_ID}.share_preferences"
     private const val TIMER_KEY = "TIMER_KEY"
     private const val TEMPERATURE_KEY = "TEMPERATURE_KEY"
+    private const val IS_OPEN_FIRST_APP = "IS_OPEN_FIRST_APP"
     const val KEY_MAP_TYPE = "map_type"
     const val DEFAULT_MAP_TYPE = GoogleMap.MAP_TYPE_NORMAL
     private var sharePreferences: SharedPreferences? = null
@@ -24,7 +27,14 @@ object SharePrefManager {
         return sharePreferences
             ?: throw IllegalStateException("Chưa khởi tạo SharePrefManager")
     }
-
+    fun isOpenFirstApp(): Boolean {
+        return getPreferences().getBoolean(IS_OPEN_FIRST_APP, true)
+    }
+    fun isFirstOpenApp(isOpen: Boolean) {
+        getPreferences().edit() {
+            putBoolean(IS_OPEN_FIRST_APP, isOpen)
+        }
+    }
     fun getTimerPref(): Int {
         return getPreferences().getInt(TIMER_KEY, 0)
     }
@@ -49,6 +59,24 @@ object SharePrefManager {
         return getPreferences().getInt(KEY_MAP_TYPE, DEFAULT_MAP_TYPE)
     }
 
+
+    fun saveCachedCoordinates(latitude: Double, longitude: Double) {
+        getPreferences().edit {
+            putFloat(CACHED_LOCATION_LAT, latitude.toFloat())
+            putFloat(CACHED_LOCATION_LNG, longitude.toFloat())
+        }
+    }
+
+    fun getCachedCoordinates(): Pair<Double, Double>? {
+        val prefs = getPreferences()
+        if (!prefs.contains(CACHED_LOCATION_LAT) || !prefs.contains(CACHED_LOCATION_LNG)) {
+            return null
+        }
+
+        val lat = prefs.getFloat(CACHED_LOCATION_LAT, 0f).toDouble()
+        val lng = prefs.getFloat(CACHED_LOCATION_LNG, 0f).toDouble()
+        return Pair(lat, lng)
+    }
     fun getString(key: String, defaultValue: Any? = null): String? {
         return when (defaultValue) {
             is String -> getPreferences().getString(key, defaultValue)

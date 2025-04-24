@@ -58,6 +58,7 @@ class PreviewOptionsFragment : BaseFragment<FragmentPreviewOptionsBinding>(
 
     private fun setupRecyclerView() {
         previewOptionsAdapter = PreviewOptionsAdapter { position, selectedTheme ->
+            previewViewModel.resetCustomTemplate()
             previewViewModel.setSelectedTemplate(selectedTheme.id)
         }
         binding.rvTemplates.apply {
@@ -73,9 +74,7 @@ class PreviewOptionsFragment : BaseFragment<FragmentPreviewOptionsBinding>(
             )
         }
         val themeList = ThemeTemplateModel.getTemplate()
-        previewOptionsAdapter?.submitList(themeList) {
-
-        }
+        previewOptionsAdapter?.submitList(themeList)
     }
 
 }

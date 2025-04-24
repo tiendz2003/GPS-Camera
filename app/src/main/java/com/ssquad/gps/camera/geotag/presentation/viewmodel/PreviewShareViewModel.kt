@@ -44,6 +44,13 @@ class PreviewShareViewModel(
             )
         }
     }
+    fun resetCustomTemplate() {
+        updatePreviewState {
+            it.copy(
+                templateState = TemplateState()
+            )
+        }
+    }
     fun saveImageToGallery(context: Context, bitmap: Bitmap) {
         viewModelScope.launch {
             updatePreviewState {

@@ -75,7 +75,7 @@ class MediaSavedActivity :
                 bottomSheet.show(supportFragmentManager, "SortBottomSheet")
             }
             btnBack.setOnClickListener {
-                onBackPressedDispatcher.onBackPressed()
+                finish()
             }
             btnTakePhoto.setOnClickListener {
                 if (PermissionManager.checkPermissionsGranted(
@@ -136,12 +136,6 @@ class MediaSavedActivity :
         loadMediaData()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_PREVIEW && resultCode == RESULT_OK) {
-            loadMediaData()
-        }
-    }
     private fun loadMediaData(){
         if (isVideo) {
             photosViewModel.loadVideosFromAppAlbum()
@@ -186,12 +180,5 @@ class MediaSavedActivity :
 
         }
     }
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-    }
 }

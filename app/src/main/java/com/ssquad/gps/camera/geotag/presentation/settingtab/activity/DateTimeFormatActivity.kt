@@ -27,7 +27,7 @@ class DateTimeFormatActivity : BaseActivity<ActivityDateTimeFormatBinding>(
     override fun initActionView() {
         with(binding) {
             btnBack.setOnClickListener {
-                onBackPressedDispatcher.onBackPressed()
+                finish()
             }
         }
         setupSaveButton()

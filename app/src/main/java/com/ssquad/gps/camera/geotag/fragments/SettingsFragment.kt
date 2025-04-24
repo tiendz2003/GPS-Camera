@@ -19,6 +19,9 @@ import com.ssquad.gps.camera.geotag.presentation.settingtab.activity.PolicyActiv
 import com.ssquad.gps.camera.geotag.presentation.settingtab.activity.SetupTempActivity
 import com.ssquad.gps.camera.geotag.utils.Constants
 import androidx.core.net.toUri
+import com.ssquad.gps.camera.geotag.presentation.hometab.activities.MediaSavedActivity
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.activity.RequestPermissionActivity
+import com.ssquad.gps.camera.geotag.utils.PermissionManager
 
 class SettingsFragment : BaseFragment<FragmentSettingsBinding>(FragmentSettingsBinding::inflate) {
     private val reqNavigate = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -35,7 +38,14 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(FragmentSettingsB
     override fun initActionView() {
         with(binding){
             llMapSetting.setOnClickListener {
-                startActivity(Intent(requireContext(), MapSettingActivity::class.java))
+                if (PermissionManager.checkLocationPermissions(requireContext())) {
+                    reqNavigate.launch(Intent(requireContext(), MapSettingActivity::class.java))
+                } else {
+                    Intent(requireContext(), RequestPermissionActivity::class.java).apply {
+                        putExtra(Constants.INTENT_REQUEST_SINGLE_PERMISSION, RequestPermissionActivity.TYPE_LOCATION)
+                        reqNavigate.launch(this)
+                    }
+                }
             }
             llMapType.setOnClickListener {
                 startActivity(Intent(requireContext(), MapTypeActivity::class.java))

@@ -30,7 +30,6 @@ class InfoBottomSheet(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val btnClose = view.findViewById<ImageButton>(R.id.btnClose)
         val btnInfo = view.findViewById<LinearLayout>(R.id.optionInfo)
         val btnShare = view.findViewById<LinearLayout>(R.id.optionShare)
         val btnDelete = view.findViewById<LinearLayout>(R.id.optionDelete)
@@ -43,9 +42,7 @@ class InfoBottomSheet(
         btnDelete.setOnClickListener {
             onDeleteClick()
         }
-        btnClose.setOnClickListener {
-            dismiss()
-        }
+
     }
 
 }

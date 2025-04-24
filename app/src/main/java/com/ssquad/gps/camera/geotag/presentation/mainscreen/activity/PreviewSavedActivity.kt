@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -43,11 +44,6 @@ class PreviewSavedActivity :
                 putExtra(EXTRA_PHOTO, photo)
             }
         }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
     }
 
     override fun onPause() {
@@ -226,6 +222,7 @@ class PreviewSavedActivity :
 
         val btnCancel = dialogView.findViewById<AppCompatButton>(R.id.btnClCancel)
         val btnDelete = dialogView.findViewById<AppCompatButton>(R.id.btnClStop)
+        val btnClose = dialogView.findViewById<ImageView>(R.id.btnCloseDialog)
 
         val alertDialog = AlertDialog.Builder(this)
             .setView(dialogView)
@@ -236,6 +233,9 @@ class PreviewSavedActivity :
             alertDialog.dismiss()
         }
 
+        btnClose.setOnClickListener {
+            alertDialog.dismiss()
+        }
         btnDelete.setOnClickListener {
             try {
                 val rowsDeleted = contentResolver.delete(photo.path, null, null)

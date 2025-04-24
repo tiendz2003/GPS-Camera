@@ -1,11 +1,17 @@
 package com.ssquad.gps.camera.geotag.presentation.hometab.activities
 
+import android.Manifest
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import com.ssquad.gps.camera.geotag.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.utils.Constants
 import com.ssquad.gps.camera.geotag.utils.invisible
@@ -34,6 +40,13 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(ActivitySplashBinding
     }
 
     override fun initView() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermission()
+            }
+        }
         if (AdsHelper.isNetworkConnected(this)) {
             binding.tvLoadingAds.visible()
             setupCMP()
@@ -43,13 +56,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(ActivitySplashBinding
                 replaceActivity()
             }, 3000)
         }
-        val animator = ValueAnimator.ofFloat(0f, 1f)
-        animator.duration = 3000
-        animator.addUpdateListener { animation ->
-            val progress = animation.animatedValue as Float
-            binding.progressBar.progress = progress
-        }
-        animator.start()
+
     }
 
     override fun initActionView() {
@@ -81,6 +88,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(ActivitySplashBinding
     private fun initAds() {
         AdmobLib.setCheckTestDevice(false)
         AdmobLib.initialize(this, isDebug = true, isShowAds = false, onInitializedAds = {
+
             if (it) {
                 // todo: fix here
                 binding.tvLoadingAds.invisible()
@@ -102,7 +110,14 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(ActivitySplashBinding
         startActivity(intent)
         finish()
     }
-
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun requestPermission() {
+        val requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+        }
+        requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             exitProcess(0)

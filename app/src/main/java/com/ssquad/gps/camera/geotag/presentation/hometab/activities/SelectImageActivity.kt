@@ -34,10 +34,7 @@ class SelectImageActivity : BaseActivity<ActivitySelectedImageBinding>(ActivityS
     private var albumName: String? = null
     private var adapter: PhotoAdapter? = null
     private val photoViewModel: PhotosViewModel by viewModel()
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-    }
+
 
     override fun initData() {
         albumId = intent.getStringExtra(ALBUM_ID)
@@ -54,7 +51,9 @@ class SelectImageActivity : BaseActivity<ActivitySelectedImageBinding>(ActivityS
     }
 
     override fun initActionView() {
-
+        binding.ivBack.setOnClickListener {
+            finish()
+        }
     }
     private fun setupRecycleView(){
         adapter = PhotoAdapter {photo->

@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -79,6 +80,9 @@ fun Int.dpToPx(context: Context): Int {
     val displayMetrics: DisplayMetrics = context.resources!!.displayMetrics
     return (this * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)).roundToInt()
 }
+fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(this, message, duration).show()
+}
 fun navToActivity(context: Context, activity: Class<*>, bundle: Bundle? = null) {
     val intent = Intent(context, activity)
     intent.putExtras(bundle ?: Bundle())
@@ -100,8 +104,8 @@ fun Bitmap.rotate(degrees: Int): Bitmap {
 }
 fun MaterialShapeDrawable.updateCornerSize(context: Context) {
     val shapeAppearanceModel = this.shapeAppearanceModel.toBuilder()
-        .setTopLeftCornerSize(16f.dpToPx(context))
-        .setTopRightCornerSize(16f.dpToPx(context))
+        .setTopLeftCornerSize(18f.dpToPx(context))
+        .setTopRightCornerSize(18f.dpToPx(context))
         .build()
 
     // Thiết lập model mới và giữ nguyên các thuộc tính đường cong cho FAB

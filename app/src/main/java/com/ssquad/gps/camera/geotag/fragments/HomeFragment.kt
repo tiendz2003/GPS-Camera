@@ -31,7 +31,6 @@ import com.ssquad.gps.camera.geotag.utils.updateSelection
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::inflate) {
     private lateinit var adapter: ThemeTemplateAdapter
-    private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
     private var lastDefaultTemplateId: String? = null // Biến lưu giá trị trước đó
     private val listTheme = ThemeTemplateModel.getTemplate()
     private var reqNavigate = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -44,15 +43,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
         setupRecycleView()
         Log.d("RecyclerView", "List size: ${listTheme.size}")
-        permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            val allGranted = permissions.all { it.value }
-            if (allGranted) {
-                // Quyền đã được cấp, gọi hành động
-                //onGranted()
-            } else {
-                Toast.makeText(requireContext(), getString(R.string.warning_camera_location_permission), Toast.LENGTH_SHORT).show()
-            }
-        }
+
     }
 
     override fun initActionView() {

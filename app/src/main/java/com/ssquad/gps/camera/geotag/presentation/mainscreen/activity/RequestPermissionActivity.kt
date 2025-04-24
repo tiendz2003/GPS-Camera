@@ -14,6 +14,7 @@ import com.ssquad.gps.camera.geotag.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.databinding.ActivityRequestPermissionBinding
 import com.ssquad.gps.camera.geotag.presentation.hometab.activities.EditAlbumLibraryActivity
 import com.ssquad.gps.camera.geotag.presentation.hometab.activities.MediaSavedActivity
+import com.ssquad.gps.camera.geotag.presentation.settingtab.activity.MapSettingActivity
 import com.ssquad.gps.camera.geotag.utils.Constants
 import com.ssquad.gps.camera.geotag.utils.PermissionManager
 import com.ssquad.gps.camera.geotag.utils.loadImageIcon
@@ -72,6 +73,7 @@ class RequestPermissionActivity :
     private val requestPermissionForLocation =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
             if (PermissionManager.checkPermissionGranted(this, permissionForLocation)) {
+                navToActivity(this@RequestPermissionActivity, MapSettingActivity::class.java)
                 finish()
             } else {
                 PermissionManager.showOpenSettingsDialog(this) {
@@ -156,15 +158,11 @@ class RequestPermissionActivity :
 
                 TYPE_LOCATION -> {
                     if (PermissionManager.checkPermissionGranted(this, permissionForLocation)) {
-                        //showToast(getString(R.string.per_granted))
                         finish()
-                        startActivity(
-                            Intent(
-                                this@RequestPermissionActivity,
-                                RequestPermissionActivity::class.java
-                            ).apply {
-                                putExtra(Constants.INTENT_REQUEST_SINGLE_PERMISSION, TYPE_LOCATION)
-                            })
+                        navToActivity(
+                            this@RequestPermissionActivity,
+                            MapSettingActivity::class.java
+                        )
                     }
                 }
 
@@ -203,9 +201,6 @@ class RequestPermissionActivity :
     private fun requestPermissionLocation() {
         if (!PermissionManager.checkPermissionGranted(this, permissionForLocation)) {
             requestPermissionForLocation.launch(permissionForLocation)
-        } else {
-            //showToast(getString(R.string.per_granted))
-            finish()
         }
     }
 

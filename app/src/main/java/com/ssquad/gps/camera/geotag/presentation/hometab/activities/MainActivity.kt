@@ -28,31 +28,10 @@ import com.ssquad.gps.camera.geotag.utils.PermissionManager
 
 class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::inflate) {
 
-    private val requiredPermissions = arrayOf(
-        Manifest.permission.CAMERA,
-        Manifest.permission.RECORD_AUDIO,
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Manifest.permission.READ_MEDIA_IMAGES
-        } else {
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        }
-    )
     private val activityForRes =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val allPermissionsGranted = SharePrefManager.getBoolean("all_permissions_granted", false)
-        val permissionsSkipped = SharePrefManager.getBoolean("permissions_skipped", false)
-
-        if (!allPermissionsGranted && !permissionsSkipped) {
-            startActivity(Intent(this, PermissionActivity::class.java))
-            finish()
-            return
-        }
-
-        enableEdgeToEdge()
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
@@ -61,7 +40,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         }
     }
 
-    override fun initData() {}
+    override fun initData() {
+
+
+    }
 
     override fun initView() {
         binding.bottomNavigationView.background = null

@@ -11,7 +11,10 @@ import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.adapters.IntroViewPagerAdapter
 import com.ssquad.gps.camera.geotag.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.databinding.ActivityIntroBinding
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.activity.PermissionActivity
 import com.ssquad.gps.camera.geotag.utils.Common
+import com.ssquad.gps.camera.geotag.utils.PermissionManager
+import com.ssquad.gps.camera.geotag.utils.SharePrefManager
 import com.ssquad.gps.camera.geotag.utils.gone
 import com.ssquad.gps.camera.geotag.utils.invisible
 import com.ssquad.gps.camera.geotag.utils.visible
@@ -25,6 +28,7 @@ class IntroActivity : BaseActivity<ActivityIntroBinding>(ActivityIntroBinding::i
         super.onStop()
         binding.vShowInterAds.gone()
     }
+
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             if (binding.vpIntro.currentItem in 1..2) {
@@ -89,7 +93,7 @@ class IntroActivity : BaseActivity<ActivityIntroBinding>(ActivityIntroBinding::i
                         1 -> {
                             binding.btnNext2.text = getString(R.string.next)
                             binding.btnNext.text = getString(R.string.next)
-                           // showNativeAds()
+                            // showNativeAds()
                         }
 
                         2 -> {
@@ -108,13 +112,33 @@ class IntroActivity : BaseActivity<ActivityIntroBinding>(ActivityIntroBinding::i
 
     override fun initActionView() {
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+
     }
 
     private fun goToHome() {
-        startActivity(Intent(this@IntroActivity, MainActivity::class.java))
+        if (SharePrefManager.isOpenFirstApp() ||
+            !PermissionManager.checkMicroPermissions(this) || !PermissionManager.checkCamPermissions(
+                this
+            ) || !PermissionManager.checkLocationPermissions(this) || !PermissionManager.checkLibraryGranted(
+                this
+            )
+        ) {
+            startActivity(
+                Intent(
+                    this,
+                    PermissionActivity::class.java
+                )
+            )
+        } else {
+            startActivity(
+                Intent(
+                    this,
+                    MainActivity::class.java
+                )
+            )
+        }
         finish()
     }
-
     private fun updateView(isShowAds: Boolean = false) {
         binding.frNative.isVisible = isShowAds
         if (isShowAds) {
@@ -132,36 +156,36 @@ class IntroActivity : BaseActivity<ActivityIntroBinding>(ActivityIntroBinding::i
         }
     }
 
- /*   private fun showNativeAds() {
-        Log.d("Intro", "${RemoteConfig.remoteNativeIntro}")
-        if (RemoteConfig.remoteNativeIntro == 0L) return
-        updateView(true)
-        AdmobLib.showNative(
-            this,
-            AdsManager.admobNativeIntro,
-            binding.frNative,
-            size = GoogleENative.UNIFIED_MEDIUM,
-            layout = R.layout.custom_ads_native_medium_2,
-            onAdsShowFail = {
-                Log.e("Intro", "Quảng cáo native không hiển thị được")
-                updateView()
-            })
+    /*   private fun showNativeAds() {
+           Log.d("Intro", "${RemoteConfig.remoteNativeIntro}")
+           if (RemoteConfig.remoteNativeIntro == 0L) return
+           updateView(true)
+           AdmobLib.showNative(
+               this,
+               AdsManager.admobNativeIntro,
+               binding.frNative,
+               size = GoogleENative.UNIFIED_MEDIUM,
+               layout = R.layout.custom_ads_native_medium_2,
+               onAdsShowFail = {
+                   Log.e("Intro", "Quảng cáo native không hiển thị được")
+                   updateView()
+               })
 
-    }
+       }
 
-    private fun showInter(navAction: () -> Unit) {
-        if (RemoteConfig.remoteInterIntro != 1L) {
-            navAction()
-        } else {
-            binding.vShowInterAds.visible()
-            AdmobLib.showInterstitial(
-                this,
-                AdsManager.admobInterIntro,
-                onAdsCloseOrFailed = {
-                    navAction()
-                },
-                isPreload = false
-            )
-        }
-    }*/
+       private fun showInter(navAction: () -> Unit) {
+           if (RemoteConfig.remoteInterIntro != 1L) {
+               navAction()
+           } else {
+               binding.vShowInterAds.visible()
+               AdmobLib.showInterstitial(
+                   this,
+                   AdsManager.admobInterIntro,
+                   onAdsCloseOrFailed = {
+                       navAction()
+                   },
+                   isPreload = false
+               )
+           }
+       }*/
 }

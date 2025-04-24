@@ -10,6 +10,8 @@ import com.ssquad.gps.camera.geotag.presentation.hometab.adapter.EditAlbumAdapte
 import com.ssquad.gps.camera.geotag.databinding.ActivityAlbumLibraryBinding
 import com.ssquad.gps.camera.geotag.presentation.viewmodel.AlbumViewModel
 import com.ssquad.gps.camera.geotag.utils.Resource
+import com.ssquad.gps.camera.geotag.utils.gone
+import com.ssquad.gps.camera.geotag.utils.visible
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class EditAlbumLibraryActivity : BaseActivity<ActivityAlbumLibraryBinding>(
@@ -52,6 +54,11 @@ class EditAlbumLibraryActivity : BaseActivity<ActivityAlbumLibraryBinding>(
                     resource.data?.let {albums->
                         Log.d("EditAlbumLibraryActivity", "observeViewModel: $albums")
                         adapter.submitList(albums)
+                        if (albums.isEmpty()) {
+                            binding.llTakePhoto.visible()
+                        }else{
+                            binding.llTakePhoto.gone()
+                        }
                     }
                 }
                 is Resource.Error -> {

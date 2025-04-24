@@ -29,8 +29,8 @@
 
         <ImageView
             android:id="@+id/ivSelected"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:layout_gravity="top|end"
             android:layout_margin="8dp"
             android:padding="4dp"

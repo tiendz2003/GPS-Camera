@@ -13,7 +13,7 @@
         android:text="MM/dd/yyyy"
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginVertical="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/imgRadio"
         app:layout_constraintStart_toStartOf="parent"
@@ -27,8 +27,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
-
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"

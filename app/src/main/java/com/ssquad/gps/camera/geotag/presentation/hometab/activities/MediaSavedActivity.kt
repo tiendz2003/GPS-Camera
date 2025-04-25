@@ -48,11 +48,6 @@ class MediaSavedActivity :
     private var isVideo: Boolean = false
     private var currentSortOption = SortOption.DATE_ADDED
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun initData() {
 

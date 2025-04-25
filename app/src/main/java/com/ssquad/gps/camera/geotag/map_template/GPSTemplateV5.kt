@@ -7,6 +7,8 @@ import android.graphics.Bitmap
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
+import androidx.core.content.res.ResourcesCompat
+import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.bases.BaseCustomView
 import com.ssquad.gps.camera.geotag.data.models.TemplateDataModel
 import com.ssquad.gps.camera.geotag.data.models.TemplateState
@@ -34,6 +36,8 @@ class GPSTemplateV5(context: Context?, attrs: AttributeSet?) : BaseCustomView(co
     override fun initStyleable(mTypedArray: TypedArray?) {}
     @SuppressLint("SetTextI18n")
     override fun setData(data: TemplateDataModel,templateState: TemplateState?) {
+        val typeface = ResourcesCompat.getFont(context, R.font.segoeprint)
+        binding.tvLocationName.typeface = typeface
         with(binding) {
             tvLocationName.text = data.location
             tvLatLabel.text = "Lat: ${data.lat?.formatCoordinate()}"

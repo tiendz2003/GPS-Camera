@@ -62,7 +62,7 @@
         android:padding="12dp"
         android:textStyle="bold"
         android:text="@string/next"
-        android:textSize="16sp"
+        android:textSize="18sp"
         android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@id/frNative"
         app:layout_goneMarginBottom="24dp" />

@@ -98,11 +98,19 @@ object SharePrefManager {
     fun putBoolean(key: String, value: Boolean) {
         getPreferences().edit { putBoolean(key, value) }
     }
-
+    fun putMultipleLongValues(values: Map<String, Long>) {
+        getPreferences().edit {
+            for ((key, value) in values) {
+                putLong(key, value)
+            }
+        }
+    }
     fun clear() {
         getPreferences().edit { clear() }
     }
-
+    fun contains(key: String): Boolean {
+        return getPreferences().contains(key) == true
+    }
     fun getTemperature(): Boolean {
         return getPreferences().getBoolean(TEMPERATURE_KEY, false)
     }

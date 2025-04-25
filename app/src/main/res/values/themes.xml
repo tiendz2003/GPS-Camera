@@ -2,7 +2,6 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.BaseProject" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="fontFamily">@font/plusjakartasans</item>
-        <item name="fontWeight">400</item>
     </style>
 
     <style name="BottomNavigationTextStyle" parent="TextAppearance.MaterialComponents.Caption">

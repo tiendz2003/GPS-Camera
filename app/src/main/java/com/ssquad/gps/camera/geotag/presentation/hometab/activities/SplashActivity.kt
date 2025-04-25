@@ -45,6 +45,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(ActivitySplashBinding
                 != PackageManager.PERMISSION_GRANTED
             ) {
                 requestPermission()
+                return
             }
         }
         if (AdsHelper.isNetworkConnected(this)) {
@@ -115,6 +116,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(ActivitySplashBinding
         val requestPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
+            replaceActivity()
         }
         requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }

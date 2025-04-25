@@ -51,6 +51,7 @@ class PreviewShareViewModel(
             )
         }
     }
+
     fun saveImageToGallery(context: Context, bitmap: Bitmap) {
         viewModelScope.launch {
             updatePreviewState {

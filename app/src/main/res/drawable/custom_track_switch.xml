@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Checked -->
     <item android:state_checked="true">
         <shape android:shape="rectangle">
-            <solid android:color="@color/colorPrimary" /> <!-- Màu nền khi bật -->
+            <solid android:color="@color/colorPrimary" />
             <corners android:radius="30dp" />
-            <size android:height="30dp" android:width="70dp" />
+            <size android:height="30dp" android:width="65dp" />
         </shape>
     </item>
-
-    <!-- Unchecked -->
     <item android:state_checked="false">
         <shape android:shape="rectangle">
-            <solid android:color="#E0E0E0" /> <!-- Màu nền khi tắt -->
+            <solid android:color="#E0E0E0" />
             <corners android:radius="30dp" />
-            <size android:height="30dp" android:width="70dp" />
+            <size android:height="30dp" android:width="54dp" />
         </shape>
     </item>
 </selector>

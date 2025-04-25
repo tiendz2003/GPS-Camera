@@ -42,7 +42,7 @@ class SelectImageActivity : BaseActivity<ActivitySelectedImageBinding>(ActivityS
         albumId?.let { albumId ->
             photoViewModel.loadPhotosFromAlbum(albumId)
         }
-        photoViewModel.getCacheDataTemplate()
+        //photoViewModel.getCacheDataTemplate()
     }
 
     override fun initView() {
@@ -59,7 +59,7 @@ class SelectImageActivity : BaseActivity<ActivitySelectedImageBinding>(ActivityS
         adapter = PhotoAdapter {photo->
             startActivity(
                 Intent(this, PreviewImageActivity::class.java).apply {
-                    putExtra("TEMPLATE_DATA", photoViewModel.cacheData.value)
+                  //  putExtra("TEMPLATE_DATA", photoViewModel.cacheData.value)
                     putExtra("IMAGE_PATH", (photo.path).toString())
                     putExtra("FROM_ALBUM", true)
                 }
@@ -89,7 +89,6 @@ class SelectImageActivity : BaseActivity<ActivitySelectedImageBinding>(ActivityS
         photoViewModel.photos.observe(this){ resource->
             when(resource){
                 is Resource.Loading -> {
-
                 }
                 is Resource.Success->{
                     resource.data?.let {photos->

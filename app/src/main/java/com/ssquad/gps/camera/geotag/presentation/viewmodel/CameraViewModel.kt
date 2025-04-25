@@ -59,7 +59,7 @@ class CameraViewModel(
     private val weatherRepository: WeatherRepository,
     private val locationRepository: MapLocationRepository,
     private val cameraRepository: CameraRepository,
-    private val mediaRepository:MediaRepository,
+    private val mediaRepository: MediaRepository,
     private val cacheDataTemplate: CacheDataTemplate,
 ) : ViewModel() {
     private val _cameraState = MutableStateFlow(CameraState())
@@ -123,7 +123,8 @@ class CameraViewModel(
     }
 
     private fun bindCameraUseCase(previewView: PreviewView, lifecycleOwner: LifecycleOwner) {
-        val cameraProvider = this.cameraProvider ?: throw IllegalStateException("Chưa khởi tạo camera")
+        val cameraProvider =
+            this.cameraProvider ?: throw IllegalStateException("Chưa khởi tạo camera")
 
         //cameara selector
         val cameraSelector = CameraSelector.Builder()
@@ -186,10 +187,12 @@ class CameraViewModel(
     fun toggleFullScreen() {
         isFullScreen = !isFullScreen
     }
-    fun toggleFlashDuringRecording(){
+
+    fun toggleFlashDuringRecording() {
         val isTorchOn = camera?.cameraInfo?.torchState?.value == TorchState.ON
         camera?.cameraControl?.enableTorch(!isTorchOn)
     }
+
     fun toggleCameraMode() {
         isVideoMode = !isVideoMode
         updateCameraState {
@@ -234,23 +237,6 @@ class CameraViewModel(
 
     fun enableGrid() {
         isGridEnabled = !isGridEnabled
-    }
-
-    private fun countToCapturePhoto(seconds: Int) {
-        viewModelScope.launch {
-            for (i in seconds downTo 1) {
-                updateCameraState {
-                    it.copy(
-                        countDownTimer = i
-                    )
-                }
-                delay(1000)
-            }
-            updateCameraState { it.copy(countDownTimer = 0) }//reset
-            //cười nào
-            capturePhoto()
-        }
-
     }
 
     fun setCaptureTime(timerSecond: Int) {
@@ -353,6 +339,7 @@ class CameraViewModel(
                 )
             }
         }
+
     }
 
     private fun startVideoRecording(context: Context) {
@@ -425,7 +412,7 @@ class CameraViewModel(
                                                 isLoading = false,
                                                 showProcessingSnackbar = false,
                                                 showSuccessSnackbar = true,
-                                                error = if (savedUri == null) "Lưu video không thành công" else null
+                                                error = if (savedUri == null) "Video save failed" else null
                                             )
                                         }
                                         delay(3000)
@@ -435,7 +422,7 @@ class CameraViewModel(
                                     } catch (e: Exception) {
                                         updateCameraState {
                                             it.copy(
-                                                error = "Lưu video không thành công: ${e.message}",
+                                                error = "Video save failed",
                                                 isLoading = false,
                                                 showProcessingSnackbar = false
                                             )
@@ -503,7 +490,7 @@ class CameraViewModel(
                 }
             }
         }
-        if (!cacheDataTemplate.isCacheValid()) {
+        if (!cacheDataTemplate.isCacheValid() || cacheDataTemplate.templateData.value == null) {
             viewModelScope.launch {
                 try {
                     var location: String? = null
@@ -536,9 +523,10 @@ class CameraViewModel(
                                 location = addressResult.address
                             }
 
-                            val tempPair = (if(tempResult is Resource.Success) tempResult.data else null)
-                                ?: (if(fakeTempResult is Resource.Success) fakeTempResult.data else null)
-                                ?: Pair(null, null)
+                            val tempPair =
+                                (if (tempResult is Resource.Success) tempResult.data else null)
+                                    ?: (if (fakeTempResult is Resource.Success) fakeTempResult.data else null)
+                                    ?: Pair(null, null)
 
                             temperatureC = tempPair.first
                             temperatureF = tempPair.second
@@ -600,7 +588,8 @@ class CameraViewModel(
     fun currentLensFacing(): Int {
         return lensFacing
     }
-    fun getLastCaptureImage(){
+
+    fun getLastCaptureImage() {
         viewModelScope.launch {
             try {
                 val uri = mediaRepository.getLatestPhotoInAlbum()
@@ -618,6 +607,7 @@ class CameraViewModel(
             }
         }
     }
+
     fun cleanupCamera() {
         try {
             cameraProvider?.unbindAll()

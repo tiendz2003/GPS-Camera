@@ -31,22 +31,30 @@ import com.ssquad.gps.camera.geotag.utils.loadImageIcon
 import androidx.core.net.toUri
 import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.databinding.ActivityPreviewBinding
+import com.ssquad.gps.camera.geotag.presentation.viewmodel.PhotosViewModel
 import com.ssquad.gps.camera.geotag.service.MapManager
 import com.ssquad.gps.camera.geotag.utils.Config
 import com.ssquad.gps.camera.geotag.utils.SharePrefManager
 import com.ssquad.gps.camera.geotag.utils.flipHorizontally
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.isActive
 
 class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPreviewBinding::inflate) {
 
     private val previewViewModel: PreviewShareViewModel by viewModel()
+    private val photosViewModel: PhotosViewModel by viewModel()
+
     private var templateData: TemplateDataModel? = null
     private var templateId: String? = null
     private lateinit var mapManager: MapManager
     private var mapSnapshotJob: Job? = null
     private var mapBitmap : Bitmap? = null
 
+    private var isTemplateDataLoaded = false
+    private var pendingImagePath: String? = null
+    private var pendingIsFromAlbum: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,15 +70,52 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
     }
 
     override fun initData() {
-        templateData = intent.parcelable<TemplateDataModel>("TEMPLATE_DATA")
         templateId = SharePrefManager.getDefaultTemplate()
-        val imgPath = intent.getStringExtra("IMAGE_PATH")
-        val isFromAlbum = intent.getBooleanExtra("FROM_ALBUM", false)
+        pendingImagePath = intent.getStringExtra("IMAGE_PATH")
+        pendingIsFromAlbum = intent.getBooleanExtra("FROM_ALBUM", false)
+
+        templateData = intent.parcelable<TemplateDataModel>("TEMPLATE_DATA")
+
         if (templateData != null && templateId != null) {
             previewViewModel.setSelectedTemplate(templateId!!)
         }
-        if (isFromAlbum) {
-            val uri = imgPath?.toUri()
+        if (templateData == null) {
+            loadTemplateData()
+        } else {
+            if (templateId != null) {
+                previewViewModel.setSelectedTemplate(templateId!!)
+            }
+            processImage()
+        }
+    }
+    private fun loadTemplateData() {
+        lifecycleScope.launch {
+            // Gọi hàm lấy dữ liệu template
+            photosViewModel.getCacheDataTemplate()
+
+            // Theo dõi luồng dữ liệu từ ViewModel
+            photosViewModel.cacheData.collectLatest { data ->
+                if (data != null) {
+                    // Đã có dữ liệu template
+                    templateData = data
+                    isTemplateDataLoaded = true
+
+                    // Ẩn trạng thái loading nếu đang hiển thị
+
+
+                    // Thiết lập template và xử lý ảnh
+                    if (templateId != null) {
+                        previewViewModel.setSelectedTemplate(templateId!!)
+                    }
+                    processImage()
+                }
+            }
+        }
+    }
+
+    private fun processImage() {
+        if (pendingIsFromAlbum) {
+            val uri = pendingImagePath?.toUri()
             Log.d("PreviewImageActivity", "uri: $uri")
             uri?.let {
                 displayEditImageWithTemplate(it, templateData, templateId)
@@ -85,7 +130,6 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
             }
         }
     }
-
     override fun initView() {
         setupViewPager()
         observeViewModel()
@@ -116,22 +160,23 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
             val lon = template.long?.replace(",", ".")?.toDouble()
 
             if (lat == null || lon == null) {
-                Log.e("PreviewImageActivity", "Toạ độ sai")
+                Log.e("PreviewImageActivity", "Invalid coordinates")
                 return
             }
             mapSnapshotJob?.cancel()
-            mapSnapshotJob = lifecycleScope.launch {
+            mapSnapshotJob = lifecycleScope.launch(Dispatchers.Main) {
                 delay(500)
+                if (!isActive) return@launch
                 withContext(Dispatchers.Main) {
                     mapManager.captureMapImage(lat, lon) { bitmap ->
-                        Log.d("PreviewImageActivity", "Đã chụp: ${bitmap != null}")
+                        Log.d("PreviewImageActivity", "Snapshot captured: ${bitmap != null}")
                         mapBitmap = bitmap
                         updateTemplateWithMap(template, mapBitmap)
                     }
                 }
             }
         } catch (e: Exception) {
-            Log.e("PreviewImageActivity", "Lỗi ${e.message}")
+            Log.e("PreviewImageActivity", "Error: ${e.message}")
             updateTemplateWithMap(template, null)
         }
     }

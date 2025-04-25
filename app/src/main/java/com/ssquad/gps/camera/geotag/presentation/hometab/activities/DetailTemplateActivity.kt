@@ -56,12 +56,6 @@ class DetailTemplateActivity : BaseActivity<ActivityDetailTemplateBinding>(
             }
         }
     }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-    }
-
     override fun initData() {
         val defaultTemplateId = SharePrefManager.getDefaultTemplate()
         loadTemplatesByType(defaultTemplateId)

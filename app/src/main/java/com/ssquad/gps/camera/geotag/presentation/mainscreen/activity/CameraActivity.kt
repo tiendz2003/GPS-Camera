@@ -39,6 +39,8 @@ import com.ssquad.gps.camera.geotag.databinding.ActivityCameraBinding
 import com.ssquad.gps.camera.geotag.presentation.hometab.activities.EditAlbumLibraryActivity
 import com.ssquad.gps.camera.geotag.utils.Constants
 import com.ssquad.gps.camera.geotag.utils.PermissionManager
+import com.ssquad.gps.camera.geotag.utils.setOnDebounceClickListener
+import com.ssquad.gps.camera.geotag.utils.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -168,24 +170,29 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
             })
 
             tvFunction.setOnClickListener {
+                //CHẾ ĐỘ CHỤP ẢNH
                 Log.d("CameraActivity", "tvFunction clicked!")
                 if (cameraViewModel.isVideoMode()) {
                     binding.motionLayoutMode.transitionToState(R.id.photo_mode)
                     cameraViewModel.toggleCameraMode()
-                    cameraViewModel.toggleFlashDuringRecording()
+                    if (cameraViewModel.camera?.cameraInfo?.torchState?.value == TorchState.ON) {
+                        cameraViewModel.toggleFlashDuringRecording()
+                        toggleFlashMode()
+                    }
                 }
             }
             tvOption.setOnClickListener {
+                //CHẾ ĐỘ QUAY VIDEO
                 Log.d("CameraActivity", "tvOption clicked!")
                 if (!cameraViewModel.isVideoMode()) {
                     binding.motionLayoutMode.transitionToState(R.id.video_mode)
                     cameraViewModel.toggleCameraMode()
                 }
-                if (cameraViewModel.getCurrentFlashMode() == ImageCapture.FLASH_MODE_ON || cameraViewModel.isVideoMode()) {
+                if (cameraViewModel.getCurrentFlashMode() == ImageCapture.FLASH_MODE_ON && cameraViewModel.isVideoMode()) {
                     cameraViewModel.toggleFlashDuringRecording()
                 }
             }
-            imvTakeCapture.setOnClickListener {
+            imvTakeCapture.setOnDebounceClickListener(1000L) {
                 if (cameraViewModel.isVideoMode()) {
                     Log.d("CameraActivity", "Video mode")
                     toggleVideoRecording()
@@ -260,7 +267,6 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                         Log.d("CameraActivity", "observeViewModel: $bitmap")
                         navigateToPreviewImage(bitmap)
                     }
-
                     cameraState.error?.let {
                         Toast.makeText(
                             this@CameraActivity,
@@ -276,8 +282,10 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                         Log.d("CountingDown", "observeViewModel: ${cameraState.countDownTimer}")
                         binding.tvCountDown.text = "${cameraState.countDownTimer}"
                         binding.tvCountDown.visible()
+                        binding.imvTakeCapture.isEnabled = false
                         startCountdownAnimation(binding.tvCountDown)
                     } else {
+                        binding.imvTakeCapture.isEnabled = true
                         binding.tvCountDown.gone()
                     }
                     cameraState.templateData?.let {
@@ -319,6 +327,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
     override fun onResume() {
         super.onResume()
         cameraViewModel.getLastCaptureImage()
+        startCamera()
         updateFlashIcon(cameraViewModel.getCurrentFlashMode()) // Cập nhật icon flash
 
     }
@@ -366,8 +375,12 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
     }
 
     private fun toggleVideoRecording() {
-        cameraViewModel.toggleVideoRecording(this)
-        updateRecordingUI(cameraViewModel.cameraState.value.isRecording)
+       try {
+           cameraViewModel.toggleVideoRecording(this)
+           updateRecordingUI(cameraViewModel.cameraState.value.isRecording)
+       }catch (e: Exception){
+           showToast(getString(R.string.error_taking_photo_please_try_again))
+       }
     }
 
     private fun updateFlashIcon(flashMode: Int) {
@@ -547,6 +560,8 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
         binding.imvTimer.isEnabled = false
         binding.imvSelectImage.isEnabled = false
         binding.imvOpenTemplate.isEnabled = false
+        binding.tvOption.isEnabled = false
+        binding.tvFunction.isEnabled = false
     }
 
     private fun enableCaptureButtons() {
@@ -556,6 +571,8 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
         binding.imvTimer.isEnabled = true
         binding.imvSelectImage.isEnabled = true
         binding.imvOpenTemplate.isEnabled = true
+        binding.tvOption.isEnabled = true
+        binding.tvFunction.isEnabled = true
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

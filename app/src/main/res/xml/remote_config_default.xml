@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap>
+    <default key="remote_splash_ads" value="2" />
+    <default key="remote_banner_splash" value="1" />
+    <default key="remote_native_language" value="1" />
+    <default key="remote_inter_language" value="0" />
+    <default key="remote_native_intro" value="1" />
+    <default key="remote_inter_intro" value="0" />
+    <default key="remote_inter_home" value="2" />
+    <default key="remote_inter_back_to_home" value="2" />
+    <default key="remote_native_home" value="1" />
+    <default key="remote_banner_home" value="1" />
+    <default key="remote_native_photo_selector" value="1" />
+    <default key="remote_banner_photo_editor" value="1" />
+    <default key="remote_inter_save" value="1" />
+    <default key="remote_native_theme_selector" value="1" />
+    <default key="remote_native_saved" value="1" />
+    <default key="remote_native_setting" value="1" />
+    <default key="remote_native_after_inter" value="1" />
+    <default key="remote_on_resume" value="1" />
+    <default key="remote_time_show_inter" value="200000" />
+</defaultsMap>

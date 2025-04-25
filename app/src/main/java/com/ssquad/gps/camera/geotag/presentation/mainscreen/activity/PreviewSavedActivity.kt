@@ -13,9 +13,13 @@ import android.util.Log
 import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.graphics.drawable.toDrawable
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SeekParameters
+import com.google.android.exoplayer2.util.Util
 import com.ssquad.gps.camera.geotag.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.data.models.Photo
 import com.ssquad.gps.camera.geotag.presentation.hometab.dialog.InfoBottomSheet
@@ -36,6 +40,10 @@ class PreviewSavedActivity :
     private lateinit var bottomSheet: InfoBottomSheet
     private val handler = Handler(Looper.getMainLooper())
     private var updateSeekBarRunnable: Runnable? = null
+    private var isPlay = true
+    private var player: ExoPlayer? = null
+    private var playWhenReady = true
+    private var playbackPosition = 0L
 
     companion object {
         private const val EXTRA_PHOTO = "extra_photo"
@@ -46,10 +54,48 @@ class PreviewSavedActivity :
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState != null) {
+            playbackPosition = savedInstanceState.getLong("playback_position", 0L)
+            playWhenReady = savedInstanceState.getBoolean("play_when_ready", true)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        player?.let {
+            outState.putLong("playback_position", it.currentPosition)
+            outState.putBoolean("play_when_ready", it.playWhenReady)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (Util.SDK_INT > 23 && photo.isVideo) {
+            initializePlayer()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (Util.SDK_INT <= 23 && photo.isVideo) {
+            initializePlayer()
+        }
+    }
+
     override fun onPause() {
         super.onPause()
-        stopSeekBar()
-        binding.videoView.pause()
+        if (Util.SDK_INT <= 23) {
+            releasePlayer()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (Util.SDK_INT > 23) {
+            releasePlayer()
+        }
     }
 
     override fun initData() {
@@ -62,60 +108,136 @@ class PreviewSavedActivity :
     }
 
     override fun initView() {
-
         with(binding) {
             if (photo.isVideo) {
-                videoView.visible()
+                // Hide ImageView, show player view
+                playerView.visible()
                 imageView.gone()
-                controlsContainer.visible()
-                videoView.setOnPreparedListener { mediaPlayer ->
-                    val duration = mediaPlayer.duration
-                    seekBar.max = duration
-                    txtDuration.text = duration.formatDuration()
-                    updateSeekBar()
-                    mediaPlayer.isLooping = true
-                    videoView.start()
-                }
-                videoView.setVideoURI(photo.path)
-                videoView.setOnCompletionListener {
-                    btnPlayPause.setImageResource(R.drawable.ic_play)
-                    seekBar.progress = seekBar.max
-                    txtCurrentTime.text = txtDuration.text
-                    stopSeekBar()
-                }
-                videoView.setOnErrorListener { _, what, extra ->
-                    Log.e("PreviewSavedActivity", "Video error: what=$what, extra=$extra")
-                    Toast.makeText(
-                        this@PreviewSavedActivity,
-                        "Lỗi khi phát video",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    true
-                }
 
-            } else {
-                controlsContainer.gone()
-                videoView.gone()
-                imageView.visible()
 
                 txtVideoTitle.text = photo.name
-                imageView.loadImageIcon(
-                    photo.path
-                )
+
+            } else {
+                // For images, hide video controls
+                playerView.gone()
+                imageView.visible()
+                imageView.loadImageIcon(photo.path)
+            }
+        }
+    }
+
+    private fun initializePlayer() {
+        if (!photo.isVideo) return
+
+        player = ExoPlayer.Builder(this)
+            .build()
+            .also { exoPlayer ->
+                exoPlayer.setSeekParameters(SeekParameters.EXACT)
+                binding.playerView.player = exoPlayer
+
+                val mediaItem = MediaItem.fromUri(photo.path)
+                exoPlayer.setMediaItem(mediaItem)
+
+                exoPlayer.playWhenReady = playWhenReady
+                exoPlayer.seekTo(playbackPosition)
+                exoPlayer.prepare()
+
+                exoPlayer.addListener(object : Player.Listener {
+                    override fun onPlaybackStateChanged(state: Int) {
+                        when (state) {
+                            Player.STATE_READY -> {
+                                binding.seekBar.max = exoPlayer.duration.toInt()
+                                binding.txtDuration.text = exoPlayer.duration.formatDuration()
+                                updateSeekBar()
+                            }
+
+                            Player.STATE_ENDED -> {
+                                // Reset về 0 khi hết video
+                                exoPlayer.seekTo(0)
+                                exoPlayer.pause()
+                                binding.btnPlayPause.setImageResource(R.drawable.ic_play)
+                                binding.seekBar.progress = 0
+                                binding.txtCurrentTime.text = 0.formatDuration()
+                                stopSeekBar()
+                            }
+
+                            else -> { /* No-op */ }
+                        }
+                    }
+
+                    override fun onIsPlayingChanged(isPlaying: Boolean) {
+                        if (isPlaying) {
+                            binding.btnPlayPause.setImageResource(R.drawable.ic_pause)
+                            updateSeekBar()
+                        } else {
+                            binding.btnPlayPause.setImageResource(R.drawable.ic_play)
+                            stopSeekBar()
+                        }
+                    }
+                })
             }
 
+        binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    player?.seekTo(progress.toLong())
+                    binding.txtCurrentTime.text = progress.formatDuration()
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                stopSeekBar()
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                if (player?.isPlaying == true) {
+                    updateSeekBar()
+                }
+            }
+        })
+    }
+
+
+    private fun releasePlayer() {
+        player?.let { exoPlayer ->
+            playbackPosition = exoPlayer.currentPosition
+            playWhenReady = exoPlayer.playWhenReady
+            exoPlayer.release()
+            player = null
         }
+        stopSeekBar()
     }
 
     override fun initActionView() {
         with(binding) {
-            btnBack.setOnClickListener {
-                onBackPressedDispatcher.onBackPressed()
+            btnPlayPause.setOnClickListener {
+                player?.let { exoPlayer ->
+                    isPlay = !isPlay
+                    if (isPlay) {
+                        exoPlayer.play()
+                        btnPlayPause.setImageResource(R.drawable.ic_pause)
+                    } else {
+                        exoPlayer.pause()
+                        btnPlayPause.setImageResource(R.drawable.ic_play)
+                    }
+                }
+            }
+
+            btnForward.setOnClickListener {
+                val positionNext = player!!.currentPosition + 5000L
+                player?.seekTo(positionNext)
+                updateSeekBar()
+            }
+
+            btnRewind.setOnClickListener {
+                val positionPrev = player!!.currentPosition - 5000L
+                player?.seekTo(positionPrev)
+                updateSeekBar()
             }
             btnMore.setOnClickListener {
                 bottomSheet = InfoBottomSheet(
                     onShareClick = {
-                        shareFileVideo(this@PreviewSavedActivity, photo.path, false)
+                        shareFileVideo(this@PreviewSavedActivity, photo.path, photo.isVideo)
                     },
                     onInfoClick = {
                         setupInfoDialog(photo)
@@ -126,44 +248,19 @@ class PreviewSavedActivity :
                 )
                 bottomSheet.show(supportFragmentManager, "InfoBottomSheet")
             }
-            btnPlayPause.setOnClickListener {
-                if (videoView.isPlaying) {
-                    videoView.pause()
-                    btnPlayPause.setImageResource(R.drawable.ic_play)
-                    stopSeekBar()
-                } else {
-                    videoView.start()
-                    btnPlayPause.setImageResource(R.drawable.ic_pause)
-                    updateSeekBar()
-                }
-
-            }
-            btnRewind.setOnClickListener {
-                val newPosition = (videoView.currentPosition - 5000).coerceAtLeast(0)
-                videoView.seekTo(newPosition)
-            }
-            btnForward.setOnClickListener {
-                val newPosition =
-                    (videoView.currentPosition + 5000).coerceAtMost(videoView.duration)
-                videoView.seekTo(newPosition)
-            }
             seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(
-                    seekBar: SeekBar?,
-                    progress: Int,
-                    fromUser: Boolean
-                ) {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                     if (fromUser) {
-                        binding.videoView.seekTo(progress)
-                        binding.txtCurrentTime.text = progress.formatDuration()
+                        player?.seekTo(progress.toLong())
                     }
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {
                     stopSeekBar()
                 }
+
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                    if (videoView.isPlaying) {
+                    if (player?.isPlaying == true) {
                         updateSeekBar()
                     }
                 }
@@ -172,25 +269,18 @@ class PreviewSavedActivity :
     }
 
     private fun updateSeekBar() {
-        stopSeekBar()
-        updateSeekBarRunnable = object : Runnable {
-            override fun run() {
-                try {
-                    if (binding.videoView.isPlaying) {
-                        binding.seekBar.progress = binding.videoView.currentPosition
-                        binding.txtCurrentTime.text = binding.videoView.currentPosition.formatDuration()
-                        handler.postDelayed(this, 100)
-                    }
-                }catch (e:Exception){
-                    Log.e("PreviewSavedActivity", "lOI CAP NHAT: ${e.message}")
-                }
+        try {
+            val currProcess = (player?.currentPosition ?: 0)
+            binding.seekBar.progress = currProcess.toInt()
+            binding.txtCurrentTime.text = currProcess.formatDuration()
+            updateSeekBarRunnable = Runnable {
+                updateSeekBar()
             }
-        }
-        updateSeekBarRunnable?.let {
-            handler.post(it)
+            handler.postDelayed(updateSeekBarRunnable!!, 300)
+        } catch (e: Exception) {
+            Log.d("PreviewSavedActivity", "updateSeekBar: error")
         }
     }
-
     private fun stopSeekBar() {
         updateSeekBarRunnable?.let { handler.removeCallbacks(it) }
         updateSeekBarRunnable = null
@@ -200,7 +290,7 @@ class PreviewSavedActivity :
         val infoDialog = Dialog(this)
         val dialogBinding = InforImgDialogBinding.inflate(layoutInflater)
         infoDialog.setContentView(dialogBinding.root)
-        Log.d("setupInfoDialog", "setupInfoDialog: ${photo.dateAdded}")
+
         with(dialogBinding) {
             tvName.text = photo.name
             tvSize.text = photo.size.kbToMb()
@@ -236,6 +326,7 @@ class PreviewSavedActivity :
         btnClose.setOnClickListener {
             alertDialog.dismiss()
         }
+
         btnDelete.setOnClickListener {
             try {
                 val rowsDeleted = contentResolver.delete(photo.path, null, null)
@@ -249,15 +340,13 @@ class PreviewSavedActivity :
                         getString(R.string.failed_to_delete_image), Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Log.e("PreviewSavedActivity", "Lỗi xóa: ${e.message}")
-               // Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("PreviewSavedActivity", "Delete error: ${e.message}")
             }
             alertDialog.dismiss()
         }
 
         alertDialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         alertDialog.show()
-
     }
 
     fun shareFileVideo(context: Context, uri: Uri, isVideo: Boolean) {
@@ -277,5 +366,6 @@ class PreviewSavedActivity :
     override fun onDestroy() {
         super.onDestroy()
         stopSeekBar()
+        releasePlayer()
     }
 }

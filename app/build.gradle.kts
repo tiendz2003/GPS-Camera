@@ -81,6 +81,10 @@ dependencies {
     // CameraX Extensions (Tùy chọn, dùng để có chế độ HDR, Night Mode...)
     implementation (libs.androidx.camera.extensions)
     // CameraX VideoCapture (Nếu muốn quay video)
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.config.ktx)
     implementation (libs.androidx.camera.video)
     implementation(libs.koin.android)
     implementation(libs.androidx.core.ktx)
@@ -94,6 +98,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation ("com.google.android.exoplayer:exoplayer:2.19.1") // Thay X.X bằng phiên bản mới nhất
+
 
     //ads library
     implementation(libs.ssquadadslibrary)

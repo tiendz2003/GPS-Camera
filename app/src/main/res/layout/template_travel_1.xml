@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="24dp"
+    android:layout_marginBottom="28dp"
    >
 
     <androidx.constraintlayout.widget.Guideline
@@ -83,9 +83,10 @@
         style="@style/aoboshi_style"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
+        android:layout_marginHorizontal="6dp"
         android:layout_marginTop="16dp"
         android:text="HOLIDAYS"
+        android:textSize="20sp"
         android:textAlignment="center"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@id/line2"

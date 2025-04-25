@@ -64,11 +64,4 @@ class EditAlbumLibraryActivity : BaseActivity<ActivityAlbumLibraryBinding>(
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
 }

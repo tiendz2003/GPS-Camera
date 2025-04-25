@@ -217,8 +217,6 @@ class MediaRepositoryImpl (private val context: Context): MediaRepository {
                         val dateAdded = cursor.getLong(dateAddedColumn)
                         val path = cursor.getString(pathColumn)
                         val bucketName = cursor.getString(bucketNameColumn)
-
-                        // Log để debug
                         Log.d("MediaRepository", "Video found: name=$name, path=$path, bucket=$bucketName")
 
                         videos.add(

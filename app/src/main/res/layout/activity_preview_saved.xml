@@ -51,10 +51,11 @@
             app:tint="@android:color/black" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <VideoView
-        android:id="@+id/videoView"
+    <com.google.android.exoplayer2.ui.PlayerView
+        android:id="@+id/playerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        app:use_controller="false"
         app:layout_constraintBottom_toTopOf="@+id/controlsContainer"
         app:layout_constraintTop_toBottomOf="@+id/topBar" />
     <androidx.appcompat.widget.AppCompatImageView

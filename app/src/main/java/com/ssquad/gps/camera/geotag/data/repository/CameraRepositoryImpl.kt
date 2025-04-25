@@ -1,5 +1,6 @@
 package com.ssquad.gps.camera.geotag.data.repository
 
+import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
@@ -68,6 +69,7 @@ class CameraRepositoryImpl : CameraRepository {
             }
         }
 
+    @SuppressLint("SuspiciousIndentation")
     override suspend fun saveVideoToGallery(context: Context, sourceUri: Uri): Uri? =
         withContext(Dispatchers.IO) {
             try {
@@ -186,7 +188,6 @@ class CameraRepositoryImpl : CameraRepository {
             // Tạo các tệp tạm
             val tempDir = File(context.cacheDir, "video_processing")
             tempDir.mkdirs()
-
             val tempInputFile = File(tempDir, "input_video.mp4")
             val tempTemplateFile = File(tempDir, "template_overlay.png")
             val tempOutputFile = File(tempDir, "output_video.mp4")

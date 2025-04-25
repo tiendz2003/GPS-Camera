@@ -74,13 +74,13 @@ class TemplatesActivity :
     }
     override fun initActionView() {
         binding.tvViewAllDaily.setOnClickListener {
-            startActivity(DetailTemplateActivity.Companion.getIntent(this, TemplateType.DAILY))
+            previewActivityLauncher.launch(DetailTemplateActivity.Companion.getIntent(this, TemplateType.DAILY))
         }
         binding.tvViewAllTravel.setOnClickListener {
-            startActivity(DetailTemplateActivity.Companion.getIntent(this, TemplateType.TRAVEL))
+            previewActivityLauncher.launch(DetailTemplateActivity.Companion.getIntent(this, TemplateType.TRAVEL))
         }
         binding.tvViewAllGPS.setOnClickListener {
-            startActivity(DetailTemplateActivity.Companion.getIntent(this, TemplateType.GPS))
+            previewActivityLauncher.launch(DetailTemplateActivity.Companion.getIntent(this, TemplateType.GPS))
         }
         binding.ivBack.setOnClickListener {
             finish()

@@ -47,6 +47,7 @@
         android:layout_height="wrap_content"
         android:contentDescription="camera"
         android:src="@drawable/ic_camera"
+        android:scaleType="center"
         app:tint="@color/white"
         app:backgroundTint="@color/colorPrimary"
         app:maxImageSize="35dp"

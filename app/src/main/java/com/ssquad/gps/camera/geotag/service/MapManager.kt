@@ -6,6 +6,7 @@ import android.location.Location
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -101,17 +102,35 @@ class MapManager(
         googleMap?.mapType = mapType
     }
 
-    fun captureMapSnapshot(googleMap: GoogleMap, callback: (Bitmap) -> Unit) {
-        Handler(Looper.getMainLooper()).post {
+    fun captureMapSnapshot(googleMap: GoogleMap, callback: (Bitmap?) -> Unit) {
+        if(Looper.myLooper() != Looper.getMainLooper()){
+            Handler(Looper.getMainLooper()).post {
+                captureMapSnapshot(googleMap, callback)
+            }
+            return
+        }
+        try {
             val snapshotReadyCallback = GoogleMap.SnapshotReadyCallback { bitmap ->
                 bitmap?.let {
                     callback(it)
+                } ?: run {
+                    callback(null)
                 }
             }
             googleMap.snapshot(snapshotReadyCallback)
+        }catch (e: Exception) {
+            Log.e("MapManager", "Lỗi khi chụp map: ${e.message}")
+            callback(null)
         }
     }
     fun captureMapImage(lat: Double, lon: Double, zoom: Float = 15f, callback: (Bitmap?) -> Unit) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            Handler(Looper.getMainLooper()).post {
+                captureMapImage(lat, lon, zoom, callback)
+            }
+            return
+        }
+
         // Kiểm tra trạng thái lifecycle
         if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
             callback(null)
@@ -119,25 +138,30 @@ class MapManager(
         }
 
         googleMap?.let { map ->
-            map.clear()
-            val position = LatLng(lat, lon)
-            map.addMarker(
-                MarkerOptions().position(position)
-                    .title(context.getString(R.string.current_location))
-            )
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, zoom))
+            try {
+                map.clear()
+                val position = LatLng(lat, lon)
+                map.addMarker(
+                    MarkerOptions().position(position)
+                        .title(context.getString(R.string.current_location))
+                )
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, zoom))
 
-            Handler(Looper.getMainLooper()).postDelayed({
-                // Kiểm tra lại trạng thái lifecycle trước khi chụp
-                if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-                    callback(null)
-                    return@postDelayed
-                }
+                Handler(Looper.getMainLooper()).postDelayed({
+                    // Kiểm tra lại trạng thái lifecycle trước khi chụp
+                    if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                        callback(null)
+                        return@postDelayed
+                    }
 
-                captureMapSnapshot(map) { bitmap ->
-                    callback(bitmap)
-                }
-            }, 300)
+                    captureMapSnapshot(map) { bitmap ->
+                        callback(bitmap)
+                    }
+                }, 300)
+            } catch (e: Exception) {
+                Log.e("MapManager", "Error preparing map: ${e.message}")
+                callback(null)
+            }
         } ?: run {
             callback(null)
         }

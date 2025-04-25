@@ -5,10 +5,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.ListenableWorker
 import com.ssquad.gps.camera.geotag.data.models.Photo
 import com.ssquad.gps.camera.geotag.data.models.SortOption
 import com.ssquad.gps.camera.geotag.data.models.TemplateDataModel
+import com.ssquad.gps.camera.geotag.domain.MapLocationRepository
 import com.ssquad.gps.camera.geotag.domain.MediaRepository
+import com.ssquad.gps.camera.geotag.domain.WeatherRepository
+import com.ssquad.gps.camera.geotag.utils.LocationResult
 import com.ssquad.gps.camera.geotag.utils.Resource
 import com.ssquad.gps.camera.geotag.utils.SharePrefManager
 import com.ssquad.gps.camera.geotag.utils.formatCoordinate
@@ -19,10 +23,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
+import java.util.Locale
 
 class PhotosViewModel(
     private val repository: MediaRepository,
-    private val cacheDataTemplate: CacheDataTemplate
+    private val cacheDataTemplate: CacheDataTemplate,
+    private val weatherRepository: WeatherRepository,
+    private val locationRepository: MapLocationRepository,
 ) : ViewModel() {
 
     private val _photos = MutableLiveData<Resource<List<Photo>>>()
@@ -106,7 +113,7 @@ class PhotosViewModel(
         if (cacheDataTemplate.isCacheValid()) {
             cacheDataTemplate.templateData.value?.let {
                 val (lat, long, location) = SharePrefManager.getCachedCoordinates()
-                    ?: Triple(it.lat?.toDouble(), it.long?.toDouble(), it.location)
+                    ?: Triple(it.lat?.replace(",",".")?.toDouble(), it.long?.replace(",",".")?.toDouble(), it.location)
 
                 _cacheData.value = TemplateDataModel(
                     location = location,
@@ -121,6 +128,49 @@ class PhotosViewModel(
                 Log.d("PhotosViewModel", "getCacheDataTemplate: $it")
             }
         }
+        if(!cacheDataTemplate.isCacheValid() || cacheDataTemplate.templateData.value == null) {
+            viewModelScope.launch {
+                try {
+                    Log.d("PhotosViewModel", "getDataTemplate: ${cacheDataTemplate.templateData.value}")
+                    val locationResult = locationRepository.getCurrentLocation()
+                    if(locationResult is LocationResult.Success){
+                        val currentLocation = locationResult.location
+                        val lat = String.format(Locale.getDefault(), "%.6f", currentLocation.latitude)
+                        val lon = String.format(Locale.getDefault(), "%.6f", currentLocation.longitude)
+                        val addressResult = locationRepository.getAddressFromLocation(currentLocation)
+                        val tempResult = weatherRepository.getCurrentTemp(currentLocation)
+                        val fakeTempResult = weatherRepository.getFakeTemp()
+
+                        val location = if(addressResult is LocationResult.Address){
+                            addressResult.address
+                        }else{
+                            null
+                        }
+
+                        val tempPair = (if(tempResult is Resource.Success) tempResult.data else null)
+                            ?: (if(fakeTempResult is Resource.Success) fakeTempResult.data else null)
+                            ?: Pair(null, null)
+
+                        val tempC = tempPair.first
+                        val tempF = tempPair.second
+
+                        _cacheData.value = TemplateDataModel(
+                            location = location,
+                            lat = lat,
+                            long = lon,
+                            temperatureC = tempC,
+                            temperatureF = tempF,
+                            currentTime = now.formatToTime(),
+                            currentDate = now.formatToDate()
+                        )
+                        Log.d("PhotosViewModel", "getCacheDataTemplate: ${cacheData.value}")
+                    }
+                } catch (e: Exception) {
+                    Log.e("PhotosViewModel", "Error: ${e.message}")
+                }
+            }
+        }
+
     }
 
 

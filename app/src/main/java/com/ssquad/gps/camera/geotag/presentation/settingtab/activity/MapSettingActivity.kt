@@ -3,9 +3,6 @@ package com.ssquad.gps.camera.geotag.presentation.settingtab.activity
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -84,7 +81,6 @@ class MapSettingActivity :
 
             mapSettingViewModel.mapSettingState.value.currentLocation?.let { location ->
                 mapManager.updateMapWithLocation(location)
-                // Kiểm tra trạng thái loading trước khi hiển thị bottom sheet
                 val isLoading = mapSettingViewModel.mapSettingState.value.currentAddress == null
                 showBottomSheet(location, isLoading)
             }
@@ -95,7 +91,6 @@ class MapSettingActivity :
                 latitude = latLng.latitude
                 longitude = latLng.longitude
             }
-            // Đóng bottom sheet cũ nếu có
             if (currentLocationSheet != null && currentLocationSheet?.isAdded == true) {
                 currentLocationSheet?.dismiss()
                 currentLocationSheet = null
@@ -114,7 +109,6 @@ class MapSettingActivity :
                 ?: getString(R.string.loading_address)
         }
 
-        // Đóng tất cả các bottom sheet cũ
         supportFragmentManager.fragments.forEach { fragment ->
             if (fragment is CurrentLocationSheet && fragment !== currentLocationSheet) {
                 fragment.dismiss()
@@ -137,13 +131,10 @@ class MapSettingActivity :
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 mapSettingViewModel.mapSettingState.collect { state ->
                     state.currentLocation?.let { location ->
-                        // Cập nhật map
                         mapManager.updateMapWithLocation(location)
 
-                        // Xác định trạng thái loading
                         val isLoading = state.currentAddress == null
 
-                        // Hiển thị hoặc cập nhật bottom sheet với trạng thái loading
                         showBottomSheet(location, isLoading)
                     }
                 }
@@ -152,7 +143,6 @@ class MapSettingActivity :
     }
 
     fun onBottomSheetDismissed() {
-        // Đặt lại tham chiếu khi sheet bị đóng
         if (currentLocationSheet != null) {
             currentLocationSheet = null
         }

@@ -38,7 +38,7 @@ object AppModule {
         single { provideRetrofit() }
         single { provideWeatherApiService(get()) }
         viewModel { AlbumViewModel(get()) }
-        viewModel { PhotosViewModel(get(),get()) }
+        viewModel { PhotosViewModel(get(),get(),get(),get()) }
         viewModel { CameraViewModel(get(), get(),get(),get(),get()) }
         viewModel { PreviewShareViewModel(get()) }
         viewModel { MapSettingViewModel(get(),get()) }

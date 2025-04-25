@@ -22,7 +22,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvTitle"
-        android:layout_width="347dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="32dp"
         android:fontFamily="@font/nunito_sans_bold"
@@ -37,14 +37,13 @@
         tools:text="@string/title_intro_1" />
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvMessage"
-        android:layout_width="347dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="32dp"
         android:fontFamily="@font/nunito_sans_regular"
         android:layout_marginTop="12dp"
         android:gravity="center"
-        android:maxLines="2"
         android:textColor="@color/colorTextTitle"
+        android:layout_marginHorizontal="32dp"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

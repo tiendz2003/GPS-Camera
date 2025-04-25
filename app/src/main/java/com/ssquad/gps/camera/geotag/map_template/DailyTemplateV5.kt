@@ -31,10 +31,11 @@ class DailyTemplateV5(context: Context?, attrs: AttributeSet?) : BaseCustomView(
     @SuppressLint("SetTextI18n")
     override fun setData(data: TemplateDataModel, state: TemplateState?) {
         val part = data.location?.split(",")
-        val city = part?.get(0)
+        val country = part?.get(1)
+
         with(binding){
             tvTime.text = data.currentTime
-            tvCity.text = city
+            tvCity.text = country
             tvAddress.text = data.location
             tvTemp.text = data.getFormattedTemperature()
             tvDate.text = data.currentDate

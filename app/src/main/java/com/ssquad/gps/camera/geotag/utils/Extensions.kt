@@ -83,6 +83,21 @@ fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(this, message, duration).show()
 }
 
+
+inline fun View.setOnDebounceClickListener(
+    delay: Long = 800L,
+    crossinline action: () -> Unit
+) {
+    var lastClickTime = 0L
+    setOnClickListener {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastClickTime >= delay) {
+            lastClickTime = currentTime
+            action()
+        }
+    }
+}
+
 fun navToActivity(context: Context, activity: Class<*>, bundle: Bundle? = null) {
     val intent = Intent(context, activity)
     intent.putExtras(bundle ?: Bundle())

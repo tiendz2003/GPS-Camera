@@ -40,7 +40,6 @@ import com.ssquad.gps.camera.geotag.utils.visible
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.or
 
 class PreviewSavedActivity :
     BaseActivity<ActivityPreviewSavedBinding>(ActivityPreviewSavedBinding::inflate) {

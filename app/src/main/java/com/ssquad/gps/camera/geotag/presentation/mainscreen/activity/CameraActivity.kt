@@ -260,13 +260,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
             }
         }
     }
-    private fun showSkeletonLoading() {
-        binding.skeletonLayout.showSkeleton() // Show shimmer effect
-    }
 
-    private fun hideSkeletonLoading() {
-        binding.skeletonLayout.showOriginal() // Hide shimmer effect
-    }
     @SuppressLint("SetTextI18n")
     private fun observeViewModel() {
         lifecycleScope.launch {

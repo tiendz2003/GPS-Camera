@@ -2,6 +2,10 @@ package com.ssquad.gps.camera.geotag.presentation.viewmodel
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
@@ -9,11 +13,13 @@ import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
 import androidx.camera.core.Camera
+import androidx.camera.core.CameraEffect
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.core.TorchState
+import androidx.camera.core.UseCaseGroup
 import androidx.camera.effects.OverlayEffect
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.FileOutputOptions
@@ -145,24 +151,52 @@ class CameraViewModel(
             .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
             .setFlashMode(flashMode)
             .build()
-        //quay vidoe
+        val mainHandler = Handler(Looper.getMainLooper())
+        overlayEffect = OverlayEffect(
+            CameraEffect.VIDEO_CAPTURE or CameraEffect.IMAGE_CAPTURE,
+            0,
+            mainHandler,
+            {
+                Log.d("CameraViewModel", "Overlay effect error: ${it.message}")
+            }
+        ).apply {
+            val textPaint = Paint().apply {
+                color = Color.RED
+                textSize = 50f
+                isAntiAlias = true
+            }
+            setOnDrawListener {
+                it.overlayCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+                it.overlayCanvas.setMatrix(it.sensorToBufferTransform)
+
+                val text = "Watermark 12345"
+                val centerX = it.overlayCanvas.width / 2f
+                val centerY = it.overlayCanvas.height / 2f
+
+                it.overlayCanvas.drawText(text, centerX, centerY, textPaint)
+
+                true
+            }
+        }
         val recorder = Recorder.Builder()
             .setQualitySelector(QualitySelector.from(Quality.HIGHEST))
             .build()
         videoCapture = VideoCapture.withOutput(recorder)
-        val mainHandler = Handler(Looper.getMainLooper())
 
         try {
             cameraProvider.unbindAll()
+            val useCaseGroup = UseCaseGroup.Builder()
+                .addUseCase(preview!!)
+                .addUseCase(videoCapture!!)
+                .addEffect(overlayEffect!!)
+                .build()
             camera = cameraProvider.bindToLifecycle(
                 lifecycleOwner,
                 cameraSelector,
-                preview,
-                imageCapture,
-                videoCapture
+                useCaseGroup
             )
-
         } catch (e: Exception) {
+            Log.d("CameraViewModel", ": ${e.message}")
             _cameraState.update {
                 it.copy(
                     error = e.message

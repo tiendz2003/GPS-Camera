@@ -2,6 +2,8 @@ package com.ssquad.gps.camera.geotag.data.repository
 
 import android.content.ContentUris
 import android.content.Context
+import android.media.ExifInterface
+import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import com.ssquad.gps.camera.geotag.R
@@ -108,10 +110,10 @@ class MediaRepositoryImpl (private val context: Context): MediaRepository {
             val photos = mutableListOf<Photo>()
             val projection = arrayOf(
                 MediaStore.Images.Media._ID,
-                //MediaStore.Images.Media.DATE_TAKEN,
                 MediaStore.Images.Media.DATE_ADDED,
                 MediaStore.Images.Media.SIZE,
-                MediaStore.Images.Media.DISPLAY_NAME
+                MediaStore.Images.Media.DISPLAY_NAME,
+                MediaStore.Images.Media.DESCRIPTION
             )
             val selection = "${MediaStore.Images.Media.BUCKET_ID} = ?"
             val selectionArgs = arrayOf(albumId)
@@ -128,6 +130,7 @@ class MediaRepositoryImpl (private val context: Context): MediaRepository {
             query?.use { cursor ->
                 val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
                 val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
+                val descriptionColumnIndex = cursor.getColumnIndex(MediaStore.Images.Media.DESCRIPTION)
                 while (cursor.moveToNext()){
                     val id = cursor.getLong(idColumn)
                     val contentUri  = ContentUris.withAppendedId(
@@ -137,6 +140,13 @@ class MediaRepositoryImpl (private val context: Context): MediaRepository {
                     val size = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE))
                     val name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME))
                     val dateAdded = cursor.getLong(dateAddedColumn)
+                    var locationAddress: String? = null
+                    if (descriptionColumnIndex != -1 && !cursor.isNull(descriptionColumnIndex)) {
+                        locationAddress = cursor.getString(descriptionColumnIndex)
+                    }
+                    if (locationAddress.isNullOrEmpty()) {
+                        locationAddress = getExifLocationData(context, contentUri)
+                    }
                     photos.add(
                         Photo(
                             id = id,
@@ -144,7 +154,8 @@ class MediaRepositoryImpl (private val context: Context): MediaRepository {
                             dateAdded = dateAdded,
                             albumId = albumId,
                             size = size,
-                            name = name
+                            name = name,
+                            locationAddress = locationAddress
                         )
                     )
                 }
@@ -163,7 +174,8 @@ class MediaRepositoryImpl (private val context: Context): MediaRepository {
                 MediaStore.Video.Media.DISPLAY_NAME,
                 MediaStore.Video.Media.DURATION,
                 MediaStore.Video.Media.DATA,  // Thêm để debug đường dẫn file
-                MediaStore.Video.Media.BUCKET_DISPLAY_NAME  // Thêm để debug tên thư mục
+                MediaStore.Video.Media.BUCKET_DISPLAY_NAME  ,
+                MediaStore.Video.Media.DESCRIPTION// Thêm để debug tên thư mục
             )
 
             // Tạo query cụ thể cho các video trong thư mục GPS_CAMERA
@@ -204,6 +216,7 @@ class MediaRepositoryImpl (private val context: Context): MediaRepository {
                     val sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE)
                     val pathColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA)
                     val bucketNameColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME)
+                    val descriptionColumnIndex = cursor.getColumnIndex(MediaStore.Video.Media.DESCRIPTION)
 
                     while (cursor.moveToNext()) {
                         val id = cursor.getLong(idColumn)
@@ -217,6 +230,10 @@ class MediaRepositoryImpl (private val context: Context): MediaRepository {
                         val dateAdded = cursor.getLong(dateAddedColumn)
                         val path = cursor.getString(pathColumn)
                         val bucketName = cursor.getString(bucketNameColumn)
+                        var locationAddress: String? = null
+                        if (descriptionColumnIndex != -1 && !cursor.isNull(descriptionColumnIndex)) {
+                            locationAddress = cursor.getString(descriptionColumnIndex)
+                        }
                         Log.d("MediaRepository", "Video found: name=$name, path=$path, bucket=$bucketName")
 
                         videos.add(
@@ -228,7 +245,8 @@ class MediaRepositoryImpl (private val context: Context): MediaRepository {
                                 size = size,
                                 name = name,
                                 duration = duration,
-                                isVideo = true
+                                isVideo = true,
+                                locationAddress = locationAddress
                             )
                         )
                     }
@@ -291,5 +309,16 @@ class MediaRepositoryImpl (private val context: Context): MediaRepository {
 
             latestPhoto
         }
+    private fun getExifLocationData(context: Context, imageUri: Uri): String? {
+        return try {
+            context.contentResolver.openInputStream(imageUri)?.use { inputStream ->
+                val exif = ExifInterface(inputStream)
+                exif.getAttribute(ExifInterface.TAG_USER_COMMENT)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
 
 }

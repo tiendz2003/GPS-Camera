@@ -1,6 +1,7 @@
 package com.ssquad.gps.camera.geotag.fragments
 
 import android.Manifest
+import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -33,8 +34,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private lateinit var adapter: ThemeTemplateAdapter
     private var lastDefaultTemplateId: String? = null // Biến lưu giá trị trước đó
     private val listTheme = ThemeTemplateModel.getTemplate()
-    private var reqNavigate = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-
+    private var reqNavigate = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val selectedTemplateId = result.data?.getStringExtra("SELECTED_TEMPLATE_ID")
+            if (selectedTemplateId != null) {
+                listTheme.forEach { it.isSelected = it.id == selectedTemplateId }
+                adapter.updateSelection(selectedTemplateId)
+            }
+        }
     }
     override fun initData() {
     }
@@ -88,7 +95,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             Log.d("RecyclerView", "Binding item: ${it.id}")
             navToPreview(it)
         }
-
         binding.rcvTheme.setupHorizontal(adapter)
         binding.rcvTheme.setHasFixedSize(true)
         adapter.submitList(listTheme){
@@ -96,13 +102,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         }
     }
     private fun navToPreview(selectedTemplate: ThemeTemplateModel) {
-        // Cập nhật trạng thái isSelected trong danh sách gốc
-        listTheme.forEach { it.isSelected = it.id == selectedTemplate.id }
-
         val themeType = selectedTemplate.type
         val filterList = listTheme.filter { it.type == themeType } as ArrayList<ThemeTemplateModel>
         val intent = PreviewTemplateActivity.getIntent(requireContext(), selectedTemplate, filterList, themeType)
-        startActivity(intent)
+        reqNavigate.launch(intent) // Sử dụng ActivityResultLauncher để nhận kết quả
     }
 
 

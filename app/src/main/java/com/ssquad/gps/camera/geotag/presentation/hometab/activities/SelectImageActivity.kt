@@ -106,5 +106,8 @@ class SelectImageActivity : BaseActivity<ActivitySelectedImageBinding>(ActivityS
     }
     override fun onResume() {
         super.onResume()
+        albumId?.let { albumId ->
+            photoViewModel.loadPhotosFromAlbum(albumId)
+        }
     }
 }

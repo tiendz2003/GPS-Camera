@@ -3,6 +3,7 @@ package com.ssquad.gps.camera.geotag.presentation.settingtab.activity
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -14,6 +15,7 @@ import com.ssquad.gps.camera.geotag.presentation.viewmodel.MapSettingViewModel
 import com.ssquad.gps.camera.geotag.service.MapManager
 import com.ssquad.gps.camera.geotag.utils.SharePrefManager
 import com.ssquad.gps.camera.geotag.utils.showToast
+import com.ssquad.gps.camera.geotag.utils.visible
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -47,7 +49,7 @@ class MapSettingActivity :
             btnMyLocation.setOnClickListener {
                 mapSettingViewModel.mapSettingState.value.yourLocation?.let { location ->
                     mapManager.updateMapWithLocation(location)
-                    showBottomSheet(location)
+                    showLocationFragment(location)
                 }
             }
             btnCheck.setOnClickListener {
@@ -82,7 +84,7 @@ class MapSettingActivity :
             mapSettingViewModel.mapSettingState.value.currentLocation?.let { location ->
                 mapManager.updateMapWithLocation(location)
                 val isLoading = mapSettingViewModel.mapSettingState.value.currentAddress == null
-                showBottomSheet(location, isLoading)
+                showLocationFragment(location, isLoading)
             }
         }
 
@@ -92,7 +94,6 @@ class MapSettingActivity :
                 longitude = latLng.longitude
             }
             if (currentLocationSheet != null && currentLocationSheet?.isAdded == true) {
-                currentLocationSheet?.dismiss()
                 currentLocationSheet = null
             }
             // Cập nhật location mới vào view model
@@ -101,7 +102,7 @@ class MapSettingActivity :
     }
 
 
-    private fun showBottomSheet(location: Location, isLoading: Boolean = false) {
+    private fun showLocationFragment(location: Location, isLoading: Boolean = false) {
         val currentAddress = if (isLoading) {
             getString(R.string.loading_address)
         } else {
@@ -109,22 +110,18 @@ class MapSettingActivity :
                 ?: getString(R.string.loading_address)
         }
 
-        supportFragmentManager.fragments.forEach { fragment ->
-            if (fragment is CurrentLocationSheet && fragment !== currentLocationSheet) {
-                fragment.dismiss()
-            }
-        }
-
-        if (currentLocationSheet != null && currentLocationSheet?.isAdded == true) {
-            // Cập nhật bottom sheet hiện tại
-            currentLocationSheet?.updateLocationInfo(location, currentAddress, isLoading)
+        val fragment = supportFragmentManager.findFragmentById(R.id.containerRoot)
+        if (fragment is CurrentLocationSheet) {
+            fragment.updateLocationInfo(location, currentAddress, isLoading)
         } else {
-            // Tạo bottom sheet mới nếu chưa có
-            currentLocationSheet =
-                CurrentLocationSheet.newInstance(location, currentAddress, isLoading)
-            currentLocationSheet?.show(supportFragmentManager, "location_sheet")
+            val newFragment = CurrentLocationSheet.newInstance(location, currentAddress, isLoading)
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.containerRoot, newFragment)
+                .commit()
+            findViewById<View>(R.id.containerRoot).visible()
         }
     }
+
 
     private fun observeViewModel() {
         lifecycleScope.launch {
@@ -135,18 +132,13 @@ class MapSettingActivity :
 
                         val isLoading = state.currentAddress == null
 
-                        showBottomSheet(location, isLoading)
+                        showLocationFragment(location, isLoading)
                     }
                 }
             }
         }
     }
 
-    fun onBottomSheetDismissed() {
-        if (currentLocationSheet != null) {
-            currentLocationSheet = null
-        }
-    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)

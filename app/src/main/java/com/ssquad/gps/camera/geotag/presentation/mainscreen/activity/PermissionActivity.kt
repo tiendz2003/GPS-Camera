@@ -14,6 +14,7 @@ import com.ssquad.gps.camera.geotag.presentation.hometab.activities.MainActivity
 import com.ssquad.gps.camera.geotag.databinding.ActivityPermissionBinding
 import com.ssquad.gps.camera.geotag.utils.PermissionManager
 import com.ssquad.gps.camera.geotag.utils.SharePrefManager
+import kotlin.text.compareTo
 
 class PermissionActivity :
     BaseActivity<ActivityPermissionBinding>(ActivityPermissionBinding::inflate) {
@@ -24,6 +25,7 @@ class PermissionActivity :
             } else {
                 if (PermissionManager.checkCamPermissions(this)) {
                     binding.switchCamera.isChecked = true
+                    binding.switchCamera.isEnabled = false // Vô hiệu hóa switch sau khi cấp quyền
                 }
             }
         }
@@ -34,6 +36,7 @@ class PermissionActivity :
             } else {
                 if (PermissionManager.checkMicroPermissions(this)) {
                     binding.switchMicrophone.isChecked = true
+                    binding.switchMicrophone.isEnabled = false // Vô hiệu hóa switch sau khi cấp quyền
                 }
             }
         }
@@ -44,6 +47,7 @@ class PermissionActivity :
             } else {
                 if (PermissionManager.checkLocationPermissions(this)) {
                     binding.switchLocation.isChecked = true
+                    binding.switchLocation.isEnabled = false // Vô hiệu hóa switch sau khi cấp quyền
                 }
             }
         }
@@ -54,6 +58,7 @@ class PermissionActivity :
             } else {
                 if (PermissionManager.checkLibraryGranted(this)) {
                     binding.switchPhotoLibrary.isChecked = true
+                    binding.switchPhotoLibrary.isEnabled = false // Vô hiệu hóa switch sau khi cấp quyền
                 }
             }
         }
@@ -71,52 +76,78 @@ class PermissionActivity :
     }
 
     private fun setupPermissionSwitches() {
-        binding.switchCamera.isChecked =
-            checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-        binding.switchMicrophone.isChecked =
-            checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
-        binding.switchLocation.isChecked =
-            checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        binding.switchPhotoLibrary.isChecked =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
-            } else {
-                checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        // CAMERA
+        if (PermissionManager.checkPermissionGranted(this, Manifest.permission.CAMERA)) {
+            binding.switchCamera.setOnCheckedChangeListener(null) // Xóa listener trước
+            binding.switchCamera.isChecked = true
+            binding.switchCamera.isEnabled = false // Vô hiệu hóa switch
+        } else {
+            binding.switchCamera.isChecked = false
+            binding.switchCamera.isEnabled = true // Đảm bảo switch có thể tương tác
+            binding.switchCamera.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) requestCameraPermission()
+                else binding.switchCamera.isChecked = false // Nếu người dùng tắt mà chưa cấp quyền
             }
+        }
 
+        // MICROPHONE
+        if (PermissionManager.checkPermissionGranted(this, Manifest.permission.RECORD_AUDIO)) {
+            binding.switchMicrophone.setOnCheckedChangeListener(null) // Xóa listener trước
+            binding.switchMicrophone.isChecked = true
+            binding.switchMicrophone.isEnabled = false // Vô hiệu hóa switch
+        } else {
+            binding.switchMicrophone.isChecked = false
+            binding.switchMicrophone.isEnabled = true // Đảm bảo switch có thể tương tác
+            binding.switchMicrophone.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) requestMicrophonePermission()
+                else binding.switchMicrophone.isChecked = false // Nếu người dùng tắt mà chưa cấp quyền
+            }
+        }
+
+        // LOCATION
+        if (PermissionManager.checkPermissionGranted(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            binding.switchLocation.setOnCheckedChangeListener(null) // Xóa listener trước
+            binding.switchLocation.isChecked = true
+            binding.switchLocation.isEnabled = false // Vô hiệu hóa switch
+        } else {
+            binding.switchLocation.isChecked = false
+            binding.switchLocation.isEnabled = true // Đảm bảo switch có thể tương tác
+            binding.switchLocation.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) requestLocationPermission()
+                else binding.switchLocation.isChecked = false // Nếu người dùng tắt mà chưa cấp quyền
+            }
+        }
+
+        // PHOTO LIBRARY
+        val photoPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+
+        if (PermissionManager.checkPermissionGranted(this, photoPermission)) {
+            binding.switchPhotoLibrary.setOnCheckedChangeListener(null) // Xóa listener trước
+            binding.switchPhotoLibrary.isChecked = true
+            binding.switchPhotoLibrary.isEnabled = false // Vô hiệu hóa switch
+        } else {
+            binding.switchPhotoLibrary.isChecked = false
+            binding.switchPhotoLibrary.isEnabled = true // Đảm bảo switch có thể tương tác
+            binding.switchPhotoLibrary.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) requestPhotoLibraryPermission()
+                else binding.switchPhotoLibrary.isChecked = false // Nếu người dùng tắt mà chưa cấp quyền
+            }
+        }
+
+        // Button actions
         binding.cardCamera.setOnClickListener { requestCameraPermission() }
         binding.cardMicrophone.setOnClickListener { requestMicrophonePermission() }
         binding.cardLocation.setOnClickListener { requestLocationPermission() }
         binding.cardPhotoLibrary.setOnClickListener { requestPhotoLibraryPermission() }
 
-        binding.switchCamera.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked && checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                requestCameraPermission()
-            }
-        }
-        binding.switchMicrophone.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked && checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                requestMicrophonePermission()
-            }
-        }
-        binding.switchLocation.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                requestLocationPermission()
-            }
-        }
-
-        binding.switchPhotoLibrary.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                requestPhotoLibraryPermission()
-            }
-        }
-        binding.btnContinue.setOnClickListener {
-            startMainActivity()
-        }
-        binding.tvGrantLater.setOnClickListener {
-            startMainActivity()
-        }
+        binding.btnContinue.setOnClickListener { startMainActivity() }
+        binding.tvGrantLater.setOnClickListener { startMainActivity() }
     }
+
 
     private fun requestCameraPermission() {
         if (!PermissionManager.checkPermissionGranted(this, Manifest.permission.CAMERA)) {
@@ -166,15 +197,44 @@ class PermissionActivity :
         finish()
     }
 
-    private fun bindPermissions() {
-        binding.switchCamera.isChecked =
-            PermissionManager.checkPermissionGranted(this, Manifest.permission.CAMERA)
-        binding.switchMicrophone.isChecked =
-            PermissionManager.checkPermissionGranted(this, Manifest.permission.RECORD_AUDIO)
-    }
-
     override fun onResume() {
         super.onResume()
-        bindPermissions()
+        updateAllSwitchStates()
+    }
+
+    private fun updateAllSwitchStates() {
+        // CAMERA
+        if (PermissionManager.checkPermissionGranted(this, Manifest.permission.CAMERA)) {
+            binding.switchCamera.setOnCheckedChangeListener(null)
+            binding.switchCamera.isChecked = true
+            binding.switchCamera.isEnabled = false
+        }
+
+        // MICROPHONE
+        if (PermissionManager.checkPermissionGranted(this, Manifest.permission.RECORD_AUDIO)) {
+            binding.switchMicrophone.setOnCheckedChangeListener(null)
+            binding.switchMicrophone.isChecked = true
+            binding.switchMicrophone.isEnabled = false
+        }
+
+        // LOCATION
+        if (PermissionManager.checkPermissionGranted(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            binding.switchLocation.setOnCheckedChangeListener(null)
+            binding.switchLocation.isChecked = true
+            binding.switchLocation.isEnabled = false
+        }
+
+        // PHOTO LIBRARY
+        val photoPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+
+        if (PermissionManager.checkPermissionGranted(this, photoPermission)) {
+            binding.switchPhotoLibrary.setOnCheckedChangeListener(null)
+            binding.switchPhotoLibrary.isChecked = true
+            binding.switchPhotoLibrary.isEnabled = false
+        }
     }
 }

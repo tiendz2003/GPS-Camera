@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
 import androidx.camera.core.Camera
@@ -12,6 +14,7 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.core.TorchState
+import androidx.camera.effects.OverlayEffect
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.FileOutputOptions
 import androidx.camera.video.Quality
@@ -72,6 +75,7 @@ class CameraViewModel(
     private var recording: Recording? = null
     private var preview: Preview? = null
     private var cameraExecutor = Executors.newSingleThreadExecutor()
+    private var overlayEffect: OverlayEffect? = null
 
     private var lensFacing = CameraSelector.LENS_FACING_BACK
     private var flashMode = ImageCapture.FLASH_MODE_OFF
@@ -146,6 +150,8 @@ class CameraViewModel(
             .setQualitySelector(QualitySelector.from(Quality.HIGHEST))
             .build()
         videoCapture = VideoCapture.withOutput(recorder)
+        val mainHandler = Handler(Looper.getMainLooper())
+
         try {
             cameraProvider.unbindAll()
             camera = cameraProvider.bindToLifecycle(
@@ -298,7 +304,6 @@ class CameraViewModel(
                 override fun onCaptureSuccess(image: ImageProxy) {
                     viewModelScope.launch {
                         try {
-
                             val bitmap = image.toBitmap()
                             val rotatedBitmap = bitmap.rotate(image.imageInfo.rotationDegrees)
                             updateCameraState {
@@ -388,18 +393,21 @@ class CameraViewModel(
                                         }
                                         // Lấy tham chiếu đến template view
                                         val templateView = _cameraState.value.templateView
+                                        val address =  _cameraState.value.templateData?.location
                                         val savedUri = if (templateView != null) {
                                             // Xử lý video với template
                                             cameraRepository.processVideoWithTemplate(
                                                 context,
                                                 Uri.fromFile(tempFile),
-                                                templateView
+                                                templateView,
+                                                address
                                             )
                                         } else {
                                             // Fallback nếu không có template view
                                             cameraRepository.saveVideoToGallery(
                                                 context,
-                                                Uri.fromFile(tempFile)
+                                                Uri.fromFile(tempFile),
+                                                address
                                             )
                                         }
                                         Log.d(

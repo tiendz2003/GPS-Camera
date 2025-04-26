@@ -64,4 +64,8 @@ class EditAlbumLibraryActivity : BaseActivity<ActivityAlbumLibraryBinding>(
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        albumsViewModel.loadAlbums()
+    }
 }

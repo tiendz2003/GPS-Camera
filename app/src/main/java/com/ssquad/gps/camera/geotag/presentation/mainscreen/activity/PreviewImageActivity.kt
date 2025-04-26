@@ -50,7 +50,7 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
     private var templateId: String? = null
     private lateinit var mapManager: MapManager
     private var mapSnapshotJob: Job? = null
-    private var mapBitmap : Bitmap? = null
+    private var mapBitmap: Bitmap? = null
 
     private var isTemplateDataLoaded = false
     private var pendingImagePath: String? = null
@@ -73,7 +73,11 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
         templateId = SharePrefManager.getDefaultTemplate()
         pendingImagePath = intent.getStringExtra("IMAGE_PATH")
         pendingIsFromAlbum = intent.getBooleanExtra("FROM_ALBUM", false)
-
+        val uri = pendingImagePath?.toUri()
+        Log.d("PreviewImageActivity", "uri: $uri")
+        uri?.let {
+            binding.imagePreview.loadImageIcon(uri)
+        }
         templateData = intent.parcelable<TemplateDataModel>("TEMPLATE_DATA")
 
         if (templateData != null && templateId != null) {
@@ -88,22 +92,17 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
             processImage()
         }
     }
+
     private fun loadTemplateData() {
         lifecycleScope.launch {
-            // Gọi hàm lấy dữ liệu template
             photosViewModel.getCacheDataTemplate()
 
-            // Theo dõi luồng dữ liệu từ ViewModel
             photosViewModel.cacheData.collectLatest { data ->
                 if (data != null) {
                     // Đã có dữ liệu template
                     templateData = data
                     isTemplateDataLoaded = true
 
-                    // Ẩn trạng thái loading nếu đang hiển thị
-
-
-                    // Thiết lập template và xử lý ảnh
                     if (templateId != null) {
                         previewViewModel.setSelectedTemplate(templateId!!)
                     }
@@ -118,18 +117,20 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
             val uri = pendingImagePath?.toUri()
             Log.d("PreviewImageActivity", "uri: $uri")
             uri?.let {
-                displayEditImageWithTemplate(it, templateData, templateId)
+                displayEditImageWithTemplate(templateData, templateId)
             }
         } else {
             val bitmap = BitmapHolder.imageBitmap
             if (bitmap != null) {
                 displayImageWithTemplate(bitmap, templateData, templateId)
             } else {
-                Toast.makeText(this, getString(R.string.error_receiving_photo), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.error_receiving_photo), Toast.LENGTH_SHORT)
+                    .show()
                 finish()
             }
         }
     }
+
     override fun initView() {
         setupViewPager()
         observeViewModel()
@@ -180,6 +181,7 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
             updateTemplateWithMap(template, null)
         }
     }
+
     private fun updateTemplateWithMap(template: TemplateDataModel, bitmap: Bitmap?) {
         binding.templateContainer.removeAllViews()
         templateId?.let { id ->
@@ -250,11 +252,9 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
     }
 
     private fun displayEditImageWithTemplate(
-        uri: Uri,
         templateData: TemplateDataModel?,
         templateId: String?
     ) {
-        binding.imagePreview.loadImageIcon(uri)
         if (templateData != null && templateId != null) {
             this.templateData = templateData
             this.templateId = templateId
@@ -275,22 +275,22 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
         this.templateId = templateId
         binding.templateContainer.removeAllViews()
         templateData?.let { data ->
-           if(Config.isGPSTemplate(templateId) && mapBitmap != null) {
-               binding.templateContainer.addTemplate(
-                   this,
-                   templateId,
-                   data,
-                   previewViewModel.previewUiState.value.templateState,
-                   mapBitmap
-               )
-           }else{
+            if (Config.isGPSTemplate(templateId) && mapBitmap != null) {
                 binding.templateContainer.addTemplate(
-                     this,
-                     templateId,
-                     data,
-                     previewViewModel.previewUiState.value.templateState
+                    this,
+                    templateId,
+                    data,
+                    previewViewModel.previewUiState.value.templateState,
+                    mapBitmap
                 )
-           }
+            } else {
+                binding.templateContainer.addTemplate(
+                    this,
+                    templateId,
+                    data,
+                    previewViewModel.previewUiState.value.templateState
+                )
+            }
 
             if (Config.isGPSTemplate(templateId) && mapBitmap == null) {
                 loadMapImage(data)
@@ -299,8 +299,6 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
     }
 
     private fun saveImage() {
-
-        // val bitmap = BitmapHolder.bitmap
         lifecycleScope.launch {
             try {
                 val combineBitmap = withContext(Dispatchers.Default) {
@@ -314,7 +312,7 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
                     }
                     originBitmap
                 }
-                previewViewModel.saveImageToGallery(this@PreviewImageActivity, combineBitmap)
+                previewViewModel.saveImageToGallery(this@PreviewImageActivity, combineBitmap, templateData?.location)
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
@@ -346,6 +344,7 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
             }
         }.attach()
     }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         binding.mapView.onSaveInstanceState(outState)
@@ -355,6 +354,7 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
         super.onLowMemory()
         binding.mapView.onLowMemory()
     }
+
     override fun onDestroy() {
         super.onDestroy()
         mapSnapshotJob?.cancel()

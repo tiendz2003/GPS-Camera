@@ -13,13 +13,14 @@ data class Album(
 @Parcelize
 data class Photo(
     val id: Long,
-    val name: String,
-    val size: Long,
     val path: Uri,
-    val albumId: String,
     val dateAdded: Long,
-    val duration: Long? = null,
-    val isVideo: Boolean = false
+    val albumId: String,
+    val size: Long,
+    val name: String,
+    val duration: Long = 0,
+    val isVideo: Boolean = false,
+    val locationAddress: String? = null
 ): Parcelable
 enum class SortOption(val displayName: String) {
     NAME("Name"),

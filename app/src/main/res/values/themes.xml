@@ -1,5 +1,4 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.BaseProject" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="fontFamily">@font/plusjakartasans</item>
     </style>
@@ -8,12 +7,15 @@
         <item name="android:textSize">14sp</item>
         <item name="android:fontFamily">@font/plusjakartasans</item>
         <item name="android:textStyle">normal</item>
+        <item name="android:lineSpacingExtra">0dp</item>
     </style>
     <style name="CustomBottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
-        <item name="android:minHeight">48dp</item> <!-- Đặt chiều cao tối thiểu -->
-        <item name="itemIconSize">24dp</item> <!-- Kích thước icon nhỏ hơn -->
-        <item name="itemPaddingTop">4dp</item> <!-- Padding trên nhỏ hơn -->
-        <item name="itemPaddingBottom">4dp</item> <!-- Padding dưới nhỏ hơn -->
+        <item name="itemIconSize">24dp</item>
+        <item name="itemTextAppearanceActive">@style/BottomNavigationTextStyle</item>
+        <item name="itemTextAppearanceInactive">@style/BottomNavigationTextStyle</item>
+        <item name="itemIconPadding">0dp</item>
+        <item name="itemPaddingTop">4dp</item>
+        <item name="itemPaddingBottom">4dp</item>
     </style>
     <style name="CustomBottomAppBar" parent="Widget.MaterialComponents.BottomAppBar">
         <item name="backgroundTint">@color/white</item>

@@ -6,6 +6,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.media.ExifInterface
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.provider.MediaStore
@@ -24,11 +25,12 @@ import androidx.core.graphics.createBitmap
 import com.arthenica.ffmpegkit.FFmpegKit
 import com.arthenica.ffmpegkit.ReturnCode
 import kotlinx.coroutines.delay
+import okhttp3.Address
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class CameraRepositoryImpl : CameraRepository {
-    override suspend fun saveImageToGallery(context: Context, bitmap: Bitmap): Uri? =
+    override suspend fun saveImageToGallery(context: Context, bitmap: Bitmap,address: String?): Uri? =
         withContext(Dispatchers.IO) {
             try {
                 val fileName = "GPS_CAMERA_${
@@ -46,6 +48,9 @@ class CameraRepositoryImpl : CameraRepository {
                     put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
                     put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM/GPS_CAMERA")
                     put(MediaStore.MediaColumns.IS_PENDING, 1)
+                    if(!address.isNullOrEmpty()){
+                        put(MediaStore.Images.ImageColumns.DESCRIPTION,address)
+                    }
                 }
 
                 context.contentResolver.also { resolver ->
@@ -61,6 +66,9 @@ class CameraRepositoryImpl : CameraRepository {
                 imageUri?.let { uri ->
                     context.contentResolver.update(uri, contentValues, null, null)
                 }
+                if (!address.isNullOrEmpty() && imageUri != null) {
+                    addExifLocationData(context, imageUri, address)
+                }
 
                 return@withContext imageUri
             } catch (e: Exception) {
@@ -70,7 +78,7 @@ class CameraRepositoryImpl : CameraRepository {
         }
 
     @SuppressLint("SuspiciousIndentation")
-    override suspend fun saveVideoToGallery(context: Context, sourceUri: Uri): Uri? =
+    override suspend fun saveVideoToGallery(context: Context, sourceUri: Uri,address: String?): Uri? =
         withContext(Dispatchers.IO) {
             try {
                 val fileName = "GPS_CAMERA_${
@@ -89,6 +97,9 @@ class CameraRepositoryImpl : CameraRepository {
                         put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM/GPS_CAMERA")
                         put(MediaStore.Video.Media.DURATION, 0) // Sẽ được cập nhật sau
                         put(MediaStore.MediaColumns.IS_PENDING, 1)
+                        if(!address.isNullOrEmpty()){
+                            put(MediaStore.Video.VideoColumns.DESCRIPTION,address)
+                        }
                     }
 
                     // Sử dụng Video.Media.EXTERNAL_CONTENT_URI cho video
@@ -150,7 +161,11 @@ class CameraRepositoryImpl : CameraRepository {
                             Log.e("VideoScan", "Scan failed: ${e.message}")
                         }
                     }
-                    return@withContext videoUri
+                if (!address.isNullOrEmpty() && videoUri != null) {
+                    addExifLocationData(context, videoUri, address)
+                }
+
+                return@withContext videoUri
 
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -166,7 +181,18 @@ class CameraRepositoryImpl : CameraRepository {
                 }
             }
         }
+    private fun addExifLocationData(context: Context, imageUri: Uri, locationAddress: String) {
+        try {
+            val path = getFilePathFromUri(context, imageUri) ?: return
 
+            val exifInterface = ExifInterface(path)
+
+            exifInterface.setAttribute(ExifInterface.TAG_USER_COMMENT, locationAddress)
+            exifInterface.saveAttributes()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
     // Hàm hỗ trợ để lấy đường dẫn file từ Uri
     private fun getFilePathFromUri(context: Context, uri: Uri): String? {
         val projection = arrayOf(MediaStore.MediaColumns.DATA)
@@ -182,7 +208,8 @@ class CameraRepositoryImpl : CameraRepository {
     override suspend fun processVideoWithTemplate(
         context: Context,
         videoUri: Uri,
-        templateView: View
+        templateView: View,
+        address: String?
     ): Uri? = withContext(Dispatchers.Default) {
         try {
             // Tạo các tệp tạm
@@ -257,7 +284,7 @@ class CameraRepositoryImpl : CameraRepository {
             if (ReturnCode.isSuccess(returnCode)) {
                 Log.i("VideoProcessor", "Xử lý video thành công")
                 // Lưu video vào thư viện xoa file tạm
-                val result = saveVideoToGallery(context, Uri.fromFile(tempOutputFile))
+                val result = saveVideoToGallery(context, Uri.fromFile(tempOutputFile),address)
                 tempInputFile.delete()
                 tempTemplateFile.delete()
                 tempOutputFile.delete()

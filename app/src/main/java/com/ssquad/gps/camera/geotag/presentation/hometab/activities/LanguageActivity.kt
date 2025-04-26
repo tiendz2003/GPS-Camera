@@ -126,18 +126,14 @@ class LanguageActivity : BaseActivity<ActivityLanguageBinding>(ActivityLanguageB
     }*/
 
     private fun applyLanguage() {
-
         adapter?.getSelectedLanguage()?.let { selectedLanguage ->
-            Common.languageSelected = selectedLanguage
+            Common.languageSelected = selectedLanguage // Lưu ngôn ngữ đã chọn
             val locale = Locale(selectedLanguage.key)
-            Log.d("LanguageActivity", "$locale")
             val config = Configuration(resources.configuration)
             config.setLocale(locale)
-            resources.updateConfiguration(config, resources.displayMetrics)
-            applicationContext.resources.updateConfiguration(config, resources.displayMetrics)
+            createConfigurationContext(config)
             navigateToHome()
         } ?: run {
-            //Thông báo
             Toast.makeText(this, R.string.please_select_language, Toast.LENGTH_SHORT).show()
         }
     }

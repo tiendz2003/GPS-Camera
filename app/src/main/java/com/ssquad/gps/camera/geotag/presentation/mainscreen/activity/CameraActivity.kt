@@ -175,9 +175,12 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                 if (cameraViewModel.isVideoMode()) {
                     binding.motionLayoutMode.transitionToState(R.id.photo_mode)
                     cameraViewModel.toggleCameraMode()
-                    if (cameraViewModel.camera?.cameraInfo?.torchState?.value == TorchState.ON) {
+                    if (cameraViewModel.camera?.cameraInfo?.torchState?.value == TorchState.ON ) {
                         cameraViewModel.toggleFlashDuringRecording()
-                        toggleFlashMode()
+                        if(cameraViewModel.getCurrentFlashMode() == ImageCapture.FLASH_MODE_OFF){
+                            toggleFlashMode()
+                            updateFlashIcon(cameraViewModel.getCurrentFlashMode())
+                        }
                     }
                 }
             }
@@ -187,9 +190,9 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                 if (!cameraViewModel.isVideoMode()) {
                     binding.motionLayoutMode.transitionToState(R.id.video_mode)
                     cameraViewModel.toggleCameraMode()
-                }
-                if (cameraViewModel.getCurrentFlashMode() == ImageCapture.FLASH_MODE_ON && cameraViewModel.isVideoMode()) {
-                    cameraViewModel.toggleFlashDuringRecording()
+                    if (cameraViewModel.getCurrentFlashMode() == ImageCapture.FLASH_MODE_ON && cameraViewModel.isVideoMode()) {
+                        cameraViewModel.toggleFlashDuringRecording()
+                    }
                 }
             }
             imvTakeCapture.setOnDebounceClickListener(1000L) {
@@ -257,7 +260,13 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
             }
         }
     }
+    private fun showSkeletonLoading() {
+        binding.skeletonLayout.showSkeleton() // Show shimmer effect
+    }
 
+    private fun hideSkeletonLoading() {
+        binding.skeletonLayout.showOriginal() // Hide shimmer effect
+    }
     @SuppressLint("SetTextI18n")
     private fun observeViewModel() {
         lifecycleScope.launch {
@@ -418,6 +427,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
     }
 
     private fun initTemplate(template: TemplateDataModel) {
+
         mapSnapshotJob?.cancel()
         cameraViewModel.selectedTemplate(templateId)
         val isGpsTemplate = Config.isGPSTemplate(templateId)

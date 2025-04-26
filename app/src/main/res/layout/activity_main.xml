@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/neutralWhite"
+    android:fitsSystemWindows="true"
     tools:context=".presentation.hometab.activities.MainActivity">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="56dp" />
+        android:layout_height="match_parent" />
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottomAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:fabCradleMargin="10dp"
+        android:layout_gravity="bottom"
         app:fabAlignmentMode="center"
+        app:fabCradleMargin="10dp"
         app:fabCradleRoundedCornerRadius="30dp"
-        android:layout_gravity="bottom">
+        app:maxButtonHeight="120dp">
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigationView"
+            style="@style/CustomBottomNavigationView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
             android:layout_marginTop="8dp"
-            android:padding="8dp"
+            android:layout_marginEnd="16dp"
             android:background="@android:color/transparent"
-            style="@style/CustomBottomNavigationView"
+            android:padding="8dp"
             android:textAlignment="gravity"
             app:itemIconTint="@color/colorPrimary"
-            app:itemTextColor="@color/colorPrimary"
             app:itemTextAppearanceActive="@style/BottomNavigationTextStyle"
             app:itemTextAppearanceInactive="@style/BottomNavigationTextStyle"
+            app:itemTextColor="@color/colorPrimary"
             app:labelVisibilityMode="labeled"
             app:menu="@menu/bottom_navigation" />
     </com.google.android.material.bottomappbar.BottomAppBar>
@@ -46,11 +46,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="camera"
-        android:src="@drawable/ic_camera"
         android:scaleType="center"
-        app:tint="@color/white"
+        android:src="@drawable/ic_camera"
         app:backgroundTint="@color/colorPrimary"
+        app:layout_anchor="@id/bottomAppBar"
         app:maxImageSize="35dp"
-        app:layout_anchor="@id/bottomAppBar" />
+        app:tint="@color/white" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

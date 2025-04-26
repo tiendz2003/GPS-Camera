@@ -190,7 +190,7 @@ fun TemplateDataModel?.getFormattedTemperature(): String {
 }
 fun Long.formatCapturedTime(): String {
     val sdf = SimpleDateFormat("h:mm a dd/MM/yyyy", Locale.getDefault())
-    return sdf.format(Date(this))
+    return sdf.format(Date(this*1000))
 }
 
 @SuppressLint("DefaultLocale")

@@ -6,13 +6,17 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
+import android.text.TextUtils
 import android.util.Log
 import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.graphics.drawable.toDrawable
 import com.google.android.exoplayer2.ExoPlayer
@@ -33,6 +37,10 @@ import com.ssquad.gps.camera.geotag.utils.kbToMb
 import com.ssquad.gps.camera.geotag.utils.loadImageIcon
 import com.ssquad.gps.camera.geotag.utils.parcelable
 import com.ssquad.gps.camera.geotag.utils.visible
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import kotlin.or
 
 class PreviewSavedActivity :
     BaseActivity<ActivityPreviewSavedBinding>(ActivityPreviewSavedBinding::inflate) {
@@ -47,6 +55,7 @@ class PreviewSavedActivity :
 
     companion object {
         private const val EXTRA_PHOTO = "extra_photo"
+        private const val DELETE_REQUEST_CODE = 101
         fun getIntent(context: Context, photo: Photo): Intent {
             return Intent(context, PreviewSavedActivity::class.java).apply {
                 putExtra(EXTRA_PHOTO, photo)
@@ -110,15 +119,27 @@ class PreviewSavedActivity :
     override fun initView() {
         with(binding) {
             if (photo.isVideo) {
-                // Hide ImageView, show player view
+                controlsContainer.visible()
                 playerView.visible()
                 imageView.gone()
+                txtVideoTitle.apply {
+                    isSelected = true
+                    ellipsize = TextUtils.TruncateAt.MARQUEE
+                    marqueeRepeatLimit = -1
+                    isSingleLine = true
+                    text = photo.name
+                }
 
-
-                txtVideoTitle.text = photo.name
 
             } else {
-                // For images, hide video controls
+                txtVideoTitle.apply {
+                    isSelected = true
+                    ellipsize = TextUtils.TruncateAt.MARQUEE
+                    marqueeRepeatLimit = -1
+                    isSingleLine = true
+                    text = photo.name
+                }
+                controlsContainer.gone()
                 playerView.gone()
                 imageView.visible()
                 imageView.loadImageIcon(photo.path)
@@ -161,7 +182,8 @@ class PreviewSavedActivity :
                                 stopSeekBar()
                             }
 
-                            else -> { /* No-op */ }
+                            else -> { /* No-op */
+                            }
                         }
                     }
 
@@ -208,6 +230,7 @@ class PreviewSavedActivity :
         stopSeekBar()
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun initActionView() {
         with(binding) {
             btnPlayPause.setOnClickListener {
@@ -222,7 +245,9 @@ class PreviewSavedActivity :
                     }
                 }
             }
-
+            btnBack.setOnClickListener {
+                finish()
+            }
             btnForward.setOnClickListener {
                 val positionNext = player!!.currentPosition + 5000L
                 player?.seekTo(positionNext)
@@ -249,7 +274,11 @@ class PreviewSavedActivity :
                 bottomSheet.show(supportFragmentManager, "InfoBottomSheet")
             }
             seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                override fun onProgressChanged(
+                    seekBar: SeekBar?,
+                    progress: Int,
+                    fromUser: Boolean
+                ) {
                     if (fromUser) {
                         player?.seekTo(progress.toLong())
                     }
@@ -281,6 +310,7 @@ class PreviewSavedActivity :
             Log.d("PreviewSavedActivity", "updateSeekBar: error")
         }
     }
+
     private fun stopSeekBar() {
         updateSeekBarRunnable?.let { handler.removeCallbacks(it) }
         updateSeekBarRunnable = null
@@ -290,12 +320,27 @@ class PreviewSavedActivity :
         val infoDialog = Dialog(this)
         val dialogBinding = InforImgDialogBinding.inflate(layoutInflater)
         infoDialog.setContentView(dialogBinding.root)
-
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        dateFormat.format(Date(photo.dateAdded * 1000))
         with(dialogBinding) {
-            tvName.text = photo.name
+            tvName.apply {
+                isSelected = true
+                ellipsize = TextUtils.TruncateAt.MARQUEE
+                marqueeRepeatLimit = -1
+                isSingleLine = true
+                text = photo.name
+            }
+
+            tvPath.apply {
+                isSelected = true
+                ellipsize = TextUtils.TruncateAt.MARQUEE
+                marqueeRepeatLimit = -1
+                isSingleLine = true
+                text = "${photo.path}"
+            }
+            tvLocation.text = photo.locationAddress
             tvSize.text = photo.size.kbToMb()
             tvDate.text = photo.dateAdded.formatCapturedTime()
-            tvPath.text = "${photo.path}"
             btnClose.setOnClickListener {
                 infoDialog.dismiss()
             }
@@ -307,6 +352,7 @@ class PreviewSavedActivity :
         infoDialog.show()
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     private fun deletePhoto() {
         val dialogView = layoutInflater.inflate(R.layout.delete_dialog, null)
 
@@ -319,34 +365,65 @@ class PreviewSavedActivity :
             .setCancelable(false)
             .create()
 
-        btnCancel.setOnClickListener {
-            alertDialog.dismiss()
-        }
-
-        btnClose.setOnClickListener {
-            alertDialog.dismiss()
-        }
+        btnCancel.setOnClickListener { alertDialog.dismiss() }
+        btnClose.setOnClickListener { alertDialog.dismiss() }
 
         btnDelete.setOnClickListener {
             try {
-                val rowsDeleted = contentResolver.delete(photo.path, null, null)
+                val photoUri = photo.path // Đảm bảo đây là content:// URI, không phải file://
+                val rowsDeleted = contentResolver.delete(photoUri, null, null)
                 if (rowsDeleted > 0) {
-                    Toast.makeText(this,
-                        getString(R.string.image_deleted_successfully), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        getString(R.string.image_deleted_successfully),
+                        Toast.LENGTH_SHORT
+                    ).show()
                     setResult(RESULT_OK)
                     finish()
                 } else {
-                    Toast.makeText(this,
-                        getString(R.string.failed_to_delete_image), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        getString(R.string.failed_to_delete_image),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
+            } catch (e: SecurityException) {
+                val pendingIntent =
+                    MediaStore.createDeleteRequest(contentResolver, listOf(photo.path)).intentSender
+                startIntentSenderForResult(
+                    pendingIntent,
+                    DELETE_REQUEST_CODE,
+                    null,
+                    0, 0, 0
+                )
             } catch (e: Exception) {
                 Log.e("PreviewSavedActivity", "Delete error: ${e.message}")
+                Toast.makeText(this, getString(R.string.failed_to_delete_image), Toast.LENGTH_SHORT)
+                    .show()
             }
             alertDialog.dismiss()
         }
 
         alertDialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         alertDialog.show()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == DELETE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Toast.makeText(
+                    this,
+                    getString(R.string.image_deleted_successfully),
+                    Toast.LENGTH_SHORT
+                ).show()
+                setResult(RESULT_OK)
+                finish()
+            } else {
+                Toast.makeText(this, getString(R.string.failed_to_delete_image), Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
     }
 
     fun shareFileVideo(context: Context, uri: Uri, isVideo: Boolean) {
@@ -368,4 +445,5 @@ class PreviewSavedActivity :
         stopSeekBar()
         releasePlayer()
     }
+
 }

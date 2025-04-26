@@ -18,7 +18,7 @@ class AlbumViewModel(
     init {
         loadAlbums()
     }
-    private fun loadAlbums(){
+    fun loadAlbums(){
         viewModelScope.launch {
             _albums.value = Resource.Loading()
             try {

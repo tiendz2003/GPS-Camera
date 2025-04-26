@@ -52,7 +52,7 @@ class PreviewShareViewModel(
         }
     }
 
-    fun saveImageToGallery(context: Context, bitmap: Bitmap) {
+    fun saveImageToGallery(context: Context, bitmap: Bitmap,address: String?) {
         viewModelScope.launch {
             updatePreviewState {
                 it.copy(
@@ -61,7 +61,7 @@ class PreviewShareViewModel(
             }
             _toastEvents.send(context.getString(R.string.saving_image))
             try {
-                val uri = cameraRepository.saveImageToGallery(context, bitmap)
+                val uri = cameraRepository.saveImageToGallery(context, bitmap,address)
                 updatePreviewState {
                     it.copy(
                         savedImageUri = uri,

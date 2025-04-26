@@ -153,8 +153,6 @@
                 android:layout_height="match_parent"
                 android:elevation="5dp"
                 android:visibility="visible" />
-
-
             <TextView
                 android:id="@+id/tv_count_down"
                 android:layout_width="wrap_content"
@@ -171,7 +169,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="@id/fl_camera"/>
-
+        <com.faltenreich.skeletonlayout.SkeletonLayout
+            android:id="@+id/skeletonLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:layout_constraintBottom_toBottomOf="@+id/fl_camera"
+            >
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:background="@color/neutralGrey" />
+            </LinearLayout>
+        </com.faltenreich.skeletonlayout.SkeletonLayout>
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cl_bottom"
             android:layout_width="match_parent"
@@ -188,7 +202,6 @@
                 app:layout_constraintEnd_toStartOf="@id/motionLayout_mode"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/motionLayout_mode" />
-
             <androidx.constraintlayout.motion.widget.MotionLayout
                 android:id="@+id/motionLayout_mode"
                 android:layout_width="0dp"

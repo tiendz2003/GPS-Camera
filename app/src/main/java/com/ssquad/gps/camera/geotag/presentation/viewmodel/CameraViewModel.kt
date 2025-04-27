@@ -1,7 +1,10 @@
 package com.ssquad.gps.camera.geotag.presentation.viewmodel
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -34,6 +37,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.ssquad.gps.camera.geotag.data.models.TemplateDataModel
 import com.ssquad.gps.camera.geotag.domain.CameraRepository
 import com.ssquad.gps.camera.geotag.domain.MapLocationRepository
@@ -48,6 +52,7 @@ import com.ssquad.gps.camera.geotag.utils.formatToTime
 import com.ssquad.gps.camera.geotag.worker.CacheDataTemplate
 import com.google.android.material.snackbar.Snackbar
 import com.ssquad.gps.camera.geotag.utils.rotate
+import com.ssquad.gps.camera.geotag.worker.VideoProcessingService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -62,6 +67,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.Executors
+import kotlin.text.compareTo
 import kotlin.text.format
 
 class CameraViewModel(
@@ -81,7 +87,7 @@ class CameraViewModel(
     private var recording: Recording? = null
     private var preview: Preview? = null
     private var cameraExecutor = Executors.newSingleThreadExecutor()
-    private var overlayEffect: OverlayEffect? = null
+    private var videoSavedReceiver: BroadcastReceiver? = null
 
     private var lensFacing = CameraSelector.LENS_FACING_BACK
     private var flashMode = ImageCapture.FLASH_MODE_OFF
@@ -151,33 +157,7 @@ class CameraViewModel(
             .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
             .setFlashMode(flashMode)
             .build()
-        val mainHandler = Handler(Looper.getMainLooper())
-        overlayEffect = OverlayEffect(
-            CameraEffect.VIDEO_CAPTURE or CameraEffect.IMAGE_CAPTURE,
-            0,
-            mainHandler,
-            {
-                Log.d("CameraViewModel", "Overlay effect error: ${it.message}")
-            }
-        ).apply {
-            val textPaint = Paint().apply {
-                color = Color.RED
-                textSize = 50f
-                isAntiAlias = true
-            }
-            setOnDrawListener {
-                it.overlayCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-                it.overlayCanvas.setMatrix(it.sensorToBufferTransform)
 
-                val text = "Watermark 12345"
-                val centerX = it.overlayCanvas.width / 2f
-                val centerY = it.overlayCanvas.height / 2f
-
-                it.overlayCanvas.drawText(text, centerX, centerY, textPaint)
-
-                true
-            }
-        }
         val recorder = Recorder.Builder()
             .setQualitySelector(QualitySelector.from(Quality.HIGHEST))
             .build()
@@ -188,12 +168,12 @@ class CameraViewModel(
             val useCaseGroup = UseCaseGroup.Builder()
                 .addUseCase(preview!!)
                 .addUseCase(videoCapture!!)
-                .addEffect(overlayEffect!!)
-                .build()
+                .addUseCase(imageCapture!!)
+
             camera = cameraProvider.bindToLifecycle(
                 lifecycleOwner,
                 cameraSelector,
-                useCaseGroup
+                useCaseGroup.build()
             )
         } catch (e: Exception) {
             Log.d("CameraViewModel", ": ${e.message}")
@@ -381,7 +361,7 @@ class CameraViewModel(
 
     }
 
-    private fun startVideoRecording(context: Context) {
+    fun startVideoRecording(context: Context) {
         val videoCapture = this.videoCapture ?: return
         tempFile?.delete()
         try {
@@ -391,10 +371,7 @@ class CameraViewModel(
                     SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
                 }.mp4"
             )
-            Log.d(
-                "CameraViewModel",
-                "Video file path: ${tempFile?.absolutePath}"
-            )
+
             val fileOutputOptions = FileOutputOptions.Builder(tempFile!!).build()
             recording = videoCapture.output.prepareRecording(context, fileOutputOptions)
                 .apply {
@@ -415,87 +392,119 @@ class CameraViewModel(
                                     it.copy(error = "Không tạo được video: " + recordEvent.error)
                                 }
                             } else {
-                                viewModelScope.launch {
-                                    try {
-                                        updateCameraState {
-                                            it.copy(
-                                                isLoading = true, error = null
-                                            )
-                                        }
-                                        updateCameraState {
-                                            it.copy(showProcessingSnackbar = true)
-                                        }
-                                        // Lấy tham chiếu đến template view
-                                        val templateView = _cameraState.value.templateView
-                                        val address =  _cameraState.value.templateData?.location
-                                        val savedUri = if (templateView != null) {
-                                            // Xử lý video với template
-                                            cameraRepository.processVideoWithTemplate(
-                                                context,
-                                                Uri.fromFile(tempFile),
-                                                templateView,
-                                                address
-                                            )
-                                        } else {
-                                            // Fallback nếu không có template view
-                                            cameraRepository.saveVideoToGallery(
-                                                context,
-                                                Uri.fromFile(tempFile),
-                                                address
-                                            )
-                                        }
-                                        Log.d(
-                                            "CameraViewModel",
-                                            "Luu video: $savedUri"
-                                        )
-                                        updateCameraState {
-                                            it.copy(
-                                                previewUri = savedUri,
-                                                isLoading = false,
-                                                showProcessingSnackbar = false,
-                                                showSuccessSnackbar = true,
-                                                error = if (savedUri == null) "Video save failed" else null
-                                            )
-                                        }
-                                        delay(3000)
-                                        updateCameraState {
-                                            it.copy(showSuccessSnackbar = false)
-                                        }
-                                    } catch (e: Exception) {
-                                        updateCameraState {
-                                            it.copy(
-                                                error = "Video save failed",
-                                                isLoading = false,
-                                                showProcessingSnackbar = false
-                                            )
-                                        }
-                                    }
-                                }
+                                handleRecordingFinished(context)
                             }
                         }
                     }
                 }
-        } catch (e: SecurityException) {
+        }catch (e: SecurityException){
             updateCameraState {
                 it.copy(
-                    error = "Không có quyền truy cập camera:${e.message}",
-                    isRecording = false,
-                    isLoading = false
+                    error = "Không thể quay video: ${e.message}"
                 )
-            }
-        } catch (e: IllegalStateException) {
-            updateCameraState {
-                it.copy(
-                    error = "Không thể bắt đầu quay video:${e.message}",
-                    isRecording = false,
-                    isLoading = false
-                )
-            }
-        } catch (e: Exception) {
-            updateCameraState {
-                it.copy(error = e.message, isRecording = false, isLoading = false)
             }
         }
+        catch (e: Exception) {
+            Log.e(TAG, "Không thể bắt đầu quay video", e)
+        }
+    }
+    private fun handleRecordingFinished(context: Context) {
+        viewModelScope.launch {
+            try {
+                updateCameraState {
+                    it.copy(
+                        isLoading = true,
+                        error = null
+                    )
+                }
+
+                registerVideoSavedReceiver(context)
+
+                // Xử lý template nếu có
+                val templatePath = _cameraState.value.templateView?.let { templateView ->
+                    cameraRepository.exportTemplateToImage(templateView)
+                }
+
+                // Khởi động service để xử lý video
+                VideoProcessingService.startProcessing(
+                    context,
+                    Uri.fromFile(tempFile),
+                    _cameraState.value.templateData?.location,
+                    templatePath
+                )
+
+
+            } catch (e: Exception) {
+                Log.e(TAG, "Lỗi khi chuẩn bị xử lý video", e)
+                updateCameraState {
+                    it.copy(
+                        isLoading = false,
+                        error = "Lỗi: ${e.message}"
+                    )
+                }
+            }
+        }
+    }
+    private fun registerVideoSavedReceiver(context: Context) {
+        // Hủy receiver cũ nếu có
+        unregisterVideoSavedReceiver(context)
+
+        // Đăng ký receiver mới
+        videoSavedReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                when (intent?.action) {
+                    VideoProcessingService.ACTION_VIDEO_SAVED -> {
+                        val savedUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            intent.getParcelableExtra(
+                                VideoProcessingService.EXTRA_SAVED_URI,
+                                Uri::class.java
+                            )
+                        } else {
+                            @Suppress("DEPRECATION")
+                            intent.getParcelableExtra(VideoProcessingService.EXTRA_SAVED_URI)
+                        }
+
+                        updateCameraState {
+                            it.copy(
+                                isLoading = false,
+                                previewUri = savedUri,
+                                showSuccessSnackbar = true
+                            )
+                        }
+                    }
+                    VideoProcessingService.ACTION_VIDEO_SAVE_FAILED -> {
+                        val errorMsg = intent.getStringExtra(
+                            VideoProcessingService.EXTRA_ERROR_MESSAGE
+                        ) ?: "Xử lý video thất bại"
+
+                        updateCameraState {
+                            it.copy(
+                                isLoading = false,
+                                error = errorMsg,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        LocalBroadcastManager.getInstance(context).registerReceiver(
+            videoSavedReceiver!!,
+            IntentFilter().apply {
+                addAction(VideoProcessingService.ACTION_VIDEO_SAVED)
+                addAction(VideoProcessingService.ACTION_VIDEO_SAVE_FAILED)
+            }
+        )
+    }
+    private fun unregisterVideoSavedReceiver(context: Context) {
+        videoSavedReceiver?.let {
+            try {
+                LocalBroadcastManager.getInstance(context).unregisterReceiver(it)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error unregistering receiver", e)
+            }
+        }
+        videoSavedReceiver = null
     }
 
     private fun stopVideoRecording() {
@@ -669,5 +678,8 @@ class CameraViewModel(
                 )
             }
         }
+    }
+    companion object {
+        private const val TAG = "CameraViewModel"
     }
 }

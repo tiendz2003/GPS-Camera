@@ -11,6 +11,8 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import com.snake.squad.adslib.AdmobLib
+import com.snake.squad.adslib.utils.GoogleENative
 import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.bases.BaseFragment
 import com.ssquad.gps.camera.geotag.data.models.ThemeTemplateModel
@@ -21,13 +23,16 @@ import com.ssquad.gps.camera.geotag.databinding.FragmentHomeBinding
 import com.ssquad.gps.camera.geotag.presentation.hometab.activities.TemplatesActivity
 import com.ssquad.gps.camera.geotag.presentation.hometab.adapter.ThemeTemplateAdapter
 import com.ssquad.gps.camera.geotag.presentation.mainscreen.activity.RequestPermissionActivity
-import com.ssquad.gps.camera.geotag.utils.Config
+import com.ssquad.gps.camera.geotag.utils.AdsManager
 import com.ssquad.gps.camera.geotag.utils.Constants
 import com.ssquad.gps.camera.geotag.utils.PermissionManager
+import com.ssquad.gps.camera.geotag.utils.RemoteConfig
 import com.ssquad.gps.camera.geotag.utils.SharePrefManager
+import com.ssquad.gps.camera.geotag.utils.gone
 import com.ssquad.gps.camera.geotag.utils.scrollToCenter
 import com.ssquad.gps.camera.geotag.utils.setupHorizontal
 import com.ssquad.gps.camera.geotag.utils.updateSelection
+import com.ssquad.gps.camera.geotag.utils.visible
 
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::inflate) {
@@ -108,11 +113,29 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         reqNavigate.launch(intent) // Sử dụng ActivityResultLauncher để nhận kết quả
     }
 
+    private fun initNativeAd() {
+        when (RemoteConfig.remoteNativeHome) {
+            0L -> {
+                binding.nativeAdHomeContainer.gone()
+            }
 
+            1L -> {
+                binding.nativeAdHomeContainer.visible()
+
+                AdmobLib.loadAndShowNative(
+                    activity = requireActivity(),
+                    admobNativeModel = AdsManager.admobNativeHome,
+                    layout = R.layout.custom_ads_native_as_button,
+                    size = GoogleENative.UNIFIED_MEDIUM_LIKE_BUTTON,
+                    viewGroup = binding.nativeAdHomeContainer,
+                )
+            }
+        }
+    }
     override fun onResume() {
         super.onResume()
+        initNativeAd()
         val defaultTemplateId = SharePrefManager.getDefaultTemplate()
-
         // Kiểm tra nếu defaultTemplateId thay đổi
         if (defaultTemplateId != lastDefaultTemplateId) {
             lastDefaultTemplateId = defaultTemplateId // Cập nhật giá trị mới

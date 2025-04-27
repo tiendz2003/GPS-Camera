@@ -298,16 +298,13 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                     cameraState.lastCaptureImage?.let { photo ->
                         binding.imvSelectImage.loadImageIcon(photo.path)
                     }
-                    if (cameraState.showProcessingSnackbar) {
-                        showProcessingSnackbar()
-                        disableCaptureButtons()
-                    } else {
-                        dismissProcessingSnackbar()
-                    }
-
                     if (cameraState.showSuccessSnackbar) {
                         showSuccessSnackbar()
-                        enableCaptureButtons()
+                        cameraViewModel.updateCameraState {
+                            it.copy(
+                                showSuccessSnackbar = false
+                            )
+                        }
                     }
                 }
             }
@@ -557,27 +554,6 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
         successSnackbar?.show()
     }
 
-    private fun disableCaptureButtons() {
-        binding.imvTakeCapture.isEnabled = false
-        binding.imvSwitchCamera.isEnabled = false
-        binding.imvFlash.isEnabled = false
-        binding.imvTimer.isEnabled = false
-        binding.imvSelectImage.isEnabled = false
-        binding.imvOpenTemplate.isEnabled = false
-        binding.tvOption.isEnabled = false
-        binding.tvFunction.isEnabled = false
-    }
-
-    private fun enableCaptureButtons() {
-        binding.imvTakeCapture.isEnabled = true
-        binding.imvSwitchCamera.isEnabled = true
-        binding.imvFlash.isEnabled = true
-        binding.imvTimer.isEnabled = true
-        binding.imvSelectImage.isEnabled = true
-        binding.imvOpenTemplate.isEnabled = true
-        binding.tvOption.isEnabled = true
-        binding.tvFunction.isEnabled = true
-    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)

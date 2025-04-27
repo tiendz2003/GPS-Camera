@@ -59,5 +59,28 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginBottom="32dp"
         android:visibility="invisible"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorPrimary"
+        android:id="@+id/viewLine"
+        app:layout_constraintBottom_toTopOf="@+id/frBanner"
+        android:visibility="invisible"
+        />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/frBanner"/>
 
+    <FrameLayout
+        android:id="@+id/frFullNative"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:layout_marginVertical="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

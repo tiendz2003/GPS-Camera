@@ -14,6 +14,7 @@ import com.ssquad.gps.camera.geotag.presentation.viewmodel.CameraViewModel
 import com.ssquad.gps.camera.geotag.presentation.viewmodel.MapSettingViewModel
 import com.ssquad.gps.camera.geotag.presentation.viewmodel.PhotosViewModel
 import com.ssquad.gps.camera.geotag.presentation.viewmodel.PreviewShareViewModel
+import com.ssquad.gps.camera.geotag.utils.FFmpegExecutor
 import com.ssquad.gps.camera.geotag.worker.CacheDataTemplate
 import com.ssquad.gps.camera.geotag.worker.LoadDataTemplateWorker
 import okhttp3.OkHttpClient
@@ -29,19 +30,27 @@ object AppModule {
     private val cacheModule = module {
         single { CacheDataTemplate() }
         factory { LoadDataTemplateWorker.Factory(get(), get(), get()) }
+        single { FFmpegExecutor() }
     }
     val appModule = module {
+        // Repositories
         single<MediaRepository> { MediaRepositoryImpl(androidContext()) }
-        single<CameraRepository> { CameraRepositoryImpl() }
+        single<CameraRepository> { CameraRepositoryImpl(androidContext(), get()) }
         single<MapLocationRepository> { MapLocationRepositoryImpl(androidContext()) }
         single<WeatherRepository> { WeatherRepositoryImpl(get()) }
+
+        // Networking
         single { provideRetrofit() }
         single { provideWeatherApiService(get()) }
+
+
+        // ViewModels
         viewModel { AlbumViewModel(get()) }
-        viewModel { PhotosViewModel(get(),get(),get(),get()) }
-        viewModel { CameraViewModel(get(), get(),get(),get(),get()) }
+        viewModel { PhotosViewModel(get(), get(), get(), get()) }
+        viewModel { CameraViewModel(get(), get(), get(), get(),get()) }
         viewModel { PreviewShareViewModel(get()) }
-        viewModel { MapSettingViewModel(get(),get()) }
+        viewModel { MapSettingViewModel(get(), get()) }
+
         includes(cacheModule)
     }
 

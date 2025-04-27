@@ -1,7 +1,6 @@
 package com.ssquad.gps.camera.geotag.data.repository
 
 import android.annotation.SuppressLint
-import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
@@ -22,15 +21,19 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.core.graphics.createBitmap
-import com.arthenica.ffmpegkit.FFmpegKit
-import com.arthenica.ffmpegkit.ReturnCode
+import com.ssquad.gps.camera.geotag.utils.FFmpegExecutor
+import com.ssquad.gps.camera.geotag.utils.FileUtils
+import com.ssquad.gps.camera.geotag.utils.VideoUtils
 import kotlinx.coroutines.delay
-import okhttp3.Address
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
-
-class CameraRepositoryImpl : CameraRepository {
-    override suspend fun saveImageToGallery(context: Context, bitmap: Bitmap,address: String?): Uri? =
+class CameraRepositoryImpl(
+    private val context: Context,
+    private val ffmpegExecutor: FFmpegExecutor
+) : CameraRepository {
+    override suspend fun saveImageToGallery(
+        context: Context,
+        bitmap: Bitmap,
+        address: String?
+    ): Uri? =
         withContext(Dispatchers.IO) {
             try {
                 val fileName = "GPS_CAMERA_${
@@ -48,8 +51,8 @@ class CameraRepositoryImpl : CameraRepository {
                     put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
                     put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM/GPS_CAMERA")
                     put(MediaStore.MediaColumns.IS_PENDING, 1)
-                    if(!address.isNullOrEmpty()){
-                        put(MediaStore.Images.ImageColumns.DESCRIPTION,address)
+                    if (!address.isNullOrEmpty()) {
+                        put(MediaStore.Images.ImageColumns.DESCRIPTION, address)
                     }
                 }
 
@@ -78,89 +81,100 @@ class CameraRepositoryImpl : CameraRepository {
         }
 
     @SuppressLint("SuspiciousIndentation")
-    override suspend fun saveVideoToGallery(context: Context, sourceUri: Uri,address: String?): Uri? =
+    override suspend fun saveVideoToGallery(
+        sourceUri: Uri,
+        address: String?
+    ): Uri? =
         withContext(Dispatchers.IO) {
             try {
                 val fileName = "GPS_CAMERA_${
                     SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
                 }.mp4"
-                    Log.d("VideoProcessor", "Saving video)")
-                    var outputStream: OutputStream? = null
-                    var videoUri: Uri? = null
+                Log.d("VideoProcessor", "Saving video)")
+                var outputStream: OutputStream? = null
+                var videoUri: Uri? = null
 
-                    val contentValues = ContentValues().apply {
-                        put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-                        put(MediaStore.MediaColumns.TITLE, fileName)
-                        put(MediaStore.MediaColumns.DATE_ADDED, System.currentTimeMillis() / 1000)
-                        put(MediaStore.MediaColumns.DATE_TAKEN, System.currentTimeMillis())
-                        put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
-                        put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM/GPS_CAMERA")
-                        put(MediaStore.Video.Media.DURATION, 0) // Sẽ được cập nhật sau
-                        put(MediaStore.MediaColumns.IS_PENDING, 1)
-                        if(!address.isNullOrEmpty()){
-                            put(MediaStore.Video.VideoColumns.DESCRIPTION,address)
-                        }
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                    put(MediaStore.MediaColumns.TITLE, fileName)
+                    put(MediaStore.MediaColumns.DATE_ADDED, System.currentTimeMillis() / 1000)
+                    put(MediaStore.MediaColumns.DATE_TAKEN, System.currentTimeMillis())
+                    put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM/GPS_CAMERA")
+                    put(MediaStore.Video.Media.DURATION, 0) // Sẽ được cập nhật sau
+                    put(MediaStore.MediaColumns.IS_PENDING, 1)
+                    if (!address.isNullOrEmpty()) {
+                        put(MediaStore.Video.VideoColumns.DESCRIPTION, address)
                     }
+                }
 
-                    // Sử dụng Video.Media.EXTERNAL_CONTENT_URI cho video
-                    context.contentResolver.also { resolver ->
-                        videoUri = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues)
-                        outputStream = videoUri?.let { resolver.openOutputStream(it) }
+                // Sử dụng Video.Media.EXTERNAL_CONTENT_URI cho video
+                context.contentResolver.also { resolver ->
+                    videoUri =
+                        resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues)
+                    outputStream = videoUri?.let { resolver.openOutputStream(it) }
+                }
+
+                outputStream?.use { output ->
+                    context.contentResolver.openInputStream(sourceUri)?.use { input ->
+                        input.copyTo(output)
                     }
+                }
 
-                    outputStream?.use { output ->
-                        context.contentResolver.openInputStream(sourceUri)?.use { input ->
-                            input.copyTo(output)
-                        }
-                    }
+                // Cập nhật IS_PENDING để hoàn tất quá trình
+                contentValues.clear()
+                contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0)
+                videoUri?.let { uri ->
+                    context.contentResolver.update(uri, contentValues, null, null)
+                }
 
-                    // Cập nhật IS_PENDING để hoàn tất quá trình
-                    contentValues.clear()
-                    contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0)
-                    videoUri?.let { uri ->
-                        context.contentResolver.update(uri, contentValues, null, null)
-                    }
-
-                    // Debug log để kiểm tra thông tin về video đã lưu
-                    videoUri?.let { uri ->
-                        val projection = arrayOf(
-                            MediaStore.Video.Media._ID,
-                            MediaStore.Video.Media.BUCKET_ID,
-                            MediaStore.Video.Media.BUCKET_DISPLAY_NAME,
-                            MediaStore.Video.Media.DATA
-                        )
-                        context.contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+                // Debug log để kiểm tra thông tin về video đã lưu
+                videoUri?.let { uri ->
+                    val projection = arrayOf(
+                        MediaStore.Video.Media._ID,
+                        MediaStore.Video.Media.BUCKET_ID,
+                        MediaStore.Video.Media.BUCKET_DISPLAY_NAME,
+                        MediaStore.Video.Media.DATA
+                    )
+                    context.contentResolver.query(uri, projection, null, null, null)
+                        ?.use { cursor ->
                             if (cursor.moveToFirst()) {
-                                val bucketIdIndex = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_ID)
-                                val bucketNameIndex = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME)
-                                val dataIndex = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA)
+                                val bucketIdIndex =
+                                    cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_ID)
+                                val bucketNameIndex =
+                                    cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME)
+                                val dataIndex =
+                                    cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA)
 
                                 val bucketId = cursor.getString(bucketIdIndex)
                                 val bucketName = cursor.getString(bucketNameIndex)
                                 val data = cursor.getString(dataIndex)
 
-                                Log.d("VideoSave", "BUCKET_ID=$bucketId, BUCKET_NAME=$bucketName, PATH=$data")
+                                Log.d(
+                                    "VideoSave",
+                                    "BUCKET_ID=$bucketId, BUCKET_NAME=$bucketName, PATH=$data"
+                                )
                             }
                         }
-                    }
+                }
 
-                    // Quét lại MediaStore để cập nhật thông tin
-                    videoUri?.let { uri ->
-                        try {
-                            // Đợi một chút để đảm bảo file đã được ghi đầy đủ
-                            delay(500)
+                // Quét lại MediaStore để cập nhật thông tin
+                videoUri?.let { uri ->
+                    try {
+                        // Đợi một chút để đảm bảo file đã được ghi đầy đủ
+                        delay(500)
 
-                            MediaScannerConnection.scanFile(
-                                context,
-                                arrayOf(getFilePathFromUri(context, uri) ?: return@let),
-                                arrayOf("video/mp4")
-                            ) { path, scannedUri ->
-                                Log.d("VideoScan", "Scanned: $path -> $scannedUri")
-                            }
-                        } catch (e: Exception) {
-                            Log.e("VideoScan", "Scan failed: ${e.message}")
+                        MediaScannerConnection.scanFile(
+                            context,
+                            arrayOf(getFilePathFromUri(context, uri) ?: return@let),
+                            arrayOf("video/mp4")
+                        ) { path, scannedUri ->
+                            Log.d("VideoScan", "Scanned: $path -> $scannedUri")
                         }
+                    } catch (e: Exception) {
+                        Log.e("VideoScan", "Scan failed: ${e.message}")
                     }
+                }
                 if (!address.isNullOrEmpty() && videoUri != null) {
                     addExifLocationData(context, videoUri, address)
                 }
@@ -181,6 +195,7 @@ class CameraRepositoryImpl : CameraRepository {
                 }
             }
         }
+
     private fun addExifLocationData(context: Context, imageUri: Uri, locationAddress: String) {
         try {
             val path = getFilePathFromUri(context, imageUri) ?: return
@@ -193,6 +208,7 @@ class CameraRepositoryImpl : CameraRepository {
             e.printStackTrace()
         }
     }
+
     // Hàm hỗ trợ để lấy đường dẫn file từ Uri
     private fun getFilePathFromUri(context: Context, uri: Uri): String? {
         val projection = arrayOf(MediaStore.MediaColumns.DATA)
@@ -206,164 +222,84 @@ class CameraRepositoryImpl : CameraRepository {
     }
 
     override suspend fun processVideoWithTemplate(
-        context: Context,
-        videoUri: Uri,
-        templateView: View,
+        inputUri: Uri,
+        templateView: View?,
         address: String?
-    ): Uri? = withContext(Dispatchers.Default) {
+    ): Uri? = withContext(Dispatchers.IO) {
         try {
-            // Tạo các tệp tạm
-            val tempDir = File(context.cacheDir, "video_processing")
-            tempDir.mkdirs()
-            val tempInputFile = File(tempDir, "input_video.mp4")
-            val tempTemplateFile = File(tempDir, "template_overlay.png")
-            val tempOutputFile = File(tempDir, "output_video.mp4")
-            //luu vào file tạm
-            context.contentResolver.openInputStream(videoUri)?.use { input ->
-                FileOutputStream(tempInputFile).use { output ->
-                    input.copyTo(output)
-                }
-            }
+            // Chuẩn bị các file tạm
+            val tempDir = VideoUtils.createTempDirectory(context)
+            val tempInputFile = VideoUtils.createTempFile(tempDir, "input_video.mp4")
+            val tempOutputFile = VideoUtils.createTempFile(tempDir, "output_video.mp4")
 
-            if (!exportTemplateToImage(templateView, tempTemplateFile.absolutePath)) {
-                Log.e("VideoProcessor", "Không export được template vào ảnh")
-                return@withContext null
-            }
-            Log.d(
-                "TemplateExport",
-                "Template file exists: ${File(tempTemplateFile.absolutePath).exists()}, size: ${
-                    File(tempTemplateFile.absolutePath).length()
-                }"
-            )
+            // Copy video gốc vào file tạm
+            VideoUtils.copyUriToFile(context, inputUri, tempInputFile)
 
-            // Xử lý video với FFmpeg
-            val cmd = arrayOf(
-                "-y",//ghi đè file nếu đã tồn tại
-                "-i",
-                tempInputFile.absolutePath,//video gốc
-                "-i",
-                tempTemplateFile.absolutePath,//template
-                "-filter_complex",
-                "[0:v][1:v]overlay=(main_w-overlay_w)/2:main_h-overlay_h",//vj tri template
-                "-c:v",
-                "libx264",
-                "-preset",
-                "ultrafast",//tăng tốc độ xử lý
-                "-pix_fmt",
-                "yuv420p",
-                "-c:a",
-                "aac",//mã hoá âm thanh
-                "-b:a",
-                "128k",
-                "-movflags",
-                "+faststart",//tối ưu phát
-                tempOutputFile.absolutePath
-            ).joinToString(" ")
-            Log.d("FFmpegCommand", "CMD: $cmd")
-            // đợi xử lý xong và lấy return code
-            //GHi nhứo: executeAsync là hàm không đồng bộ, không chặn luồng chính
-            val returnCode = suspendCoroutine<ReturnCode?> { continuation ->
-                FFmpegKit.executeAsync(
-                    cmd,
-                    { session ->
-                        continuation.resume(session.returnCode)
-                        Log.i(
-                            "VideoProcessor",
-                            "xu ly thanh cong FFmpeg code: ${session.returnCode}"
-                        )
-                    },
-                    { log ->
-                        Log.d("FFmpegKitLog", log.message)
-                    },
-                    { statistics ->
-                        Log.d("FFmpegKit", "Thoi gian: ${statistics.time}")
+            // Xử lý với template nếu có
+            if (templateView != null) {
+                val templateFile = VideoUtils.createTempFile(tempDir, "template_overlay.png")
+                val templatePath = exportTemplateToImage(templateView)
+
+                if (templatePath != null) {
+                    // Xử lý video với overlay
+                    val success = ffmpegExecutor.processVideoWithOverlay(
+                        tempInputFile.absolutePath,
+                        templatePath,
+                        tempOutputFile.absolutePath
+                    )
+
+                    if (!success) {
+                        return@withContext null
                     }
-                )
-            }
-            //xử lý xong rồi ,lấy return code
-            if (ReturnCode.isSuccess(returnCode)) {
-                Log.i("VideoProcessor", "Xử lý video thành công")
-                // Lưu video vào thư viện xoa file tạm
-                val result = saveVideoToGallery(context, Uri.fromFile(tempOutputFile),address)
-                tempInputFile.delete()
-                tempTemplateFile.delete()
-                tempOutputFile.delete()
-                tempDir.deleteRecursively()
-                return@withContext result
+                } else {
+                    // Fallback nếu không export được template
+                    FileUtils.copy(tempInputFile, tempOutputFile)
+                }
             } else {
-                Log.e("FFmpeg", "THẤT BẠI  rc=${returnCode})}")
-                tempDir.deleteRecursively()
-                return@withContext null
+                // Không có template, chỉ copy
+                FileUtils.copy(tempInputFile, tempOutputFile)
             }
+
+            // Lưu vào gallery
+            val savedUri = saveVideoToGallery(Uri.fromFile(tempOutputFile), address)
+
+            // Dọn dẹp
+            VideoUtils.cleanupTempFiles(tempDir)
+
+            return@withContext savedUri
         } catch (e: Exception) {
-            Log.e("VideoProcessor", "Lỗi khi xử lý video", e)
+            Log.e(TAG, "Error processing video", e)
             return@withContext null
         }
     }
 
-    private suspend fun exportTemplateToImage(templateView: View, outputPath: String): Boolean =
-        withContext(Dispatchers.Main) {
-            try {
-                Log.d(
-                    "TemplateExport",
-                    "Kích thước template: ${templateView.width} x ${templateView.height}"
-                )
-
-                if (templateView.width == 0 || templateView.height == 0) {
-                    return@withContext false
-                }
-
-                // Tạo bitmap từ View trên Main thread
-                val bitmap = createBitmap(templateView.width, templateView.height)
-                val canvas = Canvas(bitmap)
-                templateView.draw(canvas)
-
-                // luu file ->IO
-                withContext(Dispatchers.IO) {
-                    val outputFile = File(outputPath)
-                    FileOutputStream(outputFile).use { outputStream ->
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                        outputStream.flush()
-                    }
-                    Log.d("TemplateExport", "Export thành công vào: $outputPath")
-                }
-
-                return@withContext true
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Log.e("TemplateExport", "Lỗi khi export template: ${e.message}", e)
-                return@withContext false
-            }
-        }
-    suspend fun getLatestImageFromAppAlbum(context: Context): Uri? = withContext(Dispatchers.IO) {
+    override suspend fun exportTemplateToImage(view: View): String? = withContext(Dispatchers.Main) {
         try {
-            val collection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            val projection = arrayOf(
-                MediaStore.Images.Media._ID,
-                MediaStore.Images.Media.DATE_TAKEN,
-                MediaStore.Images.Media.RELATIVE_PATH
-            )
-            val selection = "${MediaStore.Images.Media.RELATIVE_PATH} LIKE ?"
-            val selectionArgs = arrayOf("DCIM/GPS_CAMERA/%")
-            val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT 1"
+            if (view.width <= 0 || view.height <= 0) return@withContext null
 
-            context.contentResolver.query(
-                collection,
-                projection,
-                selection,
-                selectionArgs,
-                sortOrder
-            )?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-                    val imageId = cursor.getLong(idColumn)
-                    return@withContext ContentUris.withAppendedId(collection, imageId)
+            val bitmap = createBitmap(view.width, view.height)
+            val canvas = Canvas(bitmap)
+            view.draw(canvas)
+
+            val tempFile = File(
+                context.cacheDir,
+                "template_${System.currentTimeMillis()}.png"
+            )
+
+            withContext(Dispatchers.IO) {
+                FileOutputStream(tempFile).use { outputStream ->
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                    outputStream.flush()
                 }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return@withContext null
-    }
 
+            return@withContext tempFile.absolutePath
+        } catch (e: Exception) {
+            Log.e(TAG, "Error exporting template", e)
+            return@withContext null
+        }
+    }
+    companion object {
+        private const val TAG = "VideoProcessor"
+    }
 }

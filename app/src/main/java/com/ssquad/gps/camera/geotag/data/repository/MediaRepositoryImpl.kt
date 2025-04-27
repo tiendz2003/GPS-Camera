@@ -95,7 +95,6 @@ class MediaRepositoryImpl (private val context: Context): MediaRepository {
                             )
                         } catch (e: Exception) {
                             Log.e("MediaRepository", "Lỗi khi lấy album: ${e.message}", e)
-                            // Continue processing other albums
                         }
                     }
                 }

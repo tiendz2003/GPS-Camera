@@ -7,13 +7,17 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.viewpager2.widget.ViewPager2
+import com.snake.squad.adslib.AdmobLib
+import com.snake.squad.adslib.utils.GoogleENative
 import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.adapters.IntroViewPagerAdapter
 import com.ssquad.gps.camera.geotag.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.databinding.ActivityIntroBinding
 import com.ssquad.gps.camera.geotag.presentation.mainscreen.activity.PermissionActivity
+import com.ssquad.gps.camera.geotag.utils.AdsManager
 import com.ssquad.gps.camera.geotag.utils.Common
 import com.ssquad.gps.camera.geotag.utils.PermissionManager
+import com.ssquad.gps.camera.geotag.utils.RemoteConfig
 import com.ssquad.gps.camera.geotag.utils.SharePrefManager
 import com.ssquad.gps.camera.geotag.utils.gone
 import com.ssquad.gps.camera.geotag.utils.invisible
@@ -93,7 +97,7 @@ class IntroActivity : BaseActivity<ActivityIntroBinding>(ActivityIntroBinding::i
                         1 -> {
                             binding.btnNext2.text = getString(R.string.next)
                             binding.btnNext.text = getString(R.string.next)
-                            // showNativeAds()
+                            showNativeAds()
                         }
 
                         2 -> {
@@ -116,28 +120,30 @@ class IntroActivity : BaseActivity<ActivityIntroBinding>(ActivityIntroBinding::i
     }
 
     private fun goToHome() {
-        if (SharePrefManager.isOpenFirstApp() ||
-            !PermissionManager.checkMicroPermissions(this) || !PermissionManager.checkCamPermissions(
-                this
-            ) || !PermissionManager.checkLocationPermissions(this) || !PermissionManager.checkLibraryGranted(
-                this
-            )
-        ) {
-            startActivity(
-                Intent(
-                    this,
-                    PermissionActivity::class.java
+        showInter {
+            if (SharePrefManager.isOpenFirstApp() ||
+                !PermissionManager.checkMicroPermissions(this) || !PermissionManager.checkCamPermissions(
+                    this
+                ) || !PermissionManager.checkLocationPermissions(this) || !PermissionManager.checkLibraryGranted(
+                    this
                 )
-            )
-        } else {
-            startActivity(
-                Intent(
-                    this,
-                    MainActivity::class.java
+            ) {
+                startActivity(
+                    Intent(
+                        this,
+                        PermissionActivity::class.java
+                    )
                 )
-            )
+            } else {
+                startActivity(
+                    Intent(
+                        this,
+                        MainActivity::class.java
+                    )
+                )
+            }
+            finish()
         }
-        finish()
     }
     private fun updateView(isShowAds: Boolean = false) {
         binding.frNative.isVisible = isShowAds
@@ -156,7 +162,7 @@ class IntroActivity : BaseActivity<ActivityIntroBinding>(ActivityIntroBinding::i
         }
     }
 
-    /*   private fun showNativeAds() {
+       private fun showNativeAds() {
            Log.d("Intro", "${RemoteConfig.remoteNativeIntro}")
            if (RemoteConfig.remoteNativeIntro == 0L) return
            updateView(true)
@@ -187,5 +193,5 @@ class IntroActivity : BaseActivity<ActivityIntroBinding>(ActivityIntroBinding::i
                    isPreload = false
                )
            }
-       }*/
+       }
 }

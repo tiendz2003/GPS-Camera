@@ -90,7 +90,26 @@ object SharePrefManager {
     fun putString(key: String, value: String) {
         getPreferences().edit { putString(key, value) }
     }
+    fun get(key: String, defaultValue: Long): Long {
+        return getPreferences().getLong(key, defaultValue)
+    }
+    fun get(key: String, defaultValue: Int): Int {
+        return getPreferences().getInt(key, defaultValue)
+    }
+    fun put(key: String, value: Long) {
+        if (sharePreferences == null) return
 
+        getPreferences().edit {
+            putLong(key, value)
+        }
+    }
+    fun put(key: String, value: Int) {
+        if (sharePreferences == null) return
+
+        getPreferences().edit {
+            putInt(key, value)
+        }
+    }
     fun getBoolean(key: String, defaultValue: Boolean): Boolean {
         return getPreferences().getBoolean(key, defaultValue)
     }

@@ -4,6 +4,8 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.google.firebase.crashlytics)
     id ("kotlin-parcelize")
 }
 
@@ -65,6 +67,7 @@ android {
 }
 
 dependencies {
+    implementation ("androidx.lifecycle:lifecycle-service:2.8.1")
     implementation("com.google.guava:guava:31.1-android")
     implementation ("com.google.android.gms:play-services-location:21.3.0")
     implementation ("com.squareup.retrofit2:retrofit:2.11.0")
@@ -84,6 +87,7 @@ dependencies {
     // CameraX Extensions (Tùy chọn, dùng để có chế độ HDR, Night Mode...)
     implementation (libs.androidx.camera.extensions)
     // CameraX VideoCapture (Nếu muốn quay video)
+    implementation(libs.play.services.ads)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.messaging)

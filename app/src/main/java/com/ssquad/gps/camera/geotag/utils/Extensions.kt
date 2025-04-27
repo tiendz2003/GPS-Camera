@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,8 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
@@ -37,6 +40,7 @@ import com.ssquad.gps.camera.geotag.map_template.GPSTemplateV2
 import com.ssquad.gps.camera.geotag.map_template.GPSTemplateV3
 import com.example.baseproject.map_template.GPSTemplateV4
 import com.example.baseproject.map_template.GPSTemplateV5
+import com.google.android.gms.ads.MediaAspectRatio
 import com.ssquad.gps.camera.geotag.map_template.TravelTemplateV1
 import com.ssquad.gps.camera.geotag.map_template.TravelTemplateV2
 import com.ssquad.gps.camera.geotag.map_template.TravelTemplateV3
@@ -47,7 +51,12 @@ import com.ssquad.gps.camera.geotag.presentation.hometab.adapter.ThemeTemplateAd
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.snake.squad.adslib.AdmobLib
+import com.snake.squad.adslib.models.AdmobInterModel
+import com.snake.squad.adslib.utils.GoogleENative
 import com.ssquad.gps.camera.geotag.R
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -372,4 +381,106 @@ inline fun <reified T> Gson.fromJsonWithTypeToken(value: String): T {
 
 inline fun <reified T> Gson.toJsonWithTypeToken(obj: T): String {
     return this.toJson(obj, object : TypeToken<T>() {}.type)
+}
+fun AppCompatActivity.showInterSplash(navAction: () -> Unit) {
+    loadNativeFullScreen()
+    var nativeDialog: NativeFullScreenDialog? = null
+    var isNativeFail = false
+
+    AdmobLib.loadAndShowInterstitialSplash(
+        this,
+        AdsManager.adSplashModel,
+        timeout = 10000,
+        onAdsShowed = {
+            lifecycleScope.launch {
+                delay(1000)
+                nativeDialog = createNativeFullScreen(false, navAction) {
+                    isNativeFail = true
+                }
+                nativeDialog?.show()
+            }
+        },
+        onAdsFail = {
+            navAction()
+        },
+        onAdsClose = {
+            if (!AdsManager.isShowNativeFullScreen() || isNativeFail) {
+                navAction()
+            } else {
+                nativeDialog?.isClosedOrFail = true
+            }
+        },
+        onAdsLoaded = {
+            Log.d("TAG===", "initAds: on ads loaded")
+        }
+    )
+}
+fun AppCompatActivity.createNativeFullScreen(
+    isStartNow: Boolean = false,
+    navAction: () -> Unit,
+    onFailure: () -> Unit = navAction
+): NativeFullScreenDialog? {
+    if (!AdsManager.isShowNativeFullScreen()) return null
+
+    return NativeFullScreenDialog(
+        this@createNativeFullScreen,
+        AdsManager.admobNativeFullScreenAfterInter,
+        isStartNow,
+        onClose = navAction,
+        onFailure = onFailure
+    )
+}
+
+fun AppCompatActivity.loadNativeFullScreen() {
+    if (!AdsManager.isShowNativeFullScreen()) return
+
+    AdmobLib.loadNative(
+        this,
+        AdsManager.admobNativeFullScreenAfterInter,
+        size = GoogleENative.UNIFIED_FULL_SCREEN,
+        mediaViewRatio = MediaAspectRatio.ANY
+    )
+}
+
+fun AppCompatActivity.loadAndShowInterWithNativeAfter(
+    interModel: AdmobInterModel,
+    vShowInterAds: View?,
+    isUpdateTime: Boolean = true,
+    navAction: () -> Unit
+) {
+    vShowInterAds?.visible()
+    loadNativeFullScreen()
+
+    var nativeDialog: NativeFullScreenDialog? = null
+    var isNativeFail = false
+
+    AdmobLib.loadAndShowInterstitial(
+        this,
+        interModel,
+        onAdsShowed = {
+            lifecycleScope.launch {
+                delay(1000)
+                nativeDialog = createNativeFullScreen(
+                    navAction = navAction,
+                    onFailure = { isNativeFail = true }
+                )
+                nativeDialog?.show()
+            }
+        },
+        onAdsFail = {
+            navAction()
+        },
+        onAdsClose = {
+            lifecycleScope.launch {
+                if (!AdsManager.isShowNativeFullScreen() || isNativeFail) {
+                    navAction()
+                } else {
+                    nativeDialog?.isClosedOrFail = true
+                }
+            }
+        },
+        onAdsCloseOrFailed = {
+            if (isUpdateTime) AdsManager.lastInterShown = System.currentTimeMillis()
+        }
+    )
 }

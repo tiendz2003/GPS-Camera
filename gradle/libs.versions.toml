@@ -27,8 +27,10 @@ googleFirebaseCrashlytics = "3.0.3"
 firebaseMessaging = "24.1.1"
 firebaseConfigKtx = "22.1.0"
 googleGmsGoogleServices = "4.4.2"
+playServicesAds = "24.2.0"
 
 [libraries]
+play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
 androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "cameraX" }
 androidx-camera-extensions = { module = "androidx.camera:camera-extensions", version.ref = "cameraX" }
 androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraX" }

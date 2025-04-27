@@ -9,13 +9,19 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.snake.squad.adslib.AdmobLib
+import com.snake.squad.adslib.models.AdmobNativeModel
+import com.snake.squad.adslib.utils.GoogleENative
 import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.adapters.LanguageAdapter
 import com.ssquad.gps.camera.geotag.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.databinding.ActivityLanguageBinding
+import com.ssquad.gps.camera.geotag.utils.AdsManager
 import com.ssquad.gps.camera.geotag.utils.Common
 import com.ssquad.gps.camera.geotag.utils.Constants
+import com.ssquad.gps.camera.geotag.utils.RemoteConfig
 import com.ssquad.gps.camera.geotag.utils.gone
+import com.ssquad.gps.camera.geotag.utils.loadAndShowInterWithNativeAfter
 import com.ssquad.gps.camera.geotag.utils.visible
 import java.util.Locale
 
@@ -26,7 +32,7 @@ class LanguageActivity : BaseActivity<ActivityLanguageBinding>(ActivityLanguageB
 
     override fun onStop() {
         super.onStop()
-       // binding.vShowInterAds.gone()
+       binding.vShowInterAds.gone()
     }
 
     override fun initData() {
@@ -36,7 +42,7 @@ class LanguageActivity : BaseActivity<ActivityLanguageBinding>(ActivityLanguageB
 
     override fun initView() {
         initLanguage()
-       // loadIntroAds()
+       loadIntroAds()
     }
 
     @SuppressLint("SetTextI18n")
@@ -64,10 +70,10 @@ class LanguageActivity : BaseActivity<ActivityLanguageBinding>(ActivityLanguageB
 
     override fun onResume() {
         super.onResume()
-        //showNativeAd(AdsManager.admobNativeLanguage)
+        showNativeAd(AdsManager.admobNativeLanguage)
     }
 
-   /* private fun showNativeAd(admobNativeLanguage: AdmobNativeModel) {
+    private fun showNativeAd(admobNativeLanguage: AdmobNativeModel) {
         if (RemoteConfig.remoteNativeLanguage <= 0) {
             binding.frLgNative.gone()
             return
@@ -90,8 +96,7 @@ class LanguageActivity : BaseActivity<ActivityLanguageBinding>(ActivityLanguageB
             )
         }
     }
-*/
-  /*  private fun loadIntroAds() {
+    private fun loadIntroAds() {
         if (isFromHome) return
         if (RemoteConfig.remoteNativeIntro > 0) {
             AdmobLib.loadNative(this, AdsManager.admobNativeIntro)
@@ -99,9 +104,9 @@ class LanguageActivity : BaseActivity<ActivityLanguageBinding>(ActivityLanguageB
         if (RemoteConfig.remoteInterIntro > 0) {
             AdmobLib.loadInterstitial(this, AdsManager.admobInterIntro)
         }
-    }*/
+    }
 
-   /* private fun showInterAd(navigateTo: () -> Unit) {
+    private fun showInterAd(navigateTo: () -> Unit) {
         if(isFromHome){
             //show ad từ màn home
             if (RemoteConfig.remoteInterLanguage > 0 ) {
@@ -123,7 +128,7 @@ class LanguageActivity : BaseActivity<ActivityLanguageBinding>(ActivityLanguageB
             )
         }
 
-    }*/
+    }
 
     private fun applyLanguage() {
         adapter?.getSelectedLanguage()?.let { selectedLanguage ->
@@ -132,7 +137,9 @@ class LanguageActivity : BaseActivity<ActivityLanguageBinding>(ActivityLanguageB
             val config = Configuration(resources.configuration)
             config.setLocale(locale)
             createConfigurationContext(config)
-            navigateToHome()
+            showInterAd {
+                navigateToHome()
+            }
         } ?: run {
             Toast.makeText(this, R.string.please_select_language, Toast.LENGTH_SHORT).show()
         }
@@ -147,9 +154,9 @@ class LanguageActivity : BaseActivity<ActivityLanguageBinding>(ActivityLanguageB
             languageList
         ) { selectedLanguage ->
             Log.d("LanguageActivity", "Đã chọn: ${selectedLanguage.key}")
-          /*  //show ad
+            //show ad
             showNativeAd(AdsManager.admobNativeLanguage2)
-            Log.d("LanguageActivity", "Đã chọn: ${selectedLanguage.key}")*/
+            Log.d("LanguageActivity", "Đã chọn: ${selectedLanguage.key}")
         }
 
         binding.rcvLanguage.apply {

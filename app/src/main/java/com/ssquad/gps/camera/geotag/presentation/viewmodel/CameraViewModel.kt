@@ -5,25 +5,17 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
 import androidx.camera.core.Camera
-import androidx.camera.core.CameraEffect
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.core.TorchState
 import androidx.camera.core.UseCaseGroup
-import androidx.camera.effects.OverlayEffect
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.FileOutputOptions
 import androidx.camera.video.Quality
@@ -50,11 +42,11 @@ import com.ssquad.gps.camera.geotag.utils.formatCaptureDuration
 import com.ssquad.gps.camera.geotag.utils.formatToDate
 import com.ssquad.gps.camera.geotag.utils.formatToTime
 import com.ssquad.gps.camera.geotag.worker.CacheDataTemplate
-import com.google.android.material.snackbar.Snackbar
+import com.ssquad.gps.camera.geotag.utils.SharePrefManager
+import com.ssquad.gps.camera.geotag.utils.parcelable
 import com.ssquad.gps.camera.geotag.utils.rotate
-import com.ssquad.gps.camera.geotag.worker.VideoProcessingService
+import com.ssquad.gps.camera.geotag.service.VideoProcessingService
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -67,7 +59,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.Executors
-import kotlin.text.compareTo
 import kotlin.text.format
 
 class CameraViewModel(
@@ -397,17 +388,17 @@ class CameraViewModel(
                         }
                     }
                 }
-        }catch (e: SecurityException){
+        } catch (e: SecurityException) {
             updateCameraState {
                 it.copy(
                     error = "Không thể quay video: ${e.message}"
                 )
             }
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             Log.e(TAG, "Không thể bắt đầu quay video", e)
         }
     }
+
     private fun handleRecordingFinished(context: Context) {
         viewModelScope.launch {
             try {
@@ -445,6 +436,7 @@ class CameraViewModel(
             }
         }
     }
+
     private fun registerVideoSavedReceiver(context: Context) {
         // Hủy receiver cũ nếu có
         unregisterVideoSavedReceiver(context)
@@ -454,16 +446,7 @@ class CameraViewModel(
             override fun onReceive(context: Context?, intent: Intent?) {
                 when (intent?.action) {
                     VideoProcessingService.ACTION_VIDEO_SAVED -> {
-                        val savedUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            intent.getParcelableExtra(
-                                VideoProcessingService.EXTRA_SAVED_URI,
-                                Uri::class.java
-                            )
-                        } else {
-                            @Suppress("DEPRECATION")
-                            intent.getParcelableExtra(VideoProcessingService.EXTRA_SAVED_URI)
-                        }
-
+                        val savedUri = intent.parcelable<Uri>(VideoProcessingService.EXTRA_SAVED_URI)
                         updateCameraState {
                             it.copy(
                                 isLoading = false,
@@ -472,6 +455,7 @@ class CameraViewModel(
                             )
                         }
                     }
+
                     VideoProcessingService.ACTION_VIDEO_SAVE_FAILED -> {
                         val errorMsg = intent.getStringExtra(
                             VideoProcessingService.EXTRA_ERROR_MESSAGE
@@ -496,6 +480,7 @@ class CameraViewModel(
             }
         )
     }
+
     private fun unregisterVideoSavedReceiver(context: Context) {
         videoSavedReceiver?.let {
             try {
@@ -522,20 +507,47 @@ class CameraViewModel(
 
     @SuppressLint("DefaultLocale")
     fun updateTemplateData() {
-
         val now = Date()
+        val customDate = SharePrefManager.getString("CUSTOM_DATE", "") ?: now.formatToDate()
+        val customTime = SharePrefManager.getString("CUSTOM_TIME", "") ?: now.formatToTime()
+        val selectedOption = SharePrefManager.getString("DATE_TIME_OPTION", "current")
+        Log.d("PhotosViewModel", "CUSTOM_DATE: $customDate")
+        Log.d("PhotosViewModel", "CUSTOM_TIME: $customTime")
+        Log.d("PhotosViewModel", "DATE_TIME_OPTION: $selectedOption")
+        val currentDate =
+            if (selectedOption == "custom" && customDate.isNotEmpty() && customTime.isNotEmpty()) {
+                customDate
+            } else {
+                now.formatToDate()
+            }
+
+        val currentTime =
+            if (selectedOption == "custom" && customDate.isNotEmpty() && customTime.isNotEmpty()) {
+                customTime
+            } else {
+                now.formatToTime()
+            }
+        Log.d("PhotosViewModel", "CUrrentDATE: $currentDate")
+        Log.d("PhotosViewModel", "CUrrent_TIME: $currentTime")
         if (cacheDataTemplate.isCacheValid()) {
-            cacheDataTemplate.templateData.value?.let { cacheData ->
+            cacheDataTemplate.templateData.value?.let { data ->
+                val (lat, long, location) = SharePrefManager.getCachedCoordinates()
+                    ?: Triple(
+                        data.lat?.replace(",", ".")?.toDouble(),
+                        data.long?.replace(",", ".")?.toDouble(),
+                        data.location
+                    )
+
                 updateCameraState {
                     it.copy(
                         templateData = TemplateDataModel(
-                            location = cacheData.location,
-                            lat = cacheData.lat,
-                            long = cacheData.long,
-                            temperatureC = cacheData.temperatureC,
-                            temperatureF = cacheData.temperatureF,
-                            currentTime = now.formatToTime(),
-                            currentDate = now.formatToDate()
+                            location = location,
+                            lat = lat.toString(),
+                            long = long.toString(),
+                            temperatureC = data.temperatureC,
+                            temperatureF = data.temperatureF,
+                            currentTime = currentTime,
+                            currentDate = currentDate
                         )
                     )
                 }
@@ -544,74 +556,52 @@ class CameraViewModel(
         if (!cacheDataTemplate.isCacheValid() || cacheDataTemplate.templateData.value == null) {
             viewModelScope.launch {
                 try {
-                    var location: String? = null
-                    var lat: String? = null
-                    var lon: String? = null
-                    var temperatureC: Float? = null
-                    var temperatureF: Float? = null
-
                     val locationResult = locationRepository.getCurrentLocation()
+                    if (locationResult is LocationResult.Success) {
+                        val currentLocation = locationResult.location
+                        val lat =
+                            String.format(Locale.getDefault(), "%.6f", currentLocation.latitude)
+                        val lon =
+                            String.format(Locale.getDefault(), "%.6f", currentLocation.longitude)
+                        val addressResult =
+                            locationRepository.getAddressFromLocation(currentLocation)
+                        val tempResult = weatherRepository.getCurrentTemp(currentLocation)
+                        val fakeTempResult = weatherRepository.getFakeTemp()
 
-
-                    when (locationResult) {
-                        is LocationResult.Success -> {
-                            val currentLocation = locationResult.location
-                            lat =
-                                String.format(Locale.getDefault(), "%.6f", currentLocation.latitude)
-                            lon = String.format(
-                                Locale.getDefault(),
-                                "%.6f",
-                                currentLocation.longitude
-                            )
-
-                            val addressDeferred = async {
-                                locationRepository.getAddressFromLocation(currentLocation)
-                            }
-                            val fakeTempResult = weatherRepository.getFakeTemp()
-                            val tempResult = weatherRepository.getCurrentTemp(currentLocation)
-                            val addressResult = addressDeferred.await()
-                            if (addressResult is LocationResult.Address) {
-                                location = addressResult.address
-                            }
-
-                            val tempPair =
-                                (if (tempResult is Resource.Success) tempResult.data else null)
-                                    ?: (if (fakeTempResult is Resource.Success) fakeTempResult.data else null)
-                                    ?: Pair(null, null)
-
-                            temperatureC = tempPair.first
-                            temperatureF = tempPair.second
+                        val location = if (addressResult is LocationResult.Address) {
+                            addressResult.address
+                        } else {
+                            null
                         }
 
-                        else -> {
-                            //
-                        }
-                    }
+                        val tempPair =
+                            (if (tempResult is Resource.Success) tempResult.data else null)
+                                ?: (if (fakeTempResult is Resource.Success) fakeTempResult.data else null)
+                                ?: Pair(null, null)
 
-                    // Cập nhật
-                    updateCameraState {
-                        it.copy(
-                            templateData = TemplateDataModel(
-                                location = location,
-                                lat = lat,
-                                long = lon,
-                                temperatureC = temperatureC,
-                                temperatureF = temperatureF,
-                                currentTime = now.formatToTime(),
-                                currentDate = now.formatToDate()
+                        val tempC = tempPair.first
+                        val tempF = tempPair.second
+
+                        updateCameraState {
+                            it.copy(
+                                templateData = TemplateDataModel(
+                                    location = location,
+                                    lat = lat,
+                                    long = lon,
+                                    temperatureC = tempC,
+                                    temperatureF = tempF,
+                                    currentTime = currentTime,
+                                    currentDate = currentDate
+                                )
                             )
-                        )
+                        }
+
                     }
                 } catch (e: Exception) {
-                    updateCameraState {
-                        it.copy(
-                            error = e.message
-                        )
-                    }
+                    Log.e("PhotosViewModel", "Error: ${e.message}")
                 }
             }
         }
-
     }
 
 
@@ -679,6 +669,7 @@ class CameraViewModel(
             }
         }
     }
+
     companion object {
         private const val TAG = "CameraViewModel"
     }

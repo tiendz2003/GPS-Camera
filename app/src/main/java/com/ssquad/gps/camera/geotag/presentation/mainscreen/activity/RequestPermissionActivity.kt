@@ -22,8 +22,10 @@ import com.ssquad.gps.camera.geotag.utils.navToActivity
 
 class RequestPermissionActivity :
     BaseActivity<ActivityRequestPermissionBinding>(ActivityRequestPermissionBinding::inflate) {
+
     var type = TYPE_CAMERA
     private var isOpenSettingApp = false
+
     private val permissionsForCamera by lazy {
         listOf(
             Manifest.permission.CAMERA,
@@ -33,11 +35,14 @@ class RequestPermissionActivity :
     }
 
     private val permissionForGallery by lazy {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Manifest.permission.READ_MEDIA_IMAGES
-        } else {
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        }
+        listOf(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Manifest.permission.READ_MEDIA_IMAGES
+            } else {
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            },
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
     }
 
     private val permissionForLocation by lazy { Manifest.permission.ACCESS_FINE_LOCATION }
@@ -55,8 +60,8 @@ class RequestPermissionActivity :
         }
 
     private val requestPermissionForGallery =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-            if (PermissionManager.checkPermissionGranted(this, permissionForGallery)) {
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            if (PermissionManager.checkPermissionsGranted(this, permissionForGallery)) {
                 if (intent.getBooleanExtra(Constants.INTENT_LIBRARY_PERMISSION, false)) {
                     navToActivity(this@RequestPermissionActivity, EditAlbumLibraryActivity::class.java)
                 } else {
@@ -82,13 +87,9 @@ class RequestPermissionActivity :
             }
         }
 
-
-    override fun initData() {
-
-    }
+    override fun initData() {}
 
     override fun initView() {
-        //this.window.setBackgroundDrawableResource(R.drawable.bg_transparent)
         type = intent.getIntExtra(Constants.INTENT_REQUEST_SINGLE_PERMISSION, 0)
         when (type) {
             TYPE_CAMERA -> {
@@ -97,7 +98,7 @@ class RequestPermissionActivity :
                 binding.tvContent.text = getString(R.string.hint_per_camera)
             }
 
-            TYPE_GALLERY -> {
+            TYPE_GALLERY, TYPE_SAVE_IMG -> {
                 binding.imvBanner.loadImageIcon(R.drawable.ic_per_image)
                 binding.tvTitle.text = getString(R.string.til_per_gallery)
                 binding.tvContent.text = getString(R.string.hint_per_gallery)
@@ -115,6 +116,7 @@ class RequestPermissionActivity :
                 binding.tvContent.text = getString(R.string.hint_per_camera)
             }
         }
+
         binding.imvBack.setOnClickListener { finish() }
 
         binding.btnGrant.setOnClickListener {
@@ -125,11 +127,10 @@ class RequestPermissionActivity :
                 else -> requestCameraRecord()
             }
         }
-
     }
 
-    override fun initActionView() {
-    }
+    override fun initActionView() {}
+
     override fun onResume() {
         super.onResume()
         if (isOpenSettingApp) {
@@ -137,45 +138,32 @@ class RequestPermissionActivity :
             when (type) {
                 TYPE_CAMERA -> {
                     if (PermissionManager.checkPermissionsGranted(this, permissionsForCamera)) {
-                      //  showToast(getString(R.string.per_granted))
                         finish()
                         navToActivity(this, CameraActivity::class.java)
                     }
                 }
 
-                TYPE_GALLERY -> {
-                    if (PermissionManager.checkPermissionGranted(this, permissionForGallery)) {
-                       // showToast(getString(R.string.per_granted))
+                TYPE_GALLERY, TYPE_SAVE_IMG -> {
+                    if (PermissionManager.checkPermissionsGranted(this, permissionForGallery)) {
                         finish()
-                        navToActivity(
-                            this@RequestPermissionActivity,
-                            MediaSavedActivity::class.java,Bundle().apply {
-                                putBoolean(Constants.IS_VIDEO, false)
-                            }
-                        )
+                        val intentTarget = if (intent.getBooleanExtra(Constants.INTENT_LIBRARY_PERMISSION, false)) {
+                            EditAlbumLibraryActivity::class.java
+                        } else {
+                            MediaSavedActivity::class.java
+                        }
+                        navToActivity(this@RequestPermissionActivity, intentTarget)
                     }
                 }
 
                 TYPE_LOCATION -> {
                     if (PermissionManager.checkPermissionGranted(this, permissionForLocation)) {
                         finish()
-                        navToActivity(
-                            this@RequestPermissionActivity,
-                            MapSettingActivity::class.java
-                        )
-                    }
-                }
-
-                TYPE_SAVE_IMG -> {
-                    if (PermissionManager.checkPermissionGranted(this, permissionForGallery)) {
-                      //  showToast(getString(R.string.per_granted))
-                        finish()
+                        navToActivity(this@RequestPermissionActivity, MapSettingActivity::class.java)
                     }
                 }
 
                 else -> {
                     if (PermissionManager.checkPermissionsGranted(this, permissionsForCamera)) {
-                       // showToast(getString(R.string.per_granted))
                         finish()
                     }
                 }
@@ -190,10 +178,9 @@ class RequestPermissionActivity :
     }
 
     private fun requestPermissionGallery() {
-        if (!PermissionManager.checkPermissionGranted(this, permissionForGallery)) {
-            requestPermissionForGallery.launch(permissionForGallery)
+        if (!PermissionManager.checkPermissionsGranted(this, permissionForGallery)) {
+            requestPermissionForGallery.launch(permissionForGallery.toTypedArray())
         } else {
-            //showToast(getString(R.string.per_granted))
             finish()
         }
     }
@@ -201,6 +188,8 @@ class RequestPermissionActivity :
     private fun requestPermissionLocation() {
         if (!PermissionManager.checkPermissionGranted(this, permissionForLocation)) {
             requestPermissionForLocation.launch(permissionForLocation)
+        } else {
+            finish()
         }
     }
 
@@ -213,3 +202,4 @@ class RequestPermissionActivity :
         const val REQUEST_CODE = 1001
     }
 }
+

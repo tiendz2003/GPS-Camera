@@ -46,9 +46,9 @@ object AppModule {
 
         // ViewModels
         viewModel { AlbumViewModel(get()) }
-        viewModel { PhotosViewModel(get(), get(), get(), get()) }
+        viewModel { PhotosViewModel(get()) }
         viewModel { CameraViewModel(get(), get(), get(), get(),get()) }
-        viewModel { PreviewShareViewModel(get()) }
+        viewModel { PreviewShareViewModel(get(),get(),get(),get()) }
         viewModel { MapSettingViewModel(get(), get()) }
 
         includes(cacheModule)

@@ -27,17 +27,12 @@ import java.util.Locale
 
 class PhotosViewModel(
     private val repository: MediaRepository,
-    private val cacheDataTemplate: CacheDataTemplate,
-    private val weatherRepository: WeatherRepository,
-    private val locationRepository: MapLocationRepository,
 ) : ViewModel() {
 
     private val _photos = MutableLiveData<Resource<List<Photo>>>()
     val photos: LiveData<Resource<List<Photo>>> = _photos
     private val _selectedPhoto = MutableLiveData<Photo>()
     val selectedPhoto: LiveData<Photo> = _selectedPhoto
-    private val _cacheData = MutableStateFlow<TemplateDataModel?>(null)
-    val cacheData = _cacheData.asStateFlow()
     fun loadPhotosFromAlbum(albumId: String) {
         viewModelScope.launch {
             _photos.value = Resource.Loading()
@@ -108,87 +103,7 @@ class PhotosViewModel(
         _photos.value = Resource.Success(sortedPhotos)
     }
 
-    fun getCacheDataTemplate() {
-        val now = Date()
-        val customDate = SharePrefManager.getString("CUSTOM_DATE", "")?:now.formatToDate()
-        val customTime = SharePrefManager.getString("CUSTOM_TIME", "")?:now.formatToTime()
-        val selectedOption = SharePrefManager.getString("DATE_TIME_OPTION", "current")
-        Log.d("PhotosViewModel", "CUSTOM_DATE: $customDate")
-        Log.d("PhotosViewModel", "CUSTOM_TIME: $customTime")
-        Log.d("PhotosViewModel", "DATE_TIME_OPTION: $selectedOption")
-        val currentDate = if (selectedOption == "custom" && customDate.isNotEmpty() && customTime.isNotEmpty()) {
-            customDate
-        } else {
-            now.formatToDate()
-        }
 
-        val currentTime = if (selectedOption == "custom" && customDate.isNotEmpty() && customTime.isNotEmpty()) {
-            customTime
-        } else {
-            now.formatToTime()
-        }
-        Log.d("PhotosViewModel", "CUrrentDATE: $currentDate")
-        Log.d("PhotosViewModel", "CUrrent_TIME: $currentTime")
-        if (cacheDataTemplate.isCacheValid()) {
-            cacheDataTemplate.templateData.value?.let {
-                val (lat, long, location) = SharePrefManager.getCachedCoordinates()
-                    ?: Triple(it.lat?.replace(",", ".")?.toDouble(), it.long?.replace(",", ".")?.toDouble(), it.location)
-
-                _cacheData.value = TemplateDataModel(
-                    location = location,
-                    lat = lat.toString(),
-                    long = long.toString(),
-                    temperatureC = it.temperatureC,
-                    temperatureF = it.temperatureF,
-                    currentTime = currentTime,
-                    currentDate = currentDate
-                )
-
-                Log.d("PhotosViewModel", "getCacheDataTemplate: $it")
-            }
-        }
-        if (!cacheDataTemplate.isCacheValid() || cacheDataTemplate.templateData.value == null) {
-            viewModelScope.launch {
-                try {
-                    val locationResult = locationRepository.getCurrentLocation()
-                    if (locationResult is LocationResult.Success) {
-                        val currentLocation = locationResult.location
-                        val lat = String.format(Locale.getDefault(), "%.6f", currentLocation.latitude)
-                        val lon = String.format(Locale.getDefault(), "%.6f", currentLocation.longitude)
-                        val addressResult = locationRepository.getAddressFromLocation(currentLocation)
-                        val tempResult = weatherRepository.getCurrentTemp(currentLocation)
-                        val fakeTempResult = weatherRepository.getFakeTemp()
-
-                        val location = if (addressResult is LocationResult.Address) {
-                            addressResult.address
-                        } else {
-                            null
-                        }
-
-                        val tempPair = (if (tempResult is Resource.Success) tempResult.data else null)
-                            ?: (if (fakeTempResult is Resource.Success) fakeTempResult.data else null)
-                            ?: Pair(null, null)
-
-                        val tempC = tempPair.first
-                        val tempF = tempPair.second
-
-                        _cacheData.value = TemplateDataModel(
-                            location = location,
-                            lat = lat,
-                            long = lon,
-                            temperatureC = tempC,
-                            temperatureF = tempF,
-                            currentTime = currentTime,
-                            currentDate = currentDate
-                        )
-                        Log.d("PhotosViewModel", "getCacheDataTemplate: ${cacheData.value}")
-                    }
-                } catch (e: Exception) {
-                    Log.e("PhotosViewModel", "Error: ${e.message}")
-                }
-            }
-        }
-    }
 
 
     fun selectedPhoto(photo: Photo) {
@@ -197,6 +112,5 @@ class PhotosViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        cacheDataTemplate.cleanup()
     }
 }

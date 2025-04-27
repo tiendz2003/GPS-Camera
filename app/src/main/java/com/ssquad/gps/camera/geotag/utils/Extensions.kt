@@ -20,6 +20,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
@@ -40,6 +41,7 @@ import com.ssquad.gps.camera.geotag.map_template.GPSTemplateV2
 import com.ssquad.gps.camera.geotag.map_template.GPSTemplateV3
 import com.example.baseproject.map_template.GPSTemplateV4
 import com.example.baseproject.map_template.GPSTemplateV5
+import com.faltenreich.skeletonlayout.Skeleton
 import com.google.android.gms.ads.MediaAspectRatio
 import com.ssquad.gps.camera.geotag.map_template.TravelTemplateV1
 import com.ssquad.gps.camera.geotag.map_template.TravelTemplateV2

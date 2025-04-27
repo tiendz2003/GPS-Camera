@@ -1,12 +1,13 @@
-package com.ssquad.gps.camera.geotag.worker
+package com.ssquad.gps.camera.geotag.service
 
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
+import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
@@ -24,6 +25,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import java.io.File
 
 class VideoProcessingService : Service() {
 
@@ -67,39 +69,45 @@ class VideoProcessingService : Service() {
     }
 
     private fun processVideo(inputUri: Uri, templatePath: String?, address: String?) {
+        var tempDir: File? = null
+        var tempInputFile: File? = null
+        var tempOutputFile: File? = null
+
         serviceScope.launch {
             try {
                 updateNotification("Đang xử lý video...", 0.1f)
 
                 val result = if (templatePath != null) {
                     // Sử dụng templatePath để xử lý video với FFmpeg
-                    val tempDir = VideoUtils.createTempDirectory(this@VideoProcessingService)
-                    val tempInputFile = VideoUtils.createTempFile(tempDir, "input_video.mp4")
-                    val tempOutputFile = VideoUtils.createTempFile(tempDir, "output_video.mp4")
+                    tempDir = VideoUtils.createTempDirectory(this@VideoProcessingService)
+                    tempInputFile = VideoUtils.createTempFile(tempDir!!, "input_video.mp4")
+                    tempOutputFile = VideoUtils.createTempFile(tempDir!!, "output_video.mp4")
 
-                    VideoUtils.copyUriToFile(this@VideoProcessingService, inputUri, tempInputFile)
+                    VideoUtils.copyUriToFile(this@VideoProcessingService, inputUri, tempInputFile!!)
 
                     val ffmpegExecutor : FFmpegExecutor by inject()
                     val success = ffmpegExecutor.processVideoWithOverlay(
-                        tempInputFile.absolutePath,
+                        tempInputFile!!.absolutePath,
                         templatePath,
-                        tempOutputFile.absolutePath
+                        tempOutputFile!!.absolutePath
                     ) { progress ->
                         updateNotification("Đang xử lý video...", 0.1f + progress * 0.6f)
                     }
 
                     val savedUri = if (success) {
                         updateNotification("Đang lưu video...", 0.8f)
-                        cameraRepository.saveVideoToGallery(Uri.fromFile(tempOutputFile), address)
+                        cameraRepository.saveVideoToGallery(Uri.fromFile(tempOutputFile!!), address)
                     } else null
 
-                    VideoUtils.cleanupTempFiles(tempDir)
                     savedUri
                 } else {
                     // Chỉ lưu video nếu không có template
                     updateNotification("Đang lưu video...", 0.5f)
                     cameraRepository.saveVideoToGallery(inputUri, address)
                 }
+
+                // Dọn dẹp file ngay sau khi sử dụng
+                tempDir?.let { VideoUtils.cleanupTempFiles(it) }
 
                 // Thông báo kết quả
                 if (result != null) {
@@ -110,21 +118,43 @@ class VideoProcessingService : Service() {
                     broadcastFailure("Không thể lưu video")
                 }
 
-                // Dừng service sau một khoảng thời gian ngắn
                 delay(1500)
                 stopForegroundAndService()
 
             } catch (e: Exception) {
                 Log.e(TAG, "Error in video processing", e)
+
+                // Đảm bảo dọn dẹp file tạm ngay cả khi có lỗi
+                tempDir?.let { VideoUtils.cleanupTempFiles(it) }
+
                 updateNotification("Lỗi: ${e.message}", 1.0f)
                 broadcastFailure(e.message ?: "Lỗi không xác định")
                 delay(1500)
                 stopForegroundAndService()
+            } finally {
+                // Double-check dọn dẹp
+                tempDir?.let { VideoUtils.cleanupTempFiles(it) }
             }
         }
     }
 
+
     private fun broadcastSuccess(uri: Uri) {
+        // Hiển thị notification kết quả với sound và vibration
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Xử lý video hoàn tất")
+            .setContentText("Video đã được lưu thành công")
+            .setSmallIcon(R.drawable.ig_logo)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .setVibrate(longArrayOf(0, 250, 250, 250))
+            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+            .setAutoCancel(true)
+
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager.notify(NOTIFICATION_ID + 1, builder.build())
+
+        // Tiếp tục broadcast như cũ
         val intent = Intent(ACTION_VIDEO_SAVED).apply {
             putExtra(EXTRA_SAVED_URI, uri)
         }
@@ -147,13 +177,22 @@ class VideoProcessingService : Service() {
         val channel = NotificationChannel(
             CHANNEL_ID,
             "Video Processing",
-            NotificationManager.IMPORTANCE_LOW
+            NotificationManager.IMPORTANCE_HIGH  // Thay đổi từ LOW thành HIGH
         )
         channel.description = "Thông báo khi đang xử lý video"
+        channel.enableVibration(true)
+        channel.setSound(
+            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),
+            AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+        )
 
         val notificationManager = getSystemService(NotificationManager::class.java)
         notificationManager.createNotificationChannel(channel)
     }
+
 
     private fun createProgressNotification(progress: Float): Notification {
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
@@ -161,7 +200,10 @@ class VideoProcessingService : Service() {
             .setContentText("Vui lòng đợi...")
             .setSmallIcon(R.drawable.ig_logo)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-
+            .setCategory(NotificationCompat.CATEGORY_PROGRESS) // Thêm category
+            .setVibrate(longArrayOf(0, 100, 100, 100))
+            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+            .setOngoing(true)
         if (progress > 0) {
             builder.setProgress(100, (progress * 100).toInt(), false)
         }
@@ -186,6 +228,7 @@ class VideoProcessingService : Service() {
 
     override fun onDestroy() {
         serviceScope.cancel()
+        VideoUtils.cleanupAllTempDirectories()
         super.onDestroy()
     }
 

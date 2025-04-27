@@ -11,6 +11,6 @@ data class PreviewState (
     val error: String ? = null,
     val isSaving: Boolean = false,
     val selectedTemplateId: String? = null,
-    val cacheDataTemplate: TemplateDataModel = TemplateDataModel(),
+    val cacheDataTemplate: TemplateDataModel ?= null,
     val templateState: TemplateState = TemplateState()
 )

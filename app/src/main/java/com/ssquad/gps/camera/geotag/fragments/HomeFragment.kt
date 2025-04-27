@@ -64,7 +64,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             startActivity(intent)
         }
         binding.editPhotoCard.setOnClickListener {
-            if (PermissionManager.checkLibraryGranted(requireContext())) {
+            if (PermissionManager.checkLibraryGranted(requireContext()) && PermissionManager.checkLocationGranted(requireContext())) {
                 reqNavigate.launch(Intent(requireContext(), EditAlbumLibraryActivity::class.java))
             } else {
                 Intent(requireContext(), RequestPermissionActivity::class.java).apply {

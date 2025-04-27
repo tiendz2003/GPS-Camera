@@ -77,7 +77,7 @@ dependencies {
     implementation ("androidx.work:work-runtime-ktx:2.10.0")
     implementation (libs.androidx.camera.core)
     implementation ("androidx.camera:camera-camera2:1.4.2")
-    implementation ("com.faltenreich:skeletonlayout:6.0.0")
+    implementation ("com.faltenreich:skeletonlayout:4.0.0")
     implementation("androidx.camera:camera-effects:1.4.2")
 
     // CameraX Lifecycle để tự động quản lý camera theo lifecycle

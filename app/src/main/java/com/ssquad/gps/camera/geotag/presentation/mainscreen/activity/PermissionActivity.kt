@@ -9,15 +9,18 @@ import android.os.Looper
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.presentation.hometab.activities.MainActivity
 import com.ssquad.gps.camera.geotag.databinding.ActivityPermissionBinding
 import com.ssquad.gps.camera.geotag.utils.PermissionManager
 import com.ssquad.gps.camera.geotag.utils.SharePrefManager
+import com.ssquad.gps.camera.geotag.utils.showToast
 import kotlin.text.compareTo
 
 class PermissionActivity :
     BaseActivity<ActivityPermissionBinding>(ActivityPermissionBinding::inflate) {
+    private var isOpenSettingApp = false
     private val requestCam =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
             if (!it) {
@@ -144,49 +147,76 @@ class PermissionActivity :
         binding.cardLocation.setOnClickListener { requestLocationPermission() }
         binding.cardPhotoLibrary.setOnClickListener { requestPhotoLibraryPermission() }
 
-        binding.btnContinue.setOnClickListener { startMainActivity() }
+        binding.btnContinue.setOnClickListener {
+            if (PermissionManager.checkCamPermissions(this) &&
+                PermissionManager.checkMicroPermissions(this) &&
+                PermissionManager.checkLocationPermissions(this) &&
+                PermissionManager.checkLibraryGranted(this)
+            ) {
+                startMainActivity()
+            }else{
+                showToast(getString(R.string.warning_camera_location_permission))
+            }
+        }
         binding.tvGrantLater.setOnClickListener { startMainActivity() }
     }
 
 
     private fun requestCameraPermission() {
         if (!PermissionManager.checkPermissionGranted(this, Manifest.permission.CAMERA)) {
-            requestCam.launch(Manifest.permission.CAMERA)
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+                PermissionManager.showOpenSettingsDialog(this) {
+                    binding.switchCamera.isChecked = false
+                    binding.switchCamera.isEnabled = true
+                }
+            } else {
+                requestCam.launch(Manifest.permission.CAMERA)
+            }
         }
     }
 
     private fun requestMicrophonePermission() {
         if (!PermissionManager.checkPermissionGranted(this, Manifest.permission.RECORD_AUDIO)) {
-            requestRecord.launch(Manifest.permission.RECORD_AUDIO)
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
+                PermissionManager.showOpenSettingsDialog(this) {
+                    binding.switchMicrophone.isChecked = false
+                    binding.switchMicrophone.isEnabled = true
+
+                }
+            } else {
+                requestRecord.launch(Manifest.permission.RECORD_AUDIO)
+            }
         }
     }
 
     private fun requestLocationPermission() {
-        if (!PermissionManager.checkPermissionGranted(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
-        ) {
-            requestLocation.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        if (!PermissionManager.checkPermissionGranted(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                PermissionManager.showOpenSettingsDialog(this) {
+                    binding.switchLocation.isChecked = false
+                    binding.switchLocation.isEnabled = true
+                }
+            } else {
+                requestLocation.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
         }
     }
 
     private fun requestPhotoLibraryPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (!PermissionManager.checkPermissionGranted(
-                    this,
-                    Manifest.permission.READ_MEDIA_IMAGES
-                )
-            ) {
-                requestAlbum.launch(Manifest.permission.READ_MEDIA_IMAGES)
-            }
+        val photoPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
         } else {
-            if (!PermissionManager.checkPermissionGranted(
-                    this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                )
-            ) {
-                requestAlbum.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+
+        if (!PermissionManager.checkPermissionGranted(this, photoPermission)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, photoPermission)) {
+                PermissionManager.showOpenSettingsDialog(this) {
+                    binding.switchPhotoLibrary.isChecked = false
+                    binding.switchPhotoLibrary.isEnabled = true
+                }
+            } else {
+                requestAlbum.launch(photoPermission)
             }
         }
     }
@@ -235,6 +265,14 @@ class PermissionActivity :
             binding.switchPhotoLibrary.setOnCheckedChangeListener(null)
             binding.switchPhotoLibrary.isChecked = true
             binding.switchPhotoLibrary.isEnabled = false
+        }else {
+            binding.switchPhotoLibrary.setOnCheckedChangeListener(null)
+            binding.switchPhotoLibrary.isChecked = false
+            binding.switchPhotoLibrary.isEnabled = true
+            binding.switchPhotoLibrary.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) requestPhotoLibraryPermission()
+            }
         }
     }
+
 }

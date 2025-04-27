@@ -27,7 +27,7 @@
         android:theme="@style/Theme.BaseProject"
         tools:targetApi="31">
         <service
-            android:name=".worker.VideoProcessingService"
+            android:name=".service.VideoProcessingService"
             android:foregroundServiceType="dataSync"
             android:exported="false" />
         <activity

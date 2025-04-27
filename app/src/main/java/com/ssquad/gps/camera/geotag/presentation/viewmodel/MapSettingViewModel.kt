@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ssquad.gps.camera.geotag.domain.MapLocationRepository
 import com.ssquad.gps.camera.geotag.presentation.settingtab.activity.MapSettingState
 import com.ssquad.gps.camera.geotag.utils.LocationResult
+import com.ssquad.gps.camera.geotag.utils.SharePrefManager
 import com.ssquad.gps.camera.geotag.worker.CacheDataTemplate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,9 +32,19 @@ class MapSettingViewModel(
             if (cacheDataTemplate.isCacheValid()) {
                 cacheDataTemplate.templateData.value?.let { cacheData ->
                     try {
+                        var latitude:Double ?= null
+                        var longitude:Double ?= null
+                        var address :String?=null
                         //ep' kieu
-                        val latitude = cacheData.lat?.toDoubleOrNull()
-                        val longitude = cacheData.long?.toDoubleOrNull()
+                        if(SharePrefManager.getCachedCoordinates() != null){
+                            latitude = SharePrefManager.getCachedCoordinates()?.first
+                            longitude = SharePrefManager.getCachedCoordinates()?.second
+                            address = SharePrefManager.getCachedCoordinates()?.third
+                        }else{
+                           latitude = cacheData.lat?.toDoubleOrNull()
+                           longitude = cacheData.long?.toDoubleOrNull()
+                            address = cacheData.location
+                        }
 
                         if (latitude != null && longitude != null) {
                             val location = Location("CachedProvider").apply {
@@ -46,7 +57,7 @@ class MapSettingViewModel(
                                     currentLocation = location,
                                     isLoading = false,
                                     isError = null,
-                                    currentAddress = cacheData.location,
+                                    currentAddress = address,
                                     yourLocation = location
                                 )
                             }
@@ -63,43 +74,45 @@ class MapSettingViewModel(
                 it.copy(isLoading = true, isError = null)
             }
 
-            try {
-                when (val locationResult = mapLocationRepository.getCurrentLocation()) {
-                    is LocationResult.Success -> {
-                        val currentLocation = locationResult.location
-                        updateSettingState {
-                            it.copy(
-                                currentLocation = currentLocation,
-                                yourLocation = currentLocation,
-                                isLoading = false,
-                                isError = null
-                            )
+            if(cacheDataTemplate.templateData.value == null &&SharePrefManager.getCachedCoordinates() == null) {
+                try {
+                    when (val locationResult = mapLocationRepository.getCurrentLocation()) {
+                        is LocationResult.Success -> {
+                            val currentLocation = locationResult.location
+                            updateSettingState {
+                                it.copy(
+                                    currentLocation = currentLocation,
+                                    yourLocation = currentLocation,
+                                    isLoading = false,
+                                    isError = null
+                                )
+                            }
+                            updateLocation(currentLocation)
                         }
-                        updateLocation(currentLocation)
-                    }
-                    is LocationResult.Error -> {
-                        updateSettingState {
-                            it.copy(
-                                isLoading = false,
-                                isError = locationResult.message
-                            )
+                        is LocationResult.Error -> {
+                            updateSettingState {
+                                it.copy(
+                                    isLoading = false,
+                                    isError = locationResult.message
+                                )
+                            }
+                        }
+                        is LocationResult.Address ->
+                        {
+                            updateSettingState {
+                                it.copy(
+                                    currentAddress = locationResult.address
+                                )
+                            }
                         }
                     }
-                    is LocationResult.Address ->
-                    {
-                        updateSettingState {
-                            it.copy(
-                                currentAddress = locationResult.address
-                            )
-                        }
+                } catch (e: Exception) {
+                    updateSettingState {
+                        it.copy(
+                            isLoading = false,
+                            isError = e.message
+                        )
                     }
-                }
-            } catch (e: Exception) {
-                updateSettingState {
-                    it.copy(
-                        isLoading = false,
-                        isError = e.message
-                    )
                 }
             }
         }

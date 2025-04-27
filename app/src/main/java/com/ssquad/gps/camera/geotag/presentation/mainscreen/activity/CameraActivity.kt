@@ -14,6 +14,7 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.TorchState
 import androidx.constraintlayout.motion.widget.MotionLayout
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -195,13 +196,21 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                     }
                 }
             }
-            imvTakeCapture.setOnDebounceClickListener(1000L) {
-                if (cameraViewModel.isVideoMode()) {
-                    Log.d("CameraActivity", "Video mode")
-                    toggleVideoRecording()
+            binding.imvTakeCapture.setOnDebounceClickListener(1000L) {
+                if (cameraViewModel.cameraState.value.templateData == null) {
+                    Toast.makeText(
+                        this@CameraActivity,
+                        getString(R.string.template_not_loaded_message),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 } else {
-                    Log.d("CameraActivity", "camera mode")
-                    takePicture()
+                    if (cameraViewModel.isVideoMode()) {
+                        Log.d("CameraActivity", "Video mode")
+                        toggleVideoRecording()
+                    } else {
+                        Log.d("CameraActivity", "Camera mode")
+                        takePicture()
+                    }
                 }
             }
             binding.imvFlash.setOnClickListener {
@@ -266,6 +275,8 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 cameraViewModel.cameraState.collect { cameraState ->
+                    //khi nao` chua có data thi ko cho chup
+                    binding.imvTakeCapture.isEnabled = cameraState.templateData != null
                     cameraState.captureImageBitmap?.let { bitmap ->
                         Log.d("CameraActivity", "observeViewModel: $bitmap")
                         navigateToPreviewImage(bitmap)
@@ -276,6 +287,11 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                             getString(R.string.error_taking_photo_please_try_again),
                             Toast.LENGTH_SHORT
                         ).show()
+                        cameraViewModel.updateCameraState {
+                            it.copy(
+                                error = null
+                            )
+                        }
                     }
                     cameraState.recordingDuration?.let { duration ->
                         binding.tvDurationVideo.text = duration
@@ -291,9 +307,13 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                         binding.imvTakeCapture.isEnabled = true
                         binding.tvCountDown.gone()
                     }
-                    cameraState.templateData?.let {
-                        Log.d("CameraActivity", "observeViewModel: $it")
-                        initTemplate(it)
+                    if (cameraState.templateData == null) {
+                        // Nếu chưa có template thì show shimmer
+                        showTemplateLoading(true)
+                    } else {
+                        // Có template rồi thì ẩn shimmer và initTemplate
+                        showTemplateLoading(false)
+                        initTemplate(cameraState.templateData)
                     }
                     cameraState.lastCaptureImage?.let { photo ->
                         binding.imvSelectImage.loadImageIcon(photo.path)
@@ -415,6 +435,22 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
             else -> R.drawable.ic_time
         }
         binding.imvTimer.setImageResource(iconRes)
+    }
+    private fun showTemplateLoading(show: Boolean) {
+        binding.skeletonTemplateLoading.apply {
+            if (show) {
+                // Setup shimmer config nếu muốn (set 1 lần)
+                maskColor = ContextCompat.getColor(context, R.color.neutralGrey) // màu xám loading
+                shimmerColor = ContextCompat.getColor(context, R.color.neutralWhite) // màu shimmer trắng sáng
+                shimmerDurationInMillis = 1000L // thời gian chạy 1 vòng shimmer (ms)
+                showShimmer = true // bật shimmer
+                showSkeleton() // bắt đầu loading
+                visibility = View.VISIBLE
+            } else {
+                showOriginal() // ẩn shimmer
+                visibility = View.GONE
+            }
+        }
     }
 
     private fun initTemplate(template: TemplateDataModel) {

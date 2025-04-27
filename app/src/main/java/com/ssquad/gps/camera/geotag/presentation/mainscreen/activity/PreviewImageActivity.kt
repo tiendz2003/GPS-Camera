@@ -5,7 +5,9 @@ import android.graphics.Canvas
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import com.ssquad.gps.camera.geotag.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.utils.BitmapHolder
 import androidx.fragment.app.Fragment
@@ -39,12 +41,14 @@ import com.ssquad.gps.camera.geotag.utils.flipHorizontally
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
 
 class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPreviewBinding::inflate) {
 
     private val previewViewModel: PreviewShareViewModel by viewModel()
-    private val photosViewModel: PhotosViewModel by viewModel()
 
     private var templateData: TemplateDataModel? = null
     private var templateId: String? = null
@@ -95,10 +99,12 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
 
     private fun loadTemplateData() {
         lifecycleScope.launch {
-            photosViewModel.getCacheDataTemplate()
-
-            photosViewModel.cacheData.collectLatest { data ->
-                if (data != null) {
+            previewViewModel.getCacheDataTemplate()
+            previewViewModel.previewUiState
+                .map { it.cacheDataTemplate }
+                .filterNotNull()
+                .firstOrNull()
+                ?.let { data ->
                     // Đã có dữ liệu template
                     templateData = data
                     isTemplateDataLoaded = true
@@ -108,9 +114,9 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
                     }
                     processImage()
                 }
-            }
         }
     }
+
 
     private fun processImage() {
         if (pendingIsFromAlbum) {
@@ -202,6 +208,9 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
                     if (previewUiState.selectedTemplateId != null) {
                         updateTemplate(previewUiState.selectedTemplateId)
                     }
+                    if (pendingIsFromAlbum) {
+                        showTemplateLoading(previewUiState.cacheDataTemplate == null)
+                    }
                 }
             }
         }
@@ -221,7 +230,22 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
             }
         }
     }
-
+    private fun showTemplateLoading(show: Boolean) {
+        binding.skeletonTemplateLoading.apply {
+            if (show) {
+                // Setup shimmer config nếu muốn (set 1 lần)
+                maskColor = ContextCompat.getColor(context, R.color.neutralGrey) // màu xám loading
+                shimmerColor = ContextCompat.getColor(context, R.color.neutralWhite) // màu shimmer trắng sáng
+                shimmerDurationInMillis = 1000L // thời gian chạy 1 vòng shimmer (ms)
+                showShimmer = true // bật shimmer
+                showSkeleton() // bắt đầu loading
+                visibility = View.VISIBLE
+            } else {
+                showOriginal() // ẩn shimmer
+                visibility = View.GONE
+            }
+        }
+    }
     private fun displayImageWithTemplate(
         bitmap: Bitmap,
         templateData: TemplateDataModel?,
@@ -271,7 +295,7 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
         }
     }
 
-    fun updateTemplate(templateId: String) {
+    private fun updateTemplate(templateId: String) {
         this.templateId = templateId
         binding.templateContainer.removeAllViews()
         templateData?.let { data ->

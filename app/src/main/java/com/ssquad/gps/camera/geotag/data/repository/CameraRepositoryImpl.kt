@@ -70,7 +70,7 @@ class CameraRepositoryImpl(
                     context.contentResolver.update(uri, contentValues, null, null)
                 }
                 if (!address.isNullOrEmpty() && imageUri != null) {
-                    addExifLocationData(context, imageUri, address)
+                    addExifLocationData(context, imageUri!!, address)
                 }
 
                 return@withContext imageUri
@@ -176,7 +176,7 @@ class CameraRepositoryImpl(
                     }
                 }
                 if (!address.isNullOrEmpty() && videoUri != null) {
-                    addExifLocationData(context, videoUri, address)
+                    addExifLocationData(context, videoUri!!, address)
                 }
 
                 return@withContext videoUri

@@ -43,13 +43,13 @@ data class CustomTemplateModel(
 
 @Parcelize
 data class TemplateDataModel(
-    val location: String? = null,
-    val lat: String? = null,
-    val long: String? = null,
-    val temperatureC: Float? = null,
-    val temperatureF: Float? = null,
-    val currentTime: String? = null,
-    val currentDate: String? = null
+    val location: String? = null?:"Loading...",
+    val lat: String? = null?:"Loading...",
+    val long: String? = null?:"Loading...",
+    val temperatureC: Float? = null?:0F,
+    val temperatureF: Float? = null?:0F,
+    val currentTime: String? = null?:"Loading...",
+    val currentDate: String? = null?:"Loading..."
 ) : Parcelable
 
 data class TemplateState(

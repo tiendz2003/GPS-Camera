@@ -151,4 +151,5 @@
     <string name="grant_permission">Grant Permission</string>
     <string name="error_while_playing_video">Error while playing video</string>
     <string name="unable_to_request_delete_permission">Unable to request delete permission</string>
+    <string name="template_not_loaded_message">Please wait until the template loads successfully.</string>
 </resources>

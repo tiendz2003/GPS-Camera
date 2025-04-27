@@ -74,7 +74,12 @@ object PermissionManager {
             )
         )
     }
-
+    fun checkLocationGranted(context: Context): Boolean {
+        return ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
 
     /**
      * Kiểm tra xem có nên hiển thị màn hình xin quyền hay không

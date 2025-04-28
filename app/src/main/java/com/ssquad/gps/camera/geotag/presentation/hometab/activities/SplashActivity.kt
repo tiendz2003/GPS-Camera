@@ -116,8 +116,8 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(ActivitySplashBinding
     }
 
     private fun initAds() {
-        AdmobLib.setEnabledCheckTestDevice(false)
-        AdmobLib.initialize(this, isDebug = false, isShowAds = true, onInitializedAds = {
+        AdmobLib.setCheckTestDevice(false)
+        AdmobLib.initialize(this, isDebug = true, isShowAds = true, onInitializedAds = {
 
             if (it) {
                 if (RemoteConfig.remoteOnResume == 1L) {

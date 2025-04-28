@@ -80,13 +80,13 @@ object AdsManager {
     }
 
 
-    private var countInterStopProcess = 0
- /*   fun isShowInterStopProcess(): Boolean {
-        if (RemoteConfig.remoteInterStopCleanProcess < 1) return false
+    private var countInterSave = 0
+    fun isShowInterSaveImage(): Boolean {
+        if (RemoteConfig.remoteInterSave < 1) return false
 
-        countInterStopProcess++
-        return isShowInter && countInterStopProcess % RemoteConfig.remoteInterStopCleanProcess == 0L
-    }*/
+        countInterSave++
+        return isShowInter && countInterSave % RemoteConfig.remoteInterSave == 0L
+    }
 
     private var isRatingShown = false
     fun isShowRating(): Boolean {

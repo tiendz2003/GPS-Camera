@@ -31,13 +31,21 @@ import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
 import com.ssquad.gps.camera.geotag.utils.loadImageIcon
 import androidx.core.net.toUri
+import com.snake.squad.adslib.AdmobLib
+import com.snake.squad.adslib.utils.BannerCollapsibleType
+import com.snake.squad.adslib.utils.BannerType
 import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.databinding.ActivityPreviewBinding
 import com.ssquad.gps.camera.geotag.presentation.viewmodel.PhotosViewModel
 import com.ssquad.gps.camera.geotag.service.MapManager
+import com.ssquad.gps.camera.geotag.utils.AdsManager
 import com.ssquad.gps.camera.geotag.utils.Config
+import com.ssquad.gps.camera.geotag.utils.RemoteConfig
 import com.ssquad.gps.camera.geotag.utils.SharePrefManager
 import com.ssquad.gps.camera.geotag.utils.flipHorizontally
+import com.ssquad.gps.camera.geotag.utils.gone
+import com.ssquad.gps.camera.geotag.utils.loadAndShowInterWithNativeAfter
+import com.ssquad.gps.camera.geotag.utils.visible
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -148,7 +156,9 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
                 finish()
             }
             btnSave.setOnClickListener {
-                saveImage()
+                initInterAd {
+                    saveImage()
+                }
             }
         }
     }
@@ -341,7 +351,7 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
                         this@PreviewImageActivity,
-                        "Lưu ảnh thất bại: ${e.message}",
+                        getString(R.string.image_saving_failed_please_try_again),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -349,12 +359,49 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
         }
     }
 
-    private fun resizeBitmap(bitmap: Bitmap): Bitmap {
-        val resizeBitmap =
-            bitmap.scale(binding.previewContainer.width, binding.previewContainer.height)
-        return resizeBitmap
+    private fun initBannerHomeAd() {
+        Log.d("PreviewImageActivity", "initBannerHomeAd: ${RemoteConfig.remoteBannerPhotoEditor}")
+        when (RemoteConfig.remoteBannerPhotoEditor) {
+            0L -> {
+                binding.viewLine.gone()
+                binding.frBanner.gone()
+            }
+            1L -> {
+                binding.frBanner.visible()
+                binding.viewLine.visible()
+                AdmobLib.loadAndShowBanner(
+                    this,
+                    AdsManager.BANNER_HOME,
+                    binding.frBanner,
+                    binding.viewLine,
+                    isShowOnTestDevice = true
+                )
+            }
+            2L -> {
+                binding.frBanner.visible()
+                binding.viewLine.visible()
+                AdmobLib.loadAndShowBannerCollapsible(
+                    this,
+                    AdsManager.admobBannerPhotoEditor,
+                    binding.frBanner,
+                    binding.viewLine,
+                    BannerCollapsibleType.BOTTOM,
+                    isShowOnTestDevice = true
+                )
+            }
+        }
     }
-
+    private fun initInterAd(saveImage:()-> Unit){
+        if(AdsManager.isShowInterSaveImage()){
+            binding.vShowInterAds.visible()
+            loadAndShowInterWithNativeAfter(
+                interModel = AdsManager.admobInterSave,
+                vShowInterAds = binding.vShowInterAds,
+            ) { saveImage() }
+        }else{
+            saveImage()
+        }
+    }
     private fun setupViewPager() {
         val pagerAdapter = PreviewPagerAdapter(this)
         binding.viewPager.apply {
@@ -369,6 +416,10 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
         }.attach()
     }
 
+    override fun onResume() {
+        super.onResume()
+        initBannerHomeAd()
+    }
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         binding.mapView.onSaveInstanceState(outState)

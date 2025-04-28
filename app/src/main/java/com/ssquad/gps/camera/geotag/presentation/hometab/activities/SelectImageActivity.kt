@@ -3,17 +3,23 @@ package com.ssquad.gps.camera.geotag.presentation.hometab.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.recyclerview.widget.GridLayoutManager
+import com.snake.squad.adslib.AdmobLib
 import com.ssquad.gps.camera.geotag.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.presentation.hometab.adapter.PhotoAdapter
 import com.ssquad.gps.camera.geotag.presentation.mainscreen.activity.PreviewImageActivity
 import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.databinding.ActivitySelectedImageBinding
 import com.ssquad.gps.camera.geotag.presentation.viewmodel.PhotosViewModel
+import com.ssquad.gps.camera.geotag.utils.AdsManager
 import com.ssquad.gps.camera.geotag.utils.GridSpacingItemDecoration
+import com.ssquad.gps.camera.geotag.utils.RemoteConfig
 import com.ssquad.gps.camera.geotag.utils.Resource
+import com.ssquad.gps.camera.geotag.utils.gone
+import com.ssquad.gps.camera.geotag.utils.visible
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -104,8 +110,24 @@ class SelectImageActivity : BaseActivity<ActivitySelectedImageBinding>(ActivityS
             }
         }
     }
+    fun initNativeAd(){
+        val photoSelectorKey = RemoteConfig.remoteNativePhotoSelector
+        Log.d("EditAlbumLibraryActivity", "initNativeAd: $photoSelectorKey")
+        if (photoSelectorKey > 0) {
+            binding.frNative.visible()
+            AdmobLib.loadAndShowNative(
+                this,
+                AdsManager.admobNativePhotoSelector,
+                binding.frNative,
+                layout = R.layout.custom_ads_native_small,
+            )
+        } else {
+            binding.frNative.gone()
+        }
+    }
     override fun onResume() {
         super.onResume()
+        initNativeAd()
         albumId?.let { albumId ->
             photoViewModel.loadPhotosFromAlbum(albumId)
         }

@@ -74,15 +74,23 @@
             android:layout_marginTop="10dp"
             android:gravity="center"
             android:text="@string/content_take_photo"
-            android:textSize="12sp"
-            app:layout_constraintTop_toBottomOf="@+id/banner" />
+            android:textSize="12sp" />
     </androidx.appcompat.widget.LinearLayoutCompat>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcvAlbum"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/frNative"
         app:layout_constraintTop_toBottomOf="@id/topBar"
         tools:listitem="@layout/edit_album_item" />
+    <FrameLayout
+        android:id="@+id/frNative"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

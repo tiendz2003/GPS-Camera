@@ -19,9 +19,15 @@ import com.ssquad.gps.camera.geotag.presentation.settingtab.activity.PolicyActiv
 import com.ssquad.gps.camera.geotag.presentation.settingtab.activity.SetupTempActivity
 import com.ssquad.gps.camera.geotag.utils.Constants
 import androidx.core.net.toUri
+import com.snake.squad.adslib.AdmobLib
+import com.snake.squad.adslib.utils.GoogleENative
 import com.ssquad.gps.camera.geotag.presentation.hometab.activities.MediaSavedActivity
 import com.ssquad.gps.camera.geotag.presentation.mainscreen.activity.RequestPermissionActivity
+import com.ssquad.gps.camera.geotag.utils.AdsManager
 import com.ssquad.gps.camera.geotag.utils.PermissionManager
+import com.ssquad.gps.camera.geotag.utils.RemoteConfig
+import com.ssquad.gps.camera.geotag.utils.gone
+import com.ssquad.gps.camera.geotag.utils.visible
 
 class SettingsFragment : BaseFragment<FragmentSettingsBinding>(FragmentSettingsBinding::inflate) {
     private val reqNavigate = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -76,6 +82,39 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(FragmentSettingsB
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        initNativeAd()
+    }
+    fun initNativeAd() {
+        val settingKey = RemoteConfig.remoteNativeSetting
+        if (settingKey == 0L) {
+            binding.frNative.gone()
+            return
+        }
+        binding.frNative.visible()
+        Log.d("SetingFragment", "initNativeAd: $settingKey")
+        if (AdsManager.admobNativeSetting.nativeAd.value != null) {
+            AdmobLib.showNative(
+                requireActivity(),
+                AdsManager.admobNativeSetting,
+                binding.frNative,
+                GoogleENative.UNIFIED_SMALL_LIKE_BANNER,
+                R.layout.custom_ads_native_small
+            )
+        } else {
+            AdmobLib.loadAndShowNative(
+                requireActivity(),
+                AdsManager.admobNativeSetting,
+                binding.frNative,
+                GoogleENative.UNIFIED_SMALL_LIKE_BANNER,
+                R.layout.custom_ads_native_small,
+                isShowOnTestDevice = true
+            )
+        }
+    }
+
     private fun shareApp() {
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.type = "text/plain"

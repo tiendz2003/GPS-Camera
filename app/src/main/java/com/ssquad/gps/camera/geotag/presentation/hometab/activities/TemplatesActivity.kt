@@ -3,14 +3,20 @@ package com.ssquad.gps.camera.geotag.presentation.hometab.activities
 import android.content.Intent
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
+import com.snake.squad.adslib.AdmobLib
+import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.data.models.TemplateType
 import com.ssquad.gps.camera.geotag.data.models.ThemeTemplateModel
 import com.ssquad.gps.camera.geotag.presentation.hometab.adapter.ThemeTemplateAdapter
 import com.ssquad.gps.camera.geotag.databinding.ActivityTemplatesBinding
+import com.ssquad.gps.camera.geotag.utils.AdsManager
+import com.ssquad.gps.camera.geotag.utils.RemoteConfig
 import com.ssquad.gps.camera.geotag.utils.SharePrefManager
+import com.ssquad.gps.camera.geotag.utils.gone
 import com.ssquad.gps.camera.geotag.utils.setupHorizontal
 import com.ssquad.gps.camera.geotag.utils.updateSelection
+import com.ssquad.gps.camera.geotag.utils.visible
 
 class TemplatesActivity :
     BaseActivity<ActivityTemplatesBinding>(ActivityTemplatesBinding::inflate) {
@@ -71,6 +77,7 @@ class TemplatesActivity :
     override fun onResume() {
         super.onResume()
         updateTemplateSelection()
+        initNativeAd()
     }
     override fun initActionView() {
         binding.tvViewAllDaily.setOnClickListener {
@@ -104,7 +111,21 @@ class TemplatesActivity :
         val themeType = selectedTemplate.type
         val filterList = listTheme.filter { it.type == themeType } as ArrayList<ThemeTemplateModel>
         val intent = PreviewTemplateActivity.Companion.getIntent(this, selectedTemplate, filterList, themeType)
-        // Use registerForActivityResult to handle the result
         previewActivityLauncher.launch(intent)
+    }
+    private fun initNativeAd() {
+        val themeSelectorKey = RemoteConfig.remoteNativeThemeSelector
+        Log.d("TemplatesActivity", "initNativeAd: $themeSelectorKey")
+        if (themeSelectorKey > 0) {
+            binding.frNative.visible()
+            AdmobLib.loadAndShowNative(
+                this,
+                AdsManager.admobNativeThemeSelector,
+                binding.frNative,
+                layout = R.layout.custom_ads_native_small,
+            )
+        } else {
+            binding.frNative.gone()
+        }
     }
 }

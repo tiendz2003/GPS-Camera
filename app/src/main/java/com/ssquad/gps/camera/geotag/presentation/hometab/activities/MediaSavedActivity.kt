@@ -9,6 +9,8 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.GridLayoutManager
+import com.snake.squad.adslib.AdmobLib
+import com.snake.squad.adslib.utils.GoogleENative
 import com.ssquad.gps.camera.geotag.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.data.models.SortOption
 import com.ssquad.gps.camera.geotag.presentation.hometab.adapter.PhotoAdapter
@@ -19,9 +21,11 @@ import com.ssquad.gps.camera.geotag.databinding.ActivityImagesSavedBinding
 import com.ssquad.gps.camera.geotag.presentation.mainscreen.activity.CameraActivity
 import com.ssquad.gps.camera.geotag.presentation.mainscreen.activity.RequestPermissionActivity
 import com.ssquad.gps.camera.geotag.presentation.viewmodel.PhotosViewModel
+import com.ssquad.gps.camera.geotag.utils.AdsManager
 import com.ssquad.gps.camera.geotag.utils.Constants
 import com.ssquad.gps.camera.geotag.utils.GridSpacingItemDecoration
 import com.ssquad.gps.camera.geotag.utils.PermissionManager
+import com.ssquad.gps.camera.geotag.utils.RemoteConfig
 import com.ssquad.gps.camera.geotag.utils.Resource
 import com.ssquad.gps.camera.geotag.utils.gone
 import com.ssquad.gps.camera.geotag.utils.visible
@@ -42,6 +46,7 @@ class MediaSavedActivity :
             }
         }
     }
+
     private var photoAdapter: PhotoAdapter? = null
     private val photosViewModel: PhotosViewModel by viewModel()
     private lateinit var bottomSheet: SortBottomSheet
@@ -100,7 +105,7 @@ class MediaSavedActivity :
     }
 
     private fun setupRecycleView() {
-        photoAdapter = PhotoAdapter(isVideo){ photo ->
+        photoAdapter = PhotoAdapter(isVideo) { photo ->
             startActivityForResult(
                 PreviewSavedActivity.getIntent(this, photo),
                 REQUEST_CODE_PREVIEW
@@ -128,18 +133,20 @@ class MediaSavedActivity :
 
     override fun onResume() {
         super.onResume()
+        initNativeAd()
         loadMediaData()
     }
 
-    private fun loadMediaData(){
+    private fun loadMediaData() {
         if (isVideo) {
             photosViewModel.loadVideosFromAppAlbum()
             binding.tvTitle.text = getString(R.string.saved_video)
-        }else{
+        } else {
             photosViewModel.loadPhotosFromAppAlbum()
             binding.tvTitle.text = getString(R.string.saved_image)
         }
     }
+
     private fun observeViewModel() {
         photosViewModel.photos.observe(this) { resource ->
             when (resource) {
@@ -151,15 +158,15 @@ class MediaSavedActivity :
                     resource.data?.let { photos ->
                         val photoByDates = photos.groupBy { photo ->
                             val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                            dateFormat.format(Date(photo.dateAdded*1000))
+                            dateFormat.format(Date(photo.dateAdded * 1000))
                         }
                         Log.d("MediaSavedActivity", "observeViewModel: ${photoByDates.size}")
                         photoAdapter?.submitList(photoByDates)
-                        if(photoByDates.isEmpty()){
+                        if (photoByDates.isEmpty()) {
                             Log.d("MediaSavedActivity", "observeViewModel: empty")
                             binding.llTakePhoto.visible()
                             binding.rcvImage.gone()
-                        }else{
+                        } else {
                             binding.llTakePhoto.gone()
                             binding.rcvImage.visible()
                         }
@@ -167,8 +174,10 @@ class MediaSavedActivity :
                 }
 
                 is Resource.Error -> {
-                    Toast.makeText(this,
-                        getString(R.string.unable_to_load_photos_from_album), Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this,
+                        getString(R.string.unable_to_load_photos_from_album), Toast.LENGTH_LONG
+                    ).show()
                     binding.llTakePhoto.visible()
                     binding.rcvImage.gone()
                 }
@@ -176,5 +185,22 @@ class MediaSavedActivity :
 
         }
     }
+
+    fun initNativeAd() {
+        val savedKey = RemoteConfig.remoteNativePhotoSelector
+        Log.d("MediaSavedActivity", "initNativeAd: $savedKey")
+        if (savedKey > 0) {
+            binding.frNative.visible()
+            AdmobLib.loadAndShowNative(
+                this,
+                AdsManager.admobNativeSaved,
+                binding.frNative,
+                layout = R.layout.custom_ads_native_small,
+            )
+        } else {
+            binding.frNative.gone()
+        }
+    }
+
 
 }

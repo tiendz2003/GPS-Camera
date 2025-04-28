@@ -5,10 +5,14 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import com.snake.squad.adslib.AdmobLib
+import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.presentation.hometab.adapter.EditAlbumAdapter
 import com.ssquad.gps.camera.geotag.databinding.ActivityAlbumLibraryBinding
 import com.ssquad.gps.camera.geotag.presentation.viewmodel.AlbumViewModel
+import com.ssquad.gps.camera.geotag.utils.AdsManager
+import com.ssquad.gps.camera.geotag.utils.RemoteConfig
 import com.ssquad.gps.camera.geotag.utils.Resource
 import com.ssquad.gps.camera.geotag.utils.gone
 import com.ssquad.gps.camera.geotag.utils.visible
@@ -63,9 +67,24 @@ class EditAlbumLibraryActivity : BaseActivity<ActivityAlbumLibraryBinding>(
 
         }
     }
-
+    fun initNativeAd(){
+        val photoSelectorKey = RemoteConfig.remoteNativePhotoSelector
+        Log.d("EditAlbumLibraryActivity", "initNativeAd: $photoSelectorKey")
+        if (photoSelectorKey > 0) {
+            binding.frNative.visible()
+            AdmobLib.loadAndShowNative(
+                this,
+                AdsManager.admobNativePhotoSelector,
+                binding.frNative,
+                layout = R.layout.custom_ads_native_small,
+            )
+        } else {
+            binding.frNative.gone()
+        }
+    }
     override fun onResume() {
         super.onResume()
+        initNativeAd()
         albumsViewModel.loadAlbums()
     }
 }

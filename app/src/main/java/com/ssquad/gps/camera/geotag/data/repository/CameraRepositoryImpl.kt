@@ -176,7 +176,7 @@ class CameraRepositoryImpl(
                     }
                 }
                 if (!address.isNullOrEmpty() && videoUri != null) {
-                    addExifLocationData(context, videoUri!!, address)
+                    addExifLocationData(context, videoUri, address)
                 }
 
                 return@withContext videoUri

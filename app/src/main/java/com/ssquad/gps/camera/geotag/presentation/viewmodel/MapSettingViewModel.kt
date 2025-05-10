@@ -17,32 +17,34 @@ import kotlinx.coroutines.launch
 class MapSettingViewModel(
     private val mapLocationRepository: MapLocationRepository,
     private val cacheDataTemplate: CacheDataTemplate,
-): ViewModel() {
+) : ViewModel() {
     private val _mapSettingState = MutableStateFlow(MapSettingState())
     val mapSettingState = _mapSettingState.asStateFlow()
 
     init {
         getCurrentLocation()
     }
+
     private fun updateSettingState(newState: (MapSettingState) -> MapSettingState) {
         return _mapSettingState.update(newState)
     }
+
     private fun getCurrentLocation() {
         viewModelScope.launch {
             if (cacheDataTemplate.isCacheValid()) {
                 cacheDataTemplate.templateData.value?.let { cacheData ->
                     try {
-                        var latitude:Double ?= null
-                        var longitude:Double ?= null
-                        var address :String?=null
+                        var latitude: Double? = null
+                        var longitude: Double? = null
+                        var address: String? = null
                         //ep' kieu
-                        if(SharePrefManager.getCachedCoordinates() != null){
+                        if (SharePrefManager.getCachedCoordinates() != null) {
                             latitude = SharePrefManager.getCachedCoordinates()?.first
                             longitude = SharePrefManager.getCachedCoordinates()?.second
                             address = SharePrefManager.getCachedCoordinates()?.third
-                        }else{
-                           latitude = cacheData.lat?.toDoubleOrNull()
-                           longitude = cacheData.long?.toDoubleOrNull()
+                        } else {
+                            latitude = cacheData.lat?.toDoubleOrNull()
+                            longitude = cacheData.long?.toDoubleOrNull()
                             address = cacheData.location
                         }
 
@@ -74,7 +76,7 @@ class MapSettingViewModel(
                 it.copy(isLoading = true, isError = null)
             }
 
-            if(cacheDataTemplate.templateData.value == null &&SharePrefManager.getCachedCoordinates() == null) {
+            if (cacheDataTemplate.templateData.value == null && SharePrefManager.getCachedCoordinates() == null) {
                 try {
                     when (val locationResult = mapLocationRepository.getCurrentLocation()) {
                         is LocationResult.Success -> {
@@ -89,6 +91,7 @@ class MapSettingViewModel(
                             }
                             updateLocation(currentLocation)
                         }
+
                         is LocationResult.Error -> {
                             updateSettingState {
                                 it.copy(
@@ -97,8 +100,8 @@ class MapSettingViewModel(
                                 )
                             }
                         }
-                        is LocationResult.Address ->
-                        {
+
+                        is LocationResult.Address -> {
                             updateSettingState {
                                 it.copy(
                                     currentAddress = locationResult.address
@@ -117,7 +120,8 @@ class MapSettingViewModel(
             }
         }
     }
-    fun updateLocation(location: Location){
+
+    fun updateLocation(location: Location) {
         updateSettingState {
             it.copy(
                 currentLocation = location,
@@ -135,6 +139,7 @@ class MapSettingViewModel(
                             )
                         }
                     }
+
                     is LocationResult.Error -> {
                         updateSettingState {
                             it.copy(
@@ -143,6 +148,7 @@ class MapSettingViewModel(
                             )
                         }
                     }
+
                     else -> {
                         updateSettingState { it.copy(isLoading = false) }
                     }

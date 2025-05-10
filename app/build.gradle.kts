@@ -67,6 +67,10 @@ android {
 }
 
 dependencies {
+    implementation("com.mapbox.search:autofill:2.12.0-beta.1")
+    implementation("com.mapbox.search:place-autocomplete:2.12.0-beta.1")
+    implementation("com.mapbox.search:mapbox-search-android:2.12.0-beta.1")
+    implementation("com.mapbox.maps:android:11.9.0")
     implementation ("androidx.lifecycle:lifecycle-service:2.8.1")
     implementation("com.google.guava:guava:31.1-android")
     implementation ("com.google.android.gms:play-services-location:21.3.0")
@@ -79,14 +83,9 @@ dependencies {
     implementation ("androidx.camera:camera-camera2:1.4.2")
     implementation ("com.faltenreich:skeletonlayout:4.0.0")
     implementation("androidx.camera:camera-effects:1.4.2")
-
-    // CameraX Lifecycle để tự động quản lý camera theo lifecycle
     implementation (libs.androidx.camera.lifecycle)
-    // CameraX View để hiển thị preview
     implementation (libs.androidx.camera.view)
-    // CameraX Extensions (Tùy chọn, dùng để có chế độ HDR, Night Mode...)
     implementation (libs.androidx.camera.extensions)
-    // CameraX VideoCapture (Nếu muốn quay video)
     implementation(libs.play.services.ads)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)

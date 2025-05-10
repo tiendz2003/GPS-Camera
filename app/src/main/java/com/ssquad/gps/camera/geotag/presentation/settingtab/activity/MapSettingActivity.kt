@@ -24,17 +24,16 @@ class MapSettingActivity :
     private var currentLocationSheet: CurrentLocationSheet? = null
     private val mapSettingViewModel: MapSettingViewModel by viewModel()
     private lateinit var mapManager: MapManager
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mapManager = MapManager(this, lifecycle, binding.mapView)
-
         setupMapCallbacks()
 
         binding.mapView.onCreate(savedInstanceState)
     }
 
     override fun initData() {
+
     }
 
     override fun initView() {

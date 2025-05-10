@@ -45,7 +45,6 @@ class IntroActivity : BaseActivity<ActivityIntroBinding>(ActivityIntroBinding::i
 
     override fun initData() {
         mAdapter = IntroViewPagerAdapter(this)
-        Log.d("IntroActivity", "${Common.languageSelected}")
     }
 
     override fun initView() {

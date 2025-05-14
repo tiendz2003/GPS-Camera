@@ -26,6 +26,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BaseProject"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.mapbox.maps.token"
+            android:value="@string/mapbox_access_token" />
         <service
             android:name=".service.VideoProcessingService"
             android:foregroundServiceType="dataSync"

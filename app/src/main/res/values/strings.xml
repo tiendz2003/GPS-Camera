@@ -153,4 +153,7 @@
     <string name="unable_to_request_delete_permission">Unable to request delete permission</string>
     <string name="template_not_loaded_message">Please wait until the template loads successfully.</string>
     <string name="image_saving_failed_please_try_again">Image saving failed. Please try again.</string>
+    <string name="current">Current</string>
+    <string name="manual">Manual</string>
+    <string name="unknow_location">Unknown Location</string>
 </resources>

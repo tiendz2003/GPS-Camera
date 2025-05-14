@@ -22,135 +22,109 @@ class MapSettingViewModel(
     val mapSettingState = _mapSettingState.asStateFlow()
 
     init {
-        getCurrentLocation()
+        loadInitialLocation()
     }
 
     private fun updateSettingState(newState: (MapSettingState) -> MapSettingState) {
         return _mapSettingState.update(newState)
     }
 
-    private fun getCurrentLocation() {
+    private fun loadInitialLocation() {
         viewModelScope.launch {
-            if (cacheDataTemplate.isCacheValid()) {
-                cacheDataTemplate.templateData.value?.let { cacheData ->
-                    try {
-                        var latitude: Double? = null
-                        var longitude: Double? = null
-                        var address: String? = null
-                        //ep' kieu
-                        if (SharePrefManager.getCachedCoordinates() != null) {
-                            latitude = SharePrefManager.getCachedCoordinates()?.first
-                            longitude = SharePrefManager.getCachedCoordinates()?.second
-                            address = SharePrefManager.getCachedCoordinates()?.third
-                        } else {
-                            latitude = cacheData.lat?.toDoubleOrNull()
-                            longitude = cacheData.long?.toDoubleOrNull()
-                            address = cacheData.location
-                        }
-
-                        if (latitude != null && longitude != null) {
-                            val location = Location("CachedProvider").apply {
-                                this.latitude = latitude
-                                this.longitude = longitude
-                            }
-
-                            updateSettingState {
-                                it.copy(
-                                    currentLocation = location,
-                                    isLoading = false,
-                                    isError = null,
-                                    currentAddress = address,
-                                    yourLocation = location
-                                )
-                            }
-                            updateLocation(location)
-                            //
-                        }
-                    } catch (e: Exception) {
-                        Log.e("Mapsetting", "lỗi convert: ${e.message}")
-                    }
-                }
-            }
-
             updateSettingState {
-                it.copy(isLoading = true, isError = null)
+                it.copy(
+                    isLoading = true,
+                    isError = null
+                )
             }
-
-            if (cacheDataTemplate.templateData.value == null && SharePrefManager.getCachedCoordinates() == null) {
-                try {
-                    when (val locationResult = mapLocationRepository.getCurrentLocation()) {
-                        is LocationResult.Success -> {
-                            val currentLocation = locationResult.location
-                            updateSettingState {
-                                it.copy(
-                                    currentLocation = currentLocation,
-                                    yourLocation = currentLocation,
-                                    isLoading = false,
-                                    isError = null
-                                )
-                            }
-                            updateLocation(currentLocation)
-                        }
-
-                        is LocationResult.Error -> {
-                            updateSettingState {
-                                it.copy(
-                                    isLoading = false,
-                                    isError = locationResult.message
-                                )
-                            }
-                        }
-
-                        is LocationResult.Address -> {
-                            updateSettingState {
-                                it.copy(
-                                    currentAddress = locationResult.address
-                                )
-                            }
-                        }
-                    }
-                } catch (e: Exception) {
-                    updateSettingState {
-                        it.copy(
-                            isLoading = false,
-                            isError = e.message
-                        )
-                    }
+            val cachedLocation = getCacheLocation()
+            if(cachedLocation != null) {
+                updateSettingState {
+                    it.copy(
+                        currentLocation = cachedLocation.location,
+                        isLoading = false,
+                        isError = null,
+                        currentAddress = cachedLocation.address,
+                        yourLocation = cachedLocation.location
+                    )
                 }
+                if(cachedLocation.address.isNullOrEmpty()) {
+                    fetchAddressForLocation(cachedLocation.location)
+                }
+            }else{
+                fetchCurrentLocation()
             }
+
         }
     }
-
-    fun updateLocation(location: Location) {
-        updateSettingState {
-            it.copy(
-                currentLocation = location,
-                isLoading = true // Set loading while fetching address
+    private fun getCacheLocation():CacheLocationData?{
+        SharePrefManager.getCachedCoordinates()?.let { (latitude, longitude, address)  ->
+            return CacheLocationData(
+                Location("CachedProvider").apply {
+                    this.latitude = latitude
+                    this.longitude = longitude
+                },
+                address
             )
         }
+        if(cacheDataTemplate.isCacheValid()){
+            cacheDataTemplate.templateData.value?.let { cacheData ->
+                try {
+                    val latitude = cacheData.lat?.toDoubleOrNull()
+                    val longitude = cacheData.long?.toDoubleOrNull()
+                    val address = cacheData.location
+                    if (latitude != null && longitude != null) {
+                        return CacheLocationData(
+                            Location("CachedProvider").apply {
+                                this.latitude = latitude
+                                this.longitude = longitude
+                            },
+                            address
+                        )
+                    }
+                }catch (e:Exception){
+                    Log.e("Mapsetting", "lỗi convert: ${e.message}")
+                }
+            }
+        }
+        return null
+    }
+    private fun fetchCurrentLocation(){
         viewModelScope.launch {
+            updateSettingState {
+                it.copy(
+                    isLoading = true,
+                    isError = null
+                )
+            }
             try {
-                when (val addressResult = mapLocationRepository.getAddressFromLocation(location)) {
-                    is LocationResult.Address -> {
+                when (val locationResult = mapLocationRepository.getCurrentLocation()) {
+                    is LocationResult.Success -> {
+                        val currentLocation = locationResult.location
                         updateSettingState {
                             it.copy(
-                                currentAddress = addressResult.address,
-                                isLoading = false
+                                currentLocation = currentLocation,
+                                yourLocation = currentLocation,
+                                isLoading = false,
                             )
                         }
+                        fetchAddressForLocation(currentLocation)
                     }
 
                     is LocationResult.Error -> {
                         updateSettingState {
                             it.copy(
                                 isLoading = false,
-                                isError = addressResult.message
+                                isError = locationResult.message
                             )
                         }
                     }
-
-                    else -> {
-                        updateSettingState { it.copy(isLoading = false) }
+                    else ->{
+                        updateSettingState {
+                            it.copy(
+                                isLoading = false,
+                            )
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -163,4 +137,62 @@ class MapSettingViewModel(
             }
         }
     }
+     fun updateSelectedLocation(location: Location) {
+        viewModelScope.launch {
+            updateSettingState {
+                it.copy(
+                    currentLocation = location,
+                    isLoading = true
+                )
+            }
+            fetchAddressForLocation(location)
+        }
+    }
+    private suspend fun fetchAddressForLocation(location:Location){
+        try {
+            when (val addressResult = mapLocationRepository.getAddressFromLocation(location)) {
+                is LocationResult.Address -> {
+                    updateSettingState {
+                        it.copy(
+                            currentAddress = addressResult.address,
+                            isLoading = false
+                        )
+                    }
+                    saveLocationToCache(location, addressResult.address)
+                }
+
+                is LocationResult.Error -> {
+                    updateSettingState {
+                        it.copy(
+                            isLoading = false,
+                            isError = addressResult.message
+                        )
+                    }
+                }
+
+                else -> {
+                    updateSettingState { it.copy(isLoading = false) }
+                }
+            }
+        } catch (e: Exception) {
+            updateSettingState {
+                it.copy(
+                    isLoading = false,
+                    isError = e.message
+                )
+            }
+        }
+    }
+    private fun saveLocationToCache(location: Location, address: String?) {
+        address?.let {
+            SharePrefManager.saveCachedCoordinates(location.latitude, location.longitude, it)
+        }
+    }
+    fun yourCurrentLocation(){
+        fetchCurrentLocation()
+    }
+    data class CacheLocationData(
+        val location: Location,
+        val address: String?
+    )
 }

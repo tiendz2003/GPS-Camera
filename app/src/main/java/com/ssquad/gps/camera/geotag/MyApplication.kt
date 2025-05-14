@@ -35,6 +35,7 @@ class MyApplication : AdsApplication("", isProduction = true) {
             androidContext(this@MyApplication)
             modules(AppModule.appModule)
         }
+
         SharePrefManager.initialize(this)
         val workerFactory: LoadDataTemplateWorker.Factory by inject()
         val config = Configuration.Builder()

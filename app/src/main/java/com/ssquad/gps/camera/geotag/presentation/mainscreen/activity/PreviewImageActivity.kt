@@ -31,6 +31,7 @@ import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
 import com.ssquad.gps.camera.geotag.utils.loadImageIcon
 import androidx.core.net.toUri
+import com.mapbox.maps.Style
 import com.snake.squad.adslib.AdmobLib
 import com.snake.squad.adslib.utils.BannerCollapsibleType
 import com.snake.squad.adslib.utils.BannerType
@@ -38,6 +39,7 @@ import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.databinding.ActivityPreviewBinding
 import com.ssquad.gps.camera.geotag.presentation.viewmodel.PhotosViewModel
 import com.ssquad.gps.camera.geotag.service.MapManager
+import com.ssquad.gps.camera.geotag.service.MapboxManager
 import com.ssquad.gps.camera.geotag.utils.AdsManager
 import com.ssquad.gps.camera.geotag.utils.Config
 import com.ssquad.gps.camera.geotag.utils.RemoteConfig
@@ -63,7 +65,7 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
     private lateinit var mapManager: MapManager
     private var mapSnapshotJob: Job? = null
     private var mapBitmap: Bitmap? = null
-
+    private lateinit var mapboxManager:MapboxManager
     private var isTemplateDataLoaded = false
     private var pendingImagePath: String? = null
     private var pendingIsFromAlbum: Boolean = false
@@ -82,6 +84,7 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
     }
 
     override fun initData() {
+        initMapbox()
         templateId = SharePrefManager.getDefaultTemplate()
         pendingImagePath = intent.getStringExtra("IMAGE_PATH")
         pendingIsFromAlbum = intent.getBooleanExtra("FROM_ALBUM", false)
@@ -104,7 +107,9 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
             processImage()
         }
     }
-
+    fun initMapbox(){
+        mapboxManager = MapboxManager(this)
+    }
     private fun loadTemplateData() {
         lifecycleScope.launch {
             previewViewModel.getCacheDataTemplate()
@@ -181,17 +186,23 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
                 return
             }
             mapSnapshotJob?.cancel()
-            mapSnapshotJob = lifecycleScope.launch(Dispatchers.Main) {
-                delay(500)
-                if (!isActive) return@launch
-                withContext(Dispatchers.Main) {
-                    mapManager.captureMapImage(lat, lon) { bitmap ->
-                        Log.d("PreviewImageActivity", "Snapshot captured: ${bitmap != null}")
+            mapboxManager.createSnapshot(
+                latitude = lat,
+                longitude = lon,
+                zoom = 14.0,
+                mapStyle = Style.SATELLITE_STREETS,
+                onSnapshotReady = { bitmap ->
+                    mapSnapshotJob = lifecycleScope.launch(Dispatchers.Main) {
+                        delay(1000)
                         mapBitmap = bitmap
                         updateTemplateWithMap(template, mapBitmap)
                     }
+                },
+                onError = { error ->
+                    Log.e("CameraActivity", "Error creating snapshot: $error")
+                    updateTemplateWithMap(template, null)
                 }
-            }
+            )
         } catch (e: Exception) {
             Log.e("PreviewImageActivity", "Error: ${e.message}")
             updateTemplateWithMap(template, null)

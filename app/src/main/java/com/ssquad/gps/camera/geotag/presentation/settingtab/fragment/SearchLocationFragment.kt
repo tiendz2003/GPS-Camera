@@ -1,11 +1,9 @@
 package com.ssquad.gps.camera.geotag.presentation.settingtab.fragment
 
-import android.graphics.Bitmap
-import android.location.Location
 import android.util.Log
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Lifecycle
@@ -13,18 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
-import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
-import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
-import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
-import com.mapbox.search.autocomplete.PlaceAutocomplete
-import com.mapbox.search.autocomplete.PlaceAutocompleteOptions
 import com.mapbox.search.autocomplete.PlaceAutocompleteSuggestion
 import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.bases.BaseFragment
@@ -32,6 +19,7 @@ import com.ssquad.gps.camera.geotag.databinding.FragmentSearchLocationBinding
 import com.ssquad.gps.camera.geotag.presentation.settingtab.activity.MapSettingState
 import com.ssquad.gps.camera.geotag.presentation.settingtab.adapter.PlaceAutoCompleteAdapter
 import com.ssquad.gps.camera.geotag.presentation.viewmodel.MapSettingViewModel
+import com.ssquad.gps.camera.geotag.service.MapboxManager
 import com.ssquad.gps.camera.geotag.utils.gone
 import com.ssquad.gps.camera.geotag.utils.setOnDebounceClickListener
 import com.ssquad.gps.camera.geotag.utils.visible
@@ -46,14 +34,8 @@ import java.util.Locale
 
 class SearchLocationFragment :
     BaseFragment<FragmentSearchLocationBinding>(FragmentSearchLocationBinding::inflate) {
-
-    private val placeAutoComplete by lazy {
-        PlaceAutocomplete.create()
-    }
     private val viewModel: MapSettingViewModel by activityViewModel()
-    private lateinit var pointAnnotationManager: PointAnnotationManager
-    private var currentPointAnnotation: PointAnnotation? = null
-    private lateinit var mapboxMap: MapboxMap
+    private lateinit var mapManager:MapboxManager
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
     private var searchJob: Job? = null
     private var placeAutoCompleteAdapter: PlaceAutoCompleteAdapter? = null
@@ -62,7 +44,7 @@ class SearchLocationFragment :
     }
 
     override fun initView() {
-
+        mapManager = MapboxManager(requireContext())
         setupMapView()
         setupRecycleView()
         setupSearchUI()
@@ -76,30 +58,18 @@ class SearchLocationFragment :
     }
 
     private fun setupMapView() {
-        // Khởi tạo bản đồ
-        mapboxMap = binding.mapView.mapboxMap
-
-        // Tải style bản đồ
-        mapboxMap.loadStyle(Style.MAPBOX_STREETS) {
-            viewModel.mapSettingState.value.currentLocation?.let { location ->
-                val annotationPlugin = binding.mapView.annotations
-                pointAnnotationManager = annotationPlugin.createPointAnnotationManager()
-
-                updateMapCamera(location)
+        mapManager.initializeMap(
+            mapView = binding.mapView,
+            mapStyle = Style.SATELLITE_STREETS,
+            onMapReady = {mapboxMap->
+                viewModel.mapSettingState.value.currentLocation?.let { location ->
+                    mapManager.moveCameraToLocation(location)
+                }
             }
-        }
+        )
+
     }
 
-    private fun updateMapCamera(location: Location) {
-        val cameraPosition = CameraOptions.Builder()
-            .center(Point.fromLngLat(location.longitude, location.latitude))
-            .zoom(10.0)
-            .build()
-        mapboxMap.setCamera(cameraPosition)
-        updateMarker(
-            Point.fromLngLat(location.longitude, location.latitude)
-        )
-    }
 
     private fun updateUI(state: MapSettingState) {
         // Cập nhật trạng thái loading
@@ -124,14 +94,14 @@ class SearchLocationFragment :
             resources.getDimensionPixelSize(R.dimen.bottom_sheet_peek_height)
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: android.view.View, newState: Int) {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     hideSearch()
                     binding.edtSearch.clearFocus()
                 }
             }
 
-            override fun onSlide(bottomSheet: android.view.View, slideOffset: Float) {}
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         })
     }
 
@@ -140,9 +110,20 @@ class SearchLocationFragment :
             onPlaceSuggestionSelected(suggestion)
             binding.edtSearch.setText(suggestion.name)
             binding.edtSearch.clearFocus()
-            searchJob?.cancel()
-            showBottomSheet()
-            hideKeyboard()
+            binding.tvLocationTitle.text = suggestion.name
+            binding.tvDetailedAddress.text = suggestion.formattedAddress
+            suggestion.coordinate?.let { coordinate ->
+                binding.tvLatitude.text = String.format(
+                    Locale.getDefault(),
+                    "%.5f",
+                    coordinate.latitude()
+                )
+                binding.tvLongitude.text = String.format(
+                    Locale.getDefault(),
+                    "%.5f",
+                    coordinate.longitude()
+                )
+            }
         }
         binding.recyclerView.adapter = placeAutoCompleteAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -157,7 +138,7 @@ class SearchLocationFragment :
                     hideBottomSheet()
                     searchJob?.cancel()
                     searchJob = lifecycleScope.launch {
-                        delay(300)
+                        delay(500) // Thời gian trễ 500ms trước khi thực hiện tìm kiếm
                         performSearch(query)
                     }
                 } else if (query.isEmpty()) {
@@ -200,25 +181,22 @@ class SearchLocationFragment :
         binding.progressIndicator.visible()
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                val response = placeAutoComplete.suggestions(
+                mapManager.searchPlaces(
                     query = query,
-                    options = PlaceAutocompleteOptions(
-                        limit = 10
-                    ),
-                    proximity = viewModel.mapSettingState.value.currentLocation?.let { location ->
-                        Point.fromLngLat(location.longitude, location.latitude)
-                    } ?: Point.fromLngLat(0.0, 0.0),
-                )
-                if (response.isValue) {
-                    val suggestion = requireNotNull(response.value)
-                    if (suggestion.isNotEmpty()) {
-                        Log.d("SearchLocationFragment", "Kết quả tìm kiếm: $suggestion")
-                        showPlaceSuggestion(suggestion)
-                    } else {
-                        hideSearch()
-                        showBottomSheet()
+                    proximityLocation = viewModel.mapSettingState.value.currentLocation,
+                    onSearchStarted = {
+                        binding.progressIndicator.visible()
+                    },
+                    onSearchResult = {suggestion->
+                        binding.progressIndicator.gone()
+                        if(suggestion.isNotEmpty()){
+                            showPlaceSuggestion(suggestion)
+                        }else{
+                            hideSearch()
+                            showBottomSheet()
+                        }
                     }
-                }
+                )
             }
         }
     }
@@ -258,20 +236,21 @@ class SearchLocationFragment :
         hideSearch()
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                val selectionResponse = placeAutoComplete.select(suggestion = suggestion)
-                selectionResponse.onValue { result ->
-                    binding.progressIndicator.gone()
-                    val coordinate = result.coordinate
-                    val location = Location("SearchResult").apply {
-                        latitude = coordinate.latitude()
-                        longitude = coordinate.longitude()
+                mapManager.selectPlace(
+                    suggestion = suggestion,
+                    onSuccess = {location->
+                        binding.progressIndicator.gone()
+                        mapManager.moveCameraToLocation(location)
+                        searchJob?.cancel()
+                        showBottomSheet()
+                        hideKeyboard()
+                    },
+                    onError = {
+                        binding.progressIndicator.gone()
+                        Log.e("SearchLocationFragment", "Lỗi khi chọn địa điểm: ${it.message}")
+                        showBottomSheet()
                     }
-                    updateMapCamera(location)
-
-                }.onError { e ->
-                    Log.e("SearchLocationFragment", "Lỗi khi chọn địa điểm: ${e.message}")
-                    showBottomSheet()
-                }
+                )
             }
         }
     }
@@ -290,31 +269,10 @@ class SearchLocationFragment :
         binding.tvTime.text = timeFormat.format(calendar.time)
     }
 
-    private fun updateMarker(point: Point) {
-        currentPointAnnotation?.let {
-            pointAnnotationManager.delete(it)
-        }
-        val icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_location)
-        val bitmap = icon?.let { drawable ->
-            val bitmap = Bitmap.createBitmap(
-                drawable.intrinsicWidth,
-                drawable.intrinsicHeight,
-                Bitmap.Config.ARGB_8888
-            )
-            val canvas = android.graphics.Canvas(bitmap)
-            drawable.setBounds(0, 0, canvas.width, canvas.height)
-            drawable.draw(canvas)
-            bitmap
-        } ?: return
-        val pointAnnotation = PointAnnotationOptions()
-            .withPoint(point)
-            .withIconImage(bitmap)
-            .withIconAnchor(IconAnchor.BOTTOM)
-        currentPointAnnotation = pointAnnotationManager.create(pointAnnotation)
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
         searchJob?.cancel()
+        mapManager.cleanUp()
     }
 }

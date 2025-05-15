@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -35,9 +36,11 @@ import com.ssquad.gps.camera.geotag.utils.loadImageIcon
 import com.ssquad.gps.camera.geotag.utils.startCountdownAnimation
 import com.ssquad.gps.camera.geotag.utils.visible
 import com.google.android.material.snackbar.Snackbar
+import com.mapbox.maps.Style
 import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.databinding.ActivityCameraBinding
 import com.ssquad.gps.camera.geotag.presentation.hometab.activities.EditAlbumLibraryActivity
+import com.ssquad.gps.camera.geotag.service.MapboxManager
 import com.ssquad.gps.camera.geotag.utils.Constants
 import com.ssquad.gps.camera.geotag.utils.PermissionManager
 import com.ssquad.gps.camera.geotag.utils.setOnDebounceClickListener
@@ -71,19 +74,16 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
 
     private var templateId: String? = null
     private var mapSnapshotJob: Job? = null
-    private lateinit var mapManager: MapManager
+    private lateinit var mapboxManager:MapboxManager
     private var mapSnapshot: Bitmap? = null
     private var processingSnackbar: Snackbar? = null
     private var successSnackbar: Snackbar? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         startCamera()
         observeTorchState()
-        binding.mapView.onCreate(savedInstanceState)
-        mapManager = MapManager(this, lifecycle, binding.mapView)
-        mapManager.setOnMapReadyCallback {
-            cameraViewModel.updateTemplateData()
-        }
+
     }
 
     override fun initData() {
@@ -93,6 +93,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
 
     override fun initView() {
 
+        initMapBox()
         val savedTimer = SharePrefManager.getTimerPref()
         cameraViewModel.updateCameraState {
             it.copy(
@@ -269,7 +270,16 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
             }
         }
     }
-
+    private fun initMapBox(){
+        mapboxManager = MapboxManager(this)
+        mapboxManager.initializeMap(
+            mapView = binding.mapboxView,
+            mapStyle = Style.SATELLITE_STREETS,
+            onMapReady = {
+                cameraViewModel.updateTemplateData()
+            }
+        )
+    }
     @SuppressLint("SetTextI18n")
     private fun observeViewModel() {
         lifecycleScope.launch {
@@ -439,12 +449,11 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
     private fun showTemplateLoading(show: Boolean) {
         binding.skeletonTemplateLoading.apply {
             if (show) {
-                // Setup shimmer config nếu muốn (set 1 lần)
-                maskColor = ContextCompat.getColor(context, R.color.neutralGrey) // màu xám loading
-                shimmerColor = ContextCompat.getColor(context, R.color.neutralWhite) // màu shimmer trắng sáng
-                shimmerDurationInMillis = 1000L // thời gian chạy 1 vòng shimmer (ms)
-                showShimmer = true // bật shimmer
-                showSkeleton() // bắt đầu loading
+                maskColor = ContextCompat.getColor(context, R.color.neutralGrey)
+                shimmerColor = ContextCompat.getColor(context, R.color.neutralWhite)
+                shimmerDurationInMillis = 1000L
+                showShimmer = true
+                showSkeleton()
                 visibility = View.VISIBLE
             } else {
                 showOriginal() // ẩn shimmer
@@ -473,23 +482,27 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
                     Log.e("CameraActivity", "Toạ độ null")
                     return
                 }
-                mapSnapshotJob = lifecycleScope.launch {
-                    delay(500)
-                    if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-                        return@launch
-                    }
-                    withContext(Dispatchers.Main) {
-                        mapManager.captureMapImage(lat, lon) { bitmap ->
-                            if (isFinishing || isDestroyed) return@captureMapImage
-                            mapSnapshot = bitmap
-                            Log.d("CameraActivity", "Map snapshot captured: ${bitmap != null}")
-                            updateTemplateOverlay(template, bitmap)
+
+                mapboxManager.createSnapshot(
+                    latitude = lat,
+                    longitude = lon,
+                    zoom = 14.0,
+                    mapStyle = Style.SATELLITE_STREETS,
+                    onSnapshotReady = { it ->
+                        mapSnapshot = it
+                        mapSnapshotJob = lifecycleScope.launch(Dispatchers.Main) {
+                            delay(1000)
+                            updateTemplateOverlay(template, it)
                             cameraViewModel.updateCameraState {
                                 it.copy(templateView = binding.templateOverlayContainer)
                             }
                         }
+                    },
+                    onError = { error ->
+                        Log.e("CameraActivity", "Error creating snapshot: $error")
+                        updateTemplateOverlay(template, null)
                     }
-                }
+                ) 
             } catch (e: Exception) {
                 Log.e("CameraActivity", "Error processing location data: ${e.message}")
                 updateTemplateOverlay(template, null)
@@ -563,21 +576,6 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
             }
         }
     }
-
-    private fun showProcessingSnackbar() {
-        processingSnackbar?.dismiss()
-        successSnackbar?.dismiss()
-
-        processingSnackbar =
-            CustomSnackbar.showProcessingSnackbar(binding.root, getString(R.string.processing))
-        processingSnackbar?.show()
-    }
-
-    private fun dismissProcessingSnackbar() {
-        processingSnackbar?.dismiss()
-        processingSnackbar = null
-    }
-
     private fun showSuccessSnackbar() {
         processingSnackbar?.dismiss()
         successSnackbar?.dismiss()
@@ -591,18 +589,11 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>(ActivityCameraBinding
     }
 
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        binding.mapView.onSaveInstanceState(outState)
-    }
 
-    override fun onLowMemory() {
-        super.onLowMemory()
-        binding.mapView.onLowMemory()
-    }
 
     override fun onDestroy() {
         super.onDestroy()
+        mapboxManager.destroySnapshotter()
         cameraViewModel.cancelCountDown()
         cameraViewModel.cleanupCamera()
         mapSnapshotJob?.cancel()

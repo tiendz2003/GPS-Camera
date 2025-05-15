@@ -158,7 +158,7 @@ class MapSettingViewModel(
                             isLoading = false
                         )
                     }
-                    saveLocationToCache(location, addressResult.address)
+                    //saveLocationToCache(location, addressResult.address)
                 }
 
                 is LocationResult.Error -> {
@@ -183,7 +183,7 @@ class MapSettingViewModel(
             }
         }
     }
-    private fun saveLocationToCache(location: Location, address: String?) {
+     fun saveLocationToCache(location: Location, address: String?) {
         address?.let {
             SharePrefManager.saveCachedCoordinates(location.latitude, location.longitude, it)
         }

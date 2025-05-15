@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
-    android:paddingHorizontal="16dp"
-    android:paddingVertical="12dp">
+    android:padding="12dp">
 
     <ImageView
         android:id="@+id/ivLocationPin"
@@ -38,16 +37,17 @@
         android:id="@+id/tvPlaceCategory"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
         android:background="@drawable/rounded_blue_button"
-        android:paddingHorizontal="8dp"
+        android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
         android:textColor="@color/white"
         android:textSize="10sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/tvPlaceName"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/tvPlaceName"
         app:layout_constraintTop_toTopOf="@+id/tvPlaceName"
+        app:layout_constraintVertical_bias="0.6"
         tools:text="Restaurant"
         tools:visibility="visible" />
 
@@ -73,6 +73,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/neutralGrey"
         android:textSize="14sp"
+        android:layout_marginTop="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

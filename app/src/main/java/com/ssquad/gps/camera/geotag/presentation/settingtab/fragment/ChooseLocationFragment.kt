@@ -12,7 +12,7 @@ import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.ssquad.gps.camera.geotag.R
-import com.ssquad.gps.camera.geotag.bases.BaseFragment
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseFragment
 import com.ssquad.gps.camera.geotag.databinding.FragmentChooseLocationBinding
 import com.ssquad.gps.camera.geotag.presentation.settingtab.activity.MapSettingState
 import com.ssquad.gps.camera.geotag.presentation.viewmodel.MapSettingViewModel

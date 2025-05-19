@@ -1,4 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
+
     <style name="Base.Theme.BaseProject" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="fontFamily">@font/plusjakartasans</item>
     </style>
@@ -9,6 +10,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:lineSpacingExtra">0dp</item>
     </style>
+
     <style name="CustomBottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
         <item name="itemIconSize">24dp</item>
         <item name="itemTextAppearanceActive">@style/BottomNavigationTextStyle</item>
@@ -17,6 +19,7 @@
         <item name="itemPaddingTop">4dp</item>
         <item name="itemPaddingBottom">4dp</item>
     </style>
+
     <style name="CustomBottomAppBar" parent="Widget.MaterialComponents.BottomAppBar">
         <item name="backgroundTint">@color/white</item>
         <item name="elevation">8dp</item>
@@ -37,5 +40,20 @@
         <item name="cornerSizeTopRight">24dp</item>
         <item name="cornerSizeBottomLeft">0dp</item>
         <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
+    <style name="Theme.BaseProject.AppWidgetContainerParent" parent="@android:style/Theme.DeviceDefault">
+        <!-- Radius of the outer bound of widgets to make the rounded corners -->
+        <item name="appWidgetRadius">16dp</item>
+        <!--
+        Radius of the inner view's bound of widgets to make the rounded corners.
+        It needs to be 8dp or less than the value of appWidgetRadius
+        -->
+        <item name="appWidgetInnerRadius">8dp</item>
+    </style>
+
+    <style name="Theme.BaseProject.AppWidgetContainer" parent="Theme.BaseProject.AppWidgetContainerParent">
+        <!-- Apply padding to avoid the content of the widget colliding with the rounded corners -->
+        <item name="appWidgetPadding">16dp</item>
     </style>
 </resources>

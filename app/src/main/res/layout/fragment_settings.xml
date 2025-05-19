@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.SettingsFragment">
+    tools:context=".presentation.mainscreen.fragments.SettingsFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".fragments.SettingsFragment">
+        tools:context=".presentation.mainscreen.fragments.SettingsFragment">
 
         <TextView
             android:id="@+id/tv_title"

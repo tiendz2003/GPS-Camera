@@ -1,4 +1,4 @@
-package com.ssquad.gps.camera.geotag.adapters
+package com.ssquad.gps.camera.geotag.presentation.mainscreen.adapters
 
 import android.content.Context
 import android.view.LayoutInflater

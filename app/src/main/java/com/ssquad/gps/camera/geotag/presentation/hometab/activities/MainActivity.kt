@@ -12,11 +12,11 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.ssquad.gps.camera.geotag.bases.BaseActivity
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseActivity
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
-import com.ssquad.gps.camera.geotag.fragments.HomeFragment
-import com.ssquad.gps.camera.geotag.fragments.SettingsFragment
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.fragments.HomeFragment
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.fragments.SettingsFragment
 import com.ssquad.gps.camera.geotag.presentation.mainscreen.activity.CameraActivity
 import com.ssquad.gps.camera.geotag.presentation.mainscreen.activity.PermissionActivity
 import com.ssquad.gps.camera.geotag.utils.SharePrefManager

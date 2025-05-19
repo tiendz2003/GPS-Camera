@@ -19,12 +19,11 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.ssquad.gps.camera.geotag.bases.BaseActivity
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.data.models.TemplateDataModel
 import com.ssquad.gps.camera.geotag.presentation.hometab.activities.MediaSavedActivity
 import com.ssquad.gps.camera.geotag.presentation.hometab.activities.TemplatesActivity
 import com.ssquad.gps.camera.geotag.presentation.viewmodel.CameraViewModel
-import com.ssquad.gps.camera.geotag.service.MapManager
 import com.ssquad.gps.camera.geotag.utils.BitmapHolder
 import com.ssquad.gps.camera.geotag.utils.Config
 import com.ssquad.gps.camera.geotag.utils.CustomSnackbar

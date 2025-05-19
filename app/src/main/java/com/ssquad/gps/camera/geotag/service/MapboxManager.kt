@@ -192,7 +192,6 @@ class MapboxManager(private val context: Context) {
                         val x = screenCoordinate.x.toFloat() - (markerBitmap!!.width / 2f)
                         val y = screenCoordinate.y.toFloat() - markerBitmap.height.toFloat()
 
-                        // Vẽ marker với tất cả tọa độ là Float
                         snapshot.canvas.drawBitmap(markerBitmap, x, y, null)
                     } catch (e: Exception) {
                         Log.e("Snapshotter", "Lỗi khi vẽ marker: ${e.message}", e)

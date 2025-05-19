@@ -5,7 +5,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.ssquad.gps.camera.geotag.bases.BaseFragment
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseFragment
 import com.ssquad.gps.camera.geotag.data.models.ThemeTemplateModel
 import com.ssquad.gps.camera.geotag.presentation.custom.HorizontalSpaceItemDecoration
 import com.ssquad.gps.camera.geotag.presentation.hometab.adapter.PreviewOptionsAdapter

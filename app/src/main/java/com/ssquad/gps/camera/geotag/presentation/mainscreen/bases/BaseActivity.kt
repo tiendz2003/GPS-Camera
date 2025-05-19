@@ -1,4 +1,4 @@
-package com.ssquad.gps.camera.geotag.bases
+package com.ssquad.gps.camera.geotag.presentation.mainscreen.bases
 
 import android.content.Context
 import android.content.res.Configuration

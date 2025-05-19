@@ -35,7 +35,7 @@ object AppModule {
     val appModule = module {
         // Repositories
         single<MediaRepository> { MediaRepositoryImpl(androidContext()) }
-        single<CameraRepository> { CameraRepositoryImpl(androidContext(), get()) }
+        single<CameraRepository> { CameraRepositoryImpl(androidContext(), get(),get()) }
         single<MapLocationRepository> { MapLocationRepositoryImpl(androidContext()) }
         single<WeatherRepository> { WeatherRepositoryImpl(get()) }
 

@@ -13,6 +13,7 @@ import com.ssquad.gps.camera.geotag.di.AppModule
 import com.ssquad.gps.camera.geotag.utils.SharePrefManager
 import com.ssquad.gps.camera.geotag.worker.LoadDataTemplateWorker
 import com.snake.squad.adslib.AdsApplication
+import com.ssquad.gps.camera.geotag.di.DatabaseModule
 import com.ssquad.gps.camera.geotag.utils.VideoUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +34,7 @@ class MyApplication : AdsApplication("", isProduction = true) {
         appContext = applicationContext
         startKoin {
             androidContext(this@MyApplication)
-            modules(AppModule.appModule)
+            modules(AppModule.appModule,DatabaseModule.databaseModule)
         }
 
         SharePrefManager.initialize(this)

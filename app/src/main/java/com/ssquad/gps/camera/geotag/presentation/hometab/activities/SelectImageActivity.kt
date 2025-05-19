@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.recyclerview.widget.GridLayoutManager
 import com.snake.squad.adslib.AdmobLib
-import com.ssquad.gps.camera.geotag.bases.BaseActivity
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.presentation.hometab.adapter.PhotoAdapter
 import com.ssquad.gps.camera.geotag.presentation.mainscreen.activity.PreviewImageActivity
 import com.ssquad.gps.camera.geotag.R

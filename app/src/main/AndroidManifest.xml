@@ -5,6 +5,7 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
+
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -26,53 +27,77 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BaseProject"
         tools:targetApi="31">
+        <activity
+            android:name=".presentation.settingtab.activity.WidgetActivity"
+            android:exported="false" />
+
+        <receiver
+            android:name=".widget.CameraWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.ssquad.gps.camera.UPDATE_WIDGET" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/camera_widget_info" />
+        </receiver>
+
+        <service
+            android:name=".service.CameraWidgetService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <receiver
+            android:name=".broadcast_receiver.PhotoBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.ssquad.gps.camera.NEW_PHOTO_CAPTURED" />
+            </intent-filter>
+        </receiver>
+
         <meta-data
             android:name="com.mapbox.maps.token"
             android:value="@string/mapbox_access_token" />
+
         <service
             android:name=".service.VideoProcessingService"
-            android:foregroundServiceType="dataSync"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
         <activity
             android:name=".presentation.settingtab.activity.PolicyActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.mainscreen.activity.RequestPermissionActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.mainscreen.activity.PermissionActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.settingtab.activity.SetupTempActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.settingtab.activity.CustomDateTimeActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.settingtab.activity.DateTimeFormatActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.settingtab.activity.MapTypeActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.settingtab.activity.MapSettingActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"

@@ -13,8 +13,8 @@ import com.snake.squad.adslib.AdmobLib
 import com.snake.squad.adslib.models.AdmobNativeModel
 import com.snake.squad.adslib.utils.GoogleENative
 import com.ssquad.gps.camera.geotag.R
-import com.ssquad.gps.camera.geotag.adapters.LanguageAdapter
-import com.ssquad.gps.camera.geotag.bases.BaseActivity
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.adapters.LanguageAdapter
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.databinding.ActivityLanguageBinding
 import com.ssquad.gps.camera.geotag.utils.AdsManager
 import com.ssquad.gps.camera.geotag.utils.Common

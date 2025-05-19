@@ -1,5 +1,6 @@
 package com.ssquad.gps.camera.geotag.presentation.mainscreen.activity
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.net.Uri
@@ -8,7 +9,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import com.ssquad.gps.camera.geotag.bases.BaseActivity
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.utils.BitmapHolder
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -38,7 +39,6 @@ import com.snake.squad.adslib.utils.BannerType
 import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.databinding.ActivityPreviewBinding
 import com.ssquad.gps.camera.geotag.presentation.viewmodel.PhotosViewModel
-import com.ssquad.gps.camera.geotag.service.MapManager
 import com.ssquad.gps.camera.geotag.service.MapboxManager
 import com.ssquad.gps.camera.geotag.utils.AdsManager
 import com.ssquad.gps.camera.geotag.utils.Config
@@ -62,7 +62,6 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
 
     private var templateData: TemplateDataModel? = null
     private var templateId: String? = null
-    private lateinit var mapManager: MapManager
     private var mapSnapshotJob: Job? = null
     private var mapBitmap: Bitmap? = null
     private lateinit var mapboxManager:MapboxManager
@@ -73,14 +72,7 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding.mapView.onCreate(savedInstanceState)
-        mapManager = MapManager(this, lifecycle, binding.mapView)
-        mapManager.setOnMapReadyCallback {
-            templateData?.let { data ->
-                if (isGPSTemplate()) {
-                    loadMapImage(data)
-                }
-            }
-        }
+
     }
 
     override fun initData() {
@@ -107,7 +99,7 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
             processImage()
         }
     }
-    fun initMapbox(){
+    private fun initMapbox(){
         mapboxManager = MapboxManager(this)
     }
     private fun loadTemplateData() {
@@ -289,7 +281,6 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
                 templateId,
                 templateData,
             )
-
             if (Config.isGPSTemplate(templateId)) {
                 loadMapImage(templateData)
             }
@@ -358,6 +349,8 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
                     originBitmap
                 }
                 previewViewModel.saveImageToGallery(this@PreviewImageActivity, combineBitmap, templateData?.location)
+                val intent = Intent("com.ssquad.gps.camera.NEW_PHOTO_CAPTURED")
+                sendBroadcast(intent)
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
@@ -443,6 +436,7 @@ class PreviewImageActivity : BaseActivity<ActivityPreviewBinding>(ActivityPrevie
 
     override fun onDestroy() {
         super.onDestroy()
+        mapboxManager.destroySnapshotter()
         mapSnapshotJob?.cancel()
         mapBitmap = null
         BitmapHolder.imageBitmap = null// xoa' reset sau moi lan destroy

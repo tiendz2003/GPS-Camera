@@ -13,13 +13,12 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import com.ssquad.gps.camera.geotag.R
-import com.ssquad.gps.camera.geotag.bases.BaseActivity
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.databinding.ActivityMapSettingBinding
 import com.ssquad.gps.camera.geotag.presentation.settingtab.dialog.CurrentLocationSheet
 import com.ssquad.gps.camera.geotag.presentation.settingtab.fragment.ChooseLocationFragment
 import com.ssquad.gps.camera.geotag.presentation.settingtab.fragment.SearchLocationFragment
 import com.ssquad.gps.camera.geotag.presentation.viewmodel.MapSettingViewModel
-import com.ssquad.gps.camera.geotag.service.MapManager
 import com.ssquad.gps.camera.geotag.utils.SharePrefManager
 import com.ssquad.gps.camera.geotag.utils.setOnDebounceClickListener
 import com.ssquad.gps.camera.geotag.utils.showToast

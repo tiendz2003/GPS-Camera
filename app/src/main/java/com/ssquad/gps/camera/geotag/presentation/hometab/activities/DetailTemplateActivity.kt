@@ -12,7 +12,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.ssquad.gps.camera.geotag.bases.BaseActivity
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.data.models.TemplateType
 import com.ssquad.gps.camera.geotag.data.models.ThemeTemplateModel
 import com.ssquad.gps.camera.geotag.presentation.hometab.adapter.ThemeTemplateAdapter

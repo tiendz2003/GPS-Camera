@@ -9,7 +9,7 @@ import com.snake.squad.adslib.AdmobLib
 import com.snake.squad.adslib.models.AdmobNativeModel
 import com.snake.squad.adslib.utils.GoogleENative
 import com.ssquad.gps.camera.geotag.R
-import com.ssquad.gps.camera.geotag.bases.BaseDialog
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseDialog
 import com.ssquad.gps.camera.geotag.databinding.DialogNativeFullscreenBinding
 import java.util.Timer
 import java.util.TimerTask

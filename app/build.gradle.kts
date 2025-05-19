@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
     id("kotlin-parcelize")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -72,7 +73,11 @@ android {
 }
 
 dependencies {
+    val room_version = "2.7.1"
 
+    implementation("androidx.room:room-runtime:$room_version")
+
+    ksp("androidx.room:room-compiler:$room_version")
     implementation("com.mapbox.search:mapbox-search-android:2.7.0")
     implementation("com.mapbox.search:place-autocomplete:2.7.0")
     implementation("com.mapbox.maps:android:11.9.0")

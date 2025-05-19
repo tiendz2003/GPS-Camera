@@ -1,6 +1,7 @@
 package com.ssquad.gps.camera.geotag.data.repository
 
 import android.annotation.SuppressLint
+import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
@@ -21,13 +22,17 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.core.graphics.createBitmap
+import com.ssquad.gps.camera.geotag.data.local.dao.PhotoDao
+import com.ssquad.gps.camera.geotag.data.models.PhotoDto
+import com.ssquad.gps.camera.geotag.data.models.PhotoSource
 import com.ssquad.gps.camera.geotag.utils.FFmpegExecutor
 import com.ssquad.gps.camera.geotag.utils.FileUtils
 import com.ssquad.gps.camera.geotag.utils.VideoUtils
 import kotlinx.coroutines.delay
 class CameraRepositoryImpl(
     private val context: Context,
-    private val ffmpegExecutor: FFmpegExecutor
+    private val ffmpegExecutor: FFmpegExecutor,
+    private val photoDao:PhotoDao
 ) : CameraRepository {
     override suspend fun saveImageToGallery(
         context: Context,
@@ -72,7 +77,16 @@ class CameraRepositoryImpl(
                 if (!address.isNullOrEmpty() && imageUri != null) {
                     addExifLocationData(context, imageUri!!, address)
                 }
-
+                imageUri?.let { 
+                    val photo = PhotoDto(
+                        id = ContentUris.parseId(it),
+                        path = it.toString(),
+                        timestamp = System.currentTimeMillis(),
+                        source = PhotoSource.AUTO,
+                        displayName = fileName
+                    )
+                    photoDao.insertPhoto(photo)
+                }
                 return@withContext imageUri
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -176,7 +190,7 @@ class CameraRepositoryImpl(
                     }
                 }
                 if (!address.isNullOrEmpty() && videoUri != null) {
-                    addExifLocationData(context, videoUri, address)
+                    addExifLocationData(context, videoUri!!, address)
                 }
 
                 return@withContext videoUri

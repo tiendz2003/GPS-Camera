@@ -156,4 +156,8 @@
     <string name="current">Current</string>
     <string name="manual">Manual</string>
     <string name="unknow_location">Unknown Location</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="app_widget_description">This is an app widget description</string>
+    <string name="no_photos">"No photo "</string>
 </resources>

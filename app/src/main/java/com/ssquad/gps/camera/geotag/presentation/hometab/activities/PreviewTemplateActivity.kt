@@ -6,7 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.ssquad.gps.camera.geotag.bases.BaseActivity
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.data.models.TemplateType
 import com.ssquad.gps.camera.geotag.data.models.ThemeTemplateModel
 import com.ssquad.gps.camera.geotag.presentation.custom.HorizontalSpaceItemDecoration

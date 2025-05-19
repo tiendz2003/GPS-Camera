@@ -1,10 +1,10 @@
-package com.ssquad.gps.camera.geotag.adapters
+package com.ssquad.gps.camera.geotag.presentation.mainscreen.adapters
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.ssquad.gps.camera.geotag.fragments.IntroFragment
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.fragments.IntroFragment
 
 class IntroViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
 

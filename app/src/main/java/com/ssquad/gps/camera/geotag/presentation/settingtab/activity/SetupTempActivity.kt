@@ -1,7 +1,7 @@
 package com.ssquad.gps.camera.geotag.presentation.settingtab.activity
 
 
-import com.ssquad.gps.camera.geotag.bases.BaseActivity
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.R
 import com.ssquad.gps.camera.geotag.databinding.ActivitySetupTempBinding
 import com.ssquad.gps.camera.geotag.utils.SharePrefManager

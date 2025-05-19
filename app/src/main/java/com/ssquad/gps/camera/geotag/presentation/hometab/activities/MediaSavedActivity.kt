@@ -11,7 +11,7 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.GridLayoutManager
 import com.snake.squad.adslib.AdmobLib
 import com.snake.squad.adslib.utils.GoogleENative
-import com.ssquad.gps.camera.geotag.bases.BaseActivity
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.data.models.SortOption
 import com.ssquad.gps.camera.geotag.presentation.hometab.adapter.PhotoAdapter
 import com.ssquad.gps.camera.geotag.presentation.hometab.dialog.SortBottomSheet

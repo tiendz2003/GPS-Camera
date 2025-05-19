@@ -1,4 +1,4 @@
-package com.ssquad.gps.camera.geotag.fragments
+package com.ssquad.gps.camera.geotag.presentation.mainscreen.fragments
 
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -8,7 +8,7 @@ import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import com.ssquad.gps.camera.geotag.BuildConfig
 import com.ssquad.gps.camera.geotag.R
-import com.ssquad.gps.camera.geotag.bases.BaseFragment
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseFragment
 import com.ssquad.gps.camera.geotag.presentation.hometab.activities.LanguageActivity
 import com.ssquad.gps.camera.geotag.databinding.FragmentSettingsBinding
 import com.ssquad.gps.camera.geotag.presentation.settingtab.activity.CustomDateTimeActivity

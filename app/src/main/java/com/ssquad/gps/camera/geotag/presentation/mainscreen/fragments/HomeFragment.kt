@@ -1,4 +1,4 @@
-package com.ssquad.gps.camera.geotag.fragments
+package com.ssquad.gps.camera.geotag.presentation.mainscreen.fragments
 
 import android.Manifest
 import android.app.Activity.RESULT_OK
@@ -14,7 +14,7 @@ import androidx.core.app.ActivityCompat
 import com.snake.squad.adslib.AdmobLib
 import com.snake.squad.adslib.utils.GoogleENative
 import com.ssquad.gps.camera.geotag.R
-import com.ssquad.gps.camera.geotag.bases.BaseFragment
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseFragment
 import com.ssquad.gps.camera.geotag.data.models.ThemeTemplateModel
 import com.ssquad.gps.camera.geotag.presentation.hometab.activities.EditAlbumLibraryActivity
 import com.ssquad.gps.camera.geotag.presentation.hometab.activities.MediaSavedActivity

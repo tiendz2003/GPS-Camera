@@ -24,7 +24,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SeekParameters
 import com.google.android.exoplayer2.util.Util
-import com.ssquad.gps.camera.geotag.bases.BaseActivity
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.data.models.Photo
 import com.ssquad.gps.camera.geotag.presentation.hometab.dialog.InfoBottomSheet
 import com.ssquad.gps.camera.geotag.R

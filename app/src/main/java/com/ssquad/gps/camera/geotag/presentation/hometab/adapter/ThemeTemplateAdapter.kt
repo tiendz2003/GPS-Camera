@@ -3,7 +3,7 @@ package com.ssquad.gps.camera.geotag.presentation.hometab.adapter
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.ssquad.gps.camera.geotag.bases.BaseViewHolder
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseViewHolder
 import com.ssquad.gps.camera.geotag.data.models.TemplateType
 import com.ssquad.gps.camera.geotag.data.models.ThemeTemplateModel
 

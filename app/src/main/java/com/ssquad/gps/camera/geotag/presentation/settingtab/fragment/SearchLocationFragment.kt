@@ -14,7 +14,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.mapbox.maps.Style
 import com.mapbox.search.autocomplete.PlaceAutocompleteSuggestion
 import com.ssquad.gps.camera.geotag.R
-import com.ssquad.gps.camera.geotag.bases.BaseFragment
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseFragment
 import com.ssquad.gps.camera.geotag.databinding.FragmentSearchLocationBinding
 import com.ssquad.gps.camera.geotag.presentation.settingtab.activity.MapSettingState
 import com.ssquad.gps.camera.geotag.presentation.settingtab.adapter.PlaceAutoCompleteAdapter
@@ -241,6 +241,7 @@ class SearchLocationFragment :
                     onSuccess = {location->
                         binding.progressIndicator.gone()
                         mapManager.moveCameraToLocation(location)
+                        viewModel.updateSelectedLocation(location)
                         searchJob?.cancel()
                         showBottomSheet()
                         hideKeyboard()

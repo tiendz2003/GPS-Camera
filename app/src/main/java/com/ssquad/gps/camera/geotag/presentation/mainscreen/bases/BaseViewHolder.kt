@@ -1,4 +1,4 @@
-package com.ssquad.gps.camera.geotag.bases
+package com.ssquad.gps.camera.geotag.presentation.mainscreen.bases
 
 import android.view.LayoutInflater
 import android.view.View
@@ -19,7 +19,7 @@ sealed class BaseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             binding.imvCheck.isVisible = item.isSelected
         }
         companion object{
-            fun create(parent: ViewGroup):ViewHolder{
+            fun create(parent: ViewGroup): ViewHolder {
                 val binding = ItemThemeHomeBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
@@ -35,7 +35,7 @@ sealed class BaseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             binding.imvCheck.isVisible = item.isSelected
         }
         companion object{
-            fun create(parent: ViewGroup):DetailViewHolder{
+            fun create(parent: ViewGroup): DetailViewHolder {
                 val binding = ItemDetailTemplateBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,

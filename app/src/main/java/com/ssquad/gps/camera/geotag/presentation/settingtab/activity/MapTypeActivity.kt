@@ -3,7 +3,7 @@ package com.ssquad.gps.camera.geotag.presentation.settingtab.activity
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.recyclerview.widget.GridLayoutManager
-import com.ssquad.gps.camera.geotag.bases.BaseActivity
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.data.models.MapType
 import com.ssquad.gps.camera.geotag.presentation.settingtab.adapter.MapTypeAdapter
 import com.ssquad.gps.camera.geotag.utils.GridSpaceItemDecoration

@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import com.ssquad.gps.camera.geotag.R
-import com.ssquad.gps.camera.geotag.bases.BaseActivity
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.databinding.ActivityCustomDateTimeBinding
 import com.ssquad.gps.camera.geotag.presentation.settingtab.dialog.CustomDateTimeDialog
 import com.ssquad.gps.camera.geotag.utils.SharePrefManager

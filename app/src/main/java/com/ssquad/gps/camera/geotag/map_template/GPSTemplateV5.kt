@@ -9,7 +9,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import androidx.core.content.res.ResourcesCompat
 import com.ssquad.gps.camera.geotag.R
-import com.ssquad.gps.camera.geotag.bases.BaseCustomView
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseCustomView
 import com.ssquad.gps.camera.geotag.data.models.TemplateDataModel
 import com.ssquad.gps.camera.geotag.data.models.TemplateState
 import com.ssquad.gps.camera.geotag.databinding.TemplateGps5Binding

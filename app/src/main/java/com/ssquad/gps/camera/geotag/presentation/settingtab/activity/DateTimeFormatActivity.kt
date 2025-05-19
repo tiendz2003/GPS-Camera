@@ -3,7 +3,7 @@ package com.ssquad.gps.camera.geotag.presentation.settingtab.activity
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
-import com.ssquad.gps.camera.geotag.bases.BaseActivity
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.data.models.FormatItem.Companion.DATE_FORMATS
 import com.ssquad.gps.camera.geotag.data.models.FormatItem.Companion.DATE_FORMAT_KEY
 import com.ssquad.gps.camera.geotag.data.models.FormatItem.Companion.TIME_FORMATS

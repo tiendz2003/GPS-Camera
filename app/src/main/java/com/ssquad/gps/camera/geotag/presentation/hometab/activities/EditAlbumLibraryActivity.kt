@@ -7,7 +7,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.snake.squad.adslib.AdmobLib
 import com.ssquad.gps.camera.geotag.R
-import com.ssquad.gps.camera.geotag.bases.BaseActivity
+import com.ssquad.gps.camera.geotag.presentation.mainscreen.bases.BaseActivity
 import com.ssquad.gps.camera.geotag.presentation.hometab.adapter.EditAlbumAdapter
 import com.ssquad.gps.camera.geotag.databinding.ActivityAlbumLibraryBinding
 import com.ssquad.gps.camera.geotag.presentation.viewmodel.AlbumViewModel

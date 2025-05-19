@@ -2,7 +2,7 @@ package com.ssquad.gps.camera.geotag.data.repository
 
 import android.content.ContentUris
 import android.content.Context
-import android.media.ExifInterface
+import androidx.exifinterface.media.ExifInterface
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
